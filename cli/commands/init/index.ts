@@ -1,9 +1,10 @@
+import fs from 'fs'
 import { join } from 'path'
 import { AwilixContainer } from 'awilix'
 import shelljs from 'shelljs'
 import prompts from 'prompts'
 import { assertExists, assertShellResult } from '../../utils'
-import { CreateNewKeyfile } from '../../utils/create.new.keyfile'
+import { CreateKeyfile } from '../../utils/create.keyfile'
 
 export default function provideInit(
   container: AwilixContainer
@@ -11,12 +12,12 @@ export default function provideInit(
   assertExists(container, 'container')
 
   return async function init(cliArgs: any) {
-    
     try {
       // we manually inject dependencies here (instead of through the provide function above) so that
       // we get RUNTIME errors if certain configuration is missing
       const shell = container.resolve<typeof shelljs>("shell")
-      const createNewKeyfile = container.resolve<CreateNewKeyfile>("createNewKeyfile")
+      const fortaKeystore = container.resolve<string>("fortaKeystore")
+      const createKeyfile = container.resolve<CreateKeyfile>("createKeyfile")
 
       const isTypescript = !!cliArgs.typescript
       console.log(`initializing ${isTypescript ? "Typescript" : "Javascript"} Forta Agent...`)
@@ -31,14 +32,19 @@ export default function provideInit(
       const rmResult = shell.rm('-rf', 'js', 'ts', 'node_modules', '.git')
       assertShellResult(rmResult, 'error cleaning up files')
 
-      // initialize keystore
-      console.log('creating new keyfile...')
-      const { password } = await prompts({
-        type: 'password',
-        name: 'password',
-        message: `Enter password to encrypt new keyfile`
-      })
-      await createNewKeyfile(password)
+      // create keyfile if one doesnt already exist
+      const keyfiles = shell.ls(fortaKeystore)
+      if (!keyfiles.length) {
+        console.log('creating new keyfile...')
+        const { password } = await prompts({
+          type: 'password',
+          name: 'password',
+          message: `Enter password to encrypt new keyfile`
+        })
+        await createKeyfile(password)
+      } else {
+        console.log(`found existing keyfile ${keyfiles[0]} in ${fortaKeystore}`)
+      }
     } catch (e) {
       console.error(`ERROR: ${e.message}`)
     }

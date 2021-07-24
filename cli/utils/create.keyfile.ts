@@ -1,21 +1,22 @@
 import fs from 'fs'
 import shelljs from 'shelljs'
-import { assertExists } from '.'
+import { assertExists, assertShellResult } from '.'
 var keythereum = require("keythereum");
 
-// creates a new keyfile in keystore folder (which is created if needed) encrypted using password
-export type CreateNewKeyfile = (password: string) => Promise<{ publicKey: string, privateKey: string}>
+// creates a keyfile in keystore folder (which is created if needed) encrypted using password
+export type CreateKeyfile = (password: string) => Promise<{ publicKey: string, privateKey: string}>
 
-export function provideCreateNewKeyfile(
+export function provideCreateKeyfile(
   shell: typeof shelljs,
   fortaKeystore: string
-): CreateNewKeyfile {
+): CreateKeyfile {
   assertExists(shell, 'shell')
   assertExists(fortaKeystore, 'fortaKeystore')
 
-  return async function createNewKeyfile(password: string) {
+  return async function createKeyfile(password: string) {
     if (!fs.existsSync(fortaKeystore)) {
-      shell.mkdir(fortaKeystore)
+      const mkdirResult = shell.mkdir(fortaKeystore)
+      assertShellResult(mkdirResult, 'error creating keystore folder')
     }
 
     const key = keythereum.create()
@@ -24,7 +25,7 @@ export function provideCreateNewKeyfile(
 
     const publicKey = `0x${keyObject.address}`
     const privateKey = `0x${key.privateKey.toString('hex')}`
-    console.log(`created key ${publicKey} in ${fortaKeystore} folder`)
+    console.log(`created key ${publicKey} in ${fortaKeystore}`)
 
     return {
       publicKey,

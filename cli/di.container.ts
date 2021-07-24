@@ -1,3 +1,5 @@
+import os from 'os'
+import { join } from "path"
 import { asClass, asFunction, asValue, createContainer, InjectionMode } from "awilix"
 import Web3 from 'web3'
 import shell from 'shelljs'
@@ -19,10 +21,10 @@ import { provideRunTransactionHandlersOnBlock } from "./utils/run.transaction.ha
 import { provideRunTransactionHandlersOnTransaction } from "./utils/run.transaction.handlers.on.transaction"
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
 import { provideGetKeyfile } from "./utils/get.keyfile"
-import { provideCreateNewKeyfile } from "./utils/create.new.keyfile"
+import { provideCreateKeyfile } from "./utils/create.keyfile"
 import { FortaConfig } from "."
 
-const FORTA_KEYSTORE = ".forta"
+const FORTA_KEYSTORE = join(os.homedir(), ".forta")
 const FORTA_CONFIG_FILENAME = "forta.config.json"
 
 export default function configureContainer() {
@@ -54,7 +56,7 @@ export default function configureContainer() {
     runTransactionHandlersOnTransaction: asFunction(provideRunTransactionHandlersOnTransaction),
     getJsonFile: asValue(getJsonFile),
     getKeyfile: asFunction(provideGetKeyfile),
-    createNewKeyfile: asFunction(provideCreateNewKeyfile),
+    createKeyfile: asFunction(provideCreateKeyfile),
 
     fortaKeystore: asValue(FORTA_KEYSTORE),
     fortaConfig: asFunction(() => {
