@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "Forta Agent Typescript starter project",
   "scripts": {
-    "postinstall": "npm link ../forta-agent-sdk",
     "build": "tsc",
     "start": "npm run start:dev",
     "start:dev": "nodemon --watch src --watch forta.config.json -e js,ts,json  --exec 'npm run build && forta-agent run'",
@@ -11,7 +10,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "bignumber.js": "^9.0.1"
+    "bignumber.js": "^9.0.1",
+    "forta-agent": "0.0.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
