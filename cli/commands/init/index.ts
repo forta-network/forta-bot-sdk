@@ -33,7 +33,7 @@ export default function provideInit(
       const renameGitignoreResult = shell.mv('_gitignore', '.gitignore')
       assertShellResult(renameGitignoreResult, 'error renaming gitignore file')
       // remove unused files/folders
-      const rmResult = shell.rm('-rf', 'js', 'ts', 'node_modules', '.git')
+      const rmResult = shell.rm('-rf', 'js', 'ts', '.npmignore')
       assertShellResult(rmResult, 'error cleaning up files')
 
       // create keyfile if one doesnt already exist
