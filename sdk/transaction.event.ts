@@ -1,6 +1,6 @@
 import { Block } from "./block"
 import { EventType, Network } from "./index"
-import { Receipt } from "./receipt"
+import { Log, Receipt } from "./receipt"
 import { Trace } from "./trace"
 import { Transaction } from "./transaction"
 import { keccak256 } from "./utils"
@@ -16,17 +16,53 @@ export class TransactionEvent {
     readonly block: Block
   ) {}
 
+  get hash() {
+    return this.transaction.hash
+  }
+
+  get from() {
+    return this.transaction.from
+  }
+
+  get to() {
+    return this.transaction.to
+  }
+
+  get status() {
+    return this.receipt.status
+  }
+
   get gasUsed() {
     return this.receipt.gasUsed
   }
 
-  hasEvent(eventSignature: string, contractAddress?: string): boolean {
+  get gasPrice() {
+    return this.transaction.gasPrice
+  }
+
+  get logs() {
+    return this.receipt.logs
+  }
+
+  get timestamp() {
+    return this.block.timestamp
+  }
+
+  get blockNumber() {
+    return this.block.number
+  }
+
+  get blockHash() {
+    return this.block.hash
+  }
+
+  filterEvent(eventSignature: string, contractAddress?: string): Log[] {
     const eventTopic = keccak256(eventSignature).toLowerCase()
-    const event = this.receipt.logs.find(
+    const events = this.receipt.logs.filter(
       log => log.topics.length
         && log.topics[0].toLowerCase() === eventTopic
         && (contractAddress?.length ? log.address === contractAddress : true)
     )
-    return !!event;
+    return events
   }
 }
