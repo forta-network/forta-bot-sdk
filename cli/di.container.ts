@@ -22,7 +22,7 @@ import { provideRunTransactionHandlersOnTransaction } from "./utils/run.transact
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
 import { provideGetKeyfile } from "./utils/get.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
-import { FortaConfig } from "."
+import { FortaConfig } from '../sdk'
 
 const FORTA_KEYSTORE = join(os.homedir(), ".forta")
 const FORTA_CONFIG_FILENAME = "forta.config.json"
@@ -50,6 +50,12 @@ export default function configureContainer() {
     runFile: asFunction(provideRunFile),
     runLive: asFunction(provideRunLive),
 
+    handlerPaths: asFunction((fortaConfig: FortaConfig) => {
+      if (!fortaConfig.handlers) {
+        throw new Error(`no handlers provided in ${FORTA_CONFIG_FILENAME}`)
+      }
+      return fortaConfig.handlers
+    }),
     getAgentHandlers: asFunction(provideGetAgentHandlers),
     runBlockHandlers: asFunction(provideRunBlockHandlers),
     runTransactionHandlersOnBlock: asFunction(provideRunTransactionHandlersOnBlock),

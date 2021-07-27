@@ -1,6 +1,21 @@
 import { Finding, FindingSeverity, FindingType } from "./finding"
 import { BlockEvent } from "./block.event"
 import { TransactionEvent } from "./transaction.event"
+import { getFortaConfig, getJsonRpcUrl } from "./utils"
+
+interface FortaConfig {
+  agentId?: string
+  poolId?: string
+  version?: string
+  jsonRpcUrl?: string
+  ipfsGatewayUrl?: string
+  ipfsGatewayAuthHeader?: string
+  imageRepositoryUrl?: string
+  agentRegistryContractAddress?: string
+  agentRegistryJsonRpcUrl?: string
+  handlers?: string[]
+  debug?: boolean
+}
 
 type HandleTransaction = (txEvent: TransactionEvent) => Promise<Finding[]>
 type HandleBlock = (blockEvent: BlockEvent) => Promise<Finding[]>
@@ -17,7 +32,8 @@ enum Network {
   GOERLI = 5
 }
 
-export { 
+export {
+  FortaConfig,
   HandleTransaction,
   HandleBlock,
   Finding,
@@ -26,5 +42,7 @@ export {
   BlockEvent,
   TransactionEvent,
   EventType,
-  Network
+  Network,
+  getFortaConfig,
+  getJsonRpcUrl
  }

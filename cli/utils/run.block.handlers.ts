@@ -22,7 +22,7 @@ export function provideRunBlockHandlers(
       for (const handleBlock of blockHandlers) {
         findings.push(...await handleBlock(blockEvent))
       }
-      console.log(`${findings.length} findings for block ${block.hash}: ${findings}`)
+      console.log(`${findings.length} findings for block ${block.hash} ${findings}`)
     }
 
     return block

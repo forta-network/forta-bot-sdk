@@ -1,5 +1,23 @@
+import fs from 'fs'
+import { join } from 'path'
+import { jsonc } from 'jsonc'
 import _ from 'lodash'
 import { Keccak } from 'sha3'
+import { FortaConfig } from '.'
+
+export const getFortaConfig: () => FortaConfig = () => jsonc.parse(fs.readFileSync(join(process.cwd(), 'forta.config.json'), 'utf8'))
+
+export const getJsonRpcUrl = () => {
+  // if rpc url provided by Forta Scanner i.e. in production
+  if (process.env.JSON_RPC_HOST) {
+    return `http://${process.env.JSON_RPC_HOST}${process.env.JSON_RPC_PORT ? `:${process.env.JSON_RPC_PORT}` : ''}`
+  }
+  
+  // else, use the rpc url from forta.config.json
+  const { jsonRpcUrl } = getFortaConfig()
+  if (!jsonRpcUrl) throw new Error('no jspnRpcUrl found')
+  return jsonRpcUrl
+}
 
 export const assertIsNonEmptyString = (str: string, varName: string) => {
   if (!_.isString(str) || str.length === 0) {

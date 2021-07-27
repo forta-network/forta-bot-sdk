@@ -1,19 +1,6 @@
 #!/usr/bin/env node
 import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
-export interface FortaConfig {
-  agentId?: string
-  poolId?: string
-  version?: string
-  jsonRpcUrl?: string
-  ipfsGatewayUrl?: string
-  ipfsGatewayAuthHeader?: string
-  imageRepositoryUrl?: string
-  agentRegistryContractAddress?: string
-  agentRegistryJsonRpcUrl?: string
-  handlers?: string[]
-  debug?: boolean
-}
 
 type CommandHandler = (args: any) => void
 
