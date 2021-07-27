@@ -24,6 +24,6 @@ export function provideRunTransactionHandlersOnTransaction(
     for (const handleTransaction of transactionHandlers) {
       findings.push(...await handleTransaction(txEvent))
     }
-    console.log(`${findings.length} findings for transaction ${txHash}: ${findings}`)
+    console.log(`${findings.length} findings for transaction ${txHash} ${findings}`)
   }
 }
