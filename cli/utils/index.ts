@@ -16,12 +16,6 @@ export const getJsonFile: GetJsonFile = (path: string) => {
   return jsonc.parse(data)
 }
 
-export type IsTypescriptProject = () => boolean
-export const isTypescriptProject = () => {
-  const tsConfigPath = process.cwd()+"/tsconfig.json";
-  return fs.existsSync(tsConfigPath)
-}
-
 export const assertExists = (obj: any, objName: string) => {
   if (_.isNil(obj)) throw new Error(`${objName} is required`)
 }

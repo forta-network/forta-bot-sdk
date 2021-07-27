@@ -8,7 +8,7 @@ import { AxiosInstance } from 'axios'
 import FormData from 'form-data'
 import AgentRegistry from './agent.registry'
 import { GetKeyfile } from '../../utils/get.keyfile'
-import { FortaConfig } from '../..'
+import { FortaConfig } from '../../../sdk'
 
 export default function providePublish(
   container: AwilixContainer
