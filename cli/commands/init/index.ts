@@ -28,6 +28,10 @@ export default function provideInit(
       // copy files out from js/ts folder
       const copyJsTsResult = shell.cp('-r', isTypescript ? './ts/*' : './js/*', '.')
       assertShellResult(copyJsTsResult, `error unpacking ${isTypescript ? 'ts' : 'js'} folder`)
+      // rename _gitignore to .gitignore
+      // (if we just name it .gitignore, npm publish will rename it to .npmignore 🤷🏻‍♂️)
+      const renameGitignoreResult = shell.mv('_gitignore', '.gitignore')
+      assertShellResult(renameGitignoreResult, 'error renaming gitignore file')
       // remove unused files/folders
       const rmResult = shell.rm('-rf', 'js', 'ts', 'node_modules', '.git')
       assertShellResult(rmResult, 'error cleaning up files')
