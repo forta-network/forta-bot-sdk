@@ -8,7 +8,7 @@ interface FortaConfig {
   version?: string
   jsonRpcUrl?: string
   ipfsGatewayUrl?: string
-  ipfsGatewayAuthHeader?: string
+  ipfsGatewayAuth?: string
   imageRepositoryUrl?: string
   agentRegistryContractAddress?: string
   agentRegistryJsonRpcUrl?: string

@@ -51,7 +51,7 @@ export default function configureContainer() {
     runLive: asFunction(provideRunLive),
 
     handlerPaths: asFunction((fortaConfig: FortaConfig) => {
-      if (!fortaConfig.handlers) {
+      if (!fortaConfig.handlers || !fortaConfig.handlers.length) {
         throw new Error(`no handlers provided in ${FORTA_CONFIG_FILENAME}`)
       }
       return fortaConfig.handlers
@@ -107,17 +107,17 @@ export default function configureContainer() {
       }
       return fortaConfig.ipfsGatewayUrl
     }),
-    ipfsGatewayAuthHeader: asFunction((ipfsGatewayUrl: string, fortaConfig: FortaConfig) => {
-      if (ipfsGatewayUrl.includes('ipfs.infura.io') && !fortaConfig.ipfsGatewayAuthHeader) {
-        throw new Error(`no ipfsGatewayAuthHeader provided in ${FORTA_CONFIG_FILENAME}`)
+    ipfsGatewayAuth: asFunction((ipfsGatewayUrl: string, fortaConfig: FortaConfig) => {
+      if (ipfsGatewayUrl.includes('ipfs.infura.io') && !fortaConfig.ipfsGatewayAuth) {
+        throw new Error(`no ipfsGatewayAuth provided in ${FORTA_CONFIG_FILENAME}`)
       }
-      return fortaConfig.ipfsGatewayAuthHeader
+      return fortaConfig.ipfsGatewayAuth
     }),
-    ipfsHttpClient: asFunction((ipfsGatewayUrl: string, ipfsGatewayAuthHeader: string) => {
+    ipfsHttpClient: asFunction((ipfsGatewayUrl: string, ipfsGatewayAuth: string) => {
       const options: AxiosRequestConfig = { baseURL: ipfsGatewayUrl }
-      if (ipfsGatewayAuthHeader) {
+      if (ipfsGatewayAuth) {
         options['headers'] = {
-          authorization: ipfsGatewayAuthHeader
+          authorization: ipfsGatewayAuth
         }
       }
       return axios.create(options)

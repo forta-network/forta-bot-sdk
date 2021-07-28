@@ -10,6 +10,7 @@
     "block": "forta-agent run --block",
     "range": "forta-agent run --range",
     "file": "forta-agent run --file",
+    "publish": "forta-agent publish",
     "test": "jest"
   },
   "dependencies": {
