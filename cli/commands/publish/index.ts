@@ -89,7 +89,7 @@ export default function providePublish(
         from: publicKey,
         agentId,
         agentIdHash,
-        poolIdText,
+        poolId: poolIdText,
         poolIdHash,
         version,
         timestamp: new Date().toUTCString(),
