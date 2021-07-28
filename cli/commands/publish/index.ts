@@ -26,17 +26,10 @@ export default function providePublish(
       const fortaKeystore = container.resolve<string>("fortaKeystore")
       const agentRegistry = container.resolve<AgentRegistry>("agentRegistry")
       const getKeyfile = container.resolve<GetKeyfile>("getKeyfile")
-
-      const { 
-        agentId,
-        poolId,
-        version,
-        // codeRepository,
-        // contactEmail,
-        // apiKey
-      } = container.resolve<FortaConfig>("fortaConfig")
+      const poolId = container.resolve<string>("poolId")
+      const { agentId, version } = container.resolve<FortaConfig>("fortaConfig")
       assertIsNonEmptyString(agentId!, 'agentId')
-      assertIsNonEmptyString(poolId!, 'poolId')
+      assertIsNonEmptyString(poolId, 'poolId')
   
       // build the agent image
       console.log('building agent image...')
@@ -83,7 +76,7 @@ export default function providePublish(
   
       // create agent manifest and sign it
       const agentIdHash = keccak256(agentId!)
-      const poolIdHash = keccak256(poolId!)
+      const poolIdHash = keccak256(poolId)
       const manifest = {
         from: publicKey,
         agentId,
@@ -92,8 +85,6 @@ export default function providePublish(
         poolIdHash,
         version,
         timestamp: new Date().toUTCString(),
-        // contactEmail,
-        // codeRepository,
         imageReference,
       }
       const { signature } = web3.eth.accounts.sign(JSON.stringify(manifest), privateKey);

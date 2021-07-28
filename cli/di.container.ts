@@ -74,6 +74,7 @@ export default function configureContainer() {
 
     agentController: asClass(AgentController),
     port: asValue(process.env.AGENT_GRPC_PORT || "50051"),
+    poolId: asValue("agent-devnet"),
 
     imageRepositoryUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.imageRepositoryUrl || "disco.forta.network"
