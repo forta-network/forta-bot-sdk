@@ -5,7 +5,6 @@ import { getFortaConfig, getJsonRpcUrl } from "./utils"
 
 interface FortaConfig {
   agentId?: string
-  poolId?: string
   version?: string
   jsonRpcUrl?: string
   ipfsGatewayUrl?: string
