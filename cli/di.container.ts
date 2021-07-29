@@ -74,14 +74,13 @@ export default function configureContainer() {
 
     agentController: asClass(AgentController),
     port: asValue(process.env.AGENT_GRPC_PORT || "50051"),
-    poolId: asValue("agent-devnet"),
 
     imageRepositoryUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.imageRepositoryUrl || "disco.forta.network"
     }),
     agentRegistry: asClass(AgentRegistry),
     agentRegistryContractAddress: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.agentRegistryContractAddress || "0xBD7F842Cb96dFF147d6b9b4c9f8e56acF76A969B"
+      return fortaConfig.agentRegistryContractAddress || "0x51690d812838e146332EE47c73511E04d12DbBBA"
     }),
     agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.agentRegistryJsonRpcUrl || "https://goerli-light.eth.linkpool.io/"

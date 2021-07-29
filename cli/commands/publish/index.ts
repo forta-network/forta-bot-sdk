@@ -26,10 +26,8 @@ export default function providePublish(
       const fortaKeystore = container.resolve<string>("fortaKeystore")
       const agentRegistry = container.resolve<AgentRegistry>("agentRegistry")
       const getKeyfile = container.resolve<GetKeyfile>("getKeyfile")
-      const poolId = container.resolve<string>("poolId")
       const { agentId, version } = container.resolve<FortaConfig>("fortaConfig")
       assertIsNonEmptyString(agentId!, 'agentId')
-      assertIsNonEmptyString(poolId, 'poolId')
   
       // build the agent image
       console.log('building agent image...')
@@ -76,13 +74,10 @@ export default function providePublish(
   
       // create agent manifest and sign it
       const agentIdHash = keccak256(agentId!)
-      const poolIdHash = keccak256(poolId)
       const manifest = {
         from: publicKey,
         agentId,
         agentIdHash,
-        poolId,
-        poolIdHash,
         version,
         timestamp: new Date().toUTCString(),
         imageReference,
@@ -100,16 +95,16 @@ export default function providePublish(
   
       // add/update the agent in the registry contract
       web3.eth.accounts.wallet.add(privateKey);//make sure web3 knows about this wallet in order to sign
-      const agentExists = await agentRegistry.agentExists(poolIdHash, agentIdHash)
+      const agentExists = await agentRegistry.agentExists(agentIdHash)
       if (!agentExists) {
         console.log('adding agent to registry...')
-        await agentRegistry.addAgent(publicKey, poolIdHash, agentIdHash, manifestReference)
+        await agentRegistry.createAgent(publicKey, agentIdHash, manifestReference)
       } else {
         console.log('updating agent in registry...')
-        await agentRegistry.updateAgent(publicKey, poolIdHash, agentIdHash, manifestReference)
+        await agentRegistry.updateAgent(publicKey, agentIdHash, manifestReference)
       }
   
-      console.log(`${agentExists ? 'updated' : 'added'} agent ${agentIdHash} to pool ${poolIdHash} with reference ${manifestReference}`)
+      console.log(`${agentExists ? 'updated' : 'added'} agent ${agentIdHash} with reference ${manifestReference}`)
     } catch (e) {
       console.error(`ERROR: ${e.message}`)
     }

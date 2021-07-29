@@ -16,21 +16,21 @@ export default class AgentRegistry {
     )
   }
 
-  async agentExists(poolId: string, agentId: string) {
-    return this.contract.methods.agentExists(poolId, agentId).call()
+  async agentExists(agentId: string) {
+    return this.contract.methods.agentExists(agentId).call()
   }
   
-  async addAgent(from: string, poolId: string, agentId: string, reference: string) {
-    const addAgentTx = this.contract.methods.addAgent(poolId, agentId, reference)
-    const gas = await addAgentTx.estimateGas({ from })
-    await addAgentTx.send({
+  async createAgent(from: string, agentId: string, reference: string) {
+    const createAgentTx = this.contract.methods.createAgent(agentId, reference)
+    const gas = await createAgentTx.estimateGas({ from })
+    await createAgentTx.send({
       from,
       gas: Math.round(gas * 1.15)
     })
   }
 
-  async updateAgent(from: string, poolId: string, agentId: string, reference: string) {
-    const updateAgentTx = this.contract.methods.updateAgent(poolId, agentId, reference)
+  async updateAgent(from: string, agentId: string, reference: string) {
+    const updateAgentTx = this.contract.methods.updateAgent(agentId, reference)
     const gas = await updateAgentTx.estimateGas({ from })
     await updateAgentTx.send({
       from,
