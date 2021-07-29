@@ -1,6 +1,7 @@
 {
   "name": "forta-agent",
   "version": "0.0.5",
+  "license": "MIT",
   "description": "Forta Agent SDK and CLI tool",
   "main": "dist/sdk/index.js",
   "types": "dist/sdk/index.d.ts",
