@@ -22,6 +22,7 @@ import { provideRunTransactionHandlersOnTransaction } from "./utils/run.transact
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
 import { provideGetKeyfile } from "./utils/get.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
+import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
 
 const FORTA_KEYSTORE = join(os.homedir(), ".forta")
@@ -37,6 +38,15 @@ export default function configureContainer() {
     shell: asFunction((isDebug: boolean) => {
       shell.config.silent = isDebug ? false : true
       return shell
+    }).singleton(),
+    axios: asValue(axios),
+
+    fortaKeystore: asValue(FORTA_KEYSTORE),
+    fortaConfig: asFunction(() => {
+      let config = {}
+      // try to read from config file (could throw error if one does not exist yet i.e. when running init command)
+      try { config = getJsonFile(`./${FORTA_CONFIG_FILENAME}`) } catch (e) {}
+      return config
     }).singleton(),
 
     init: asFunction(provideInit),
@@ -64,12 +74,15 @@ export default function configureContainer() {
     getKeyfile: asFunction(provideGetKeyfile),
     createKeyfile: asFunction(provideCreateKeyfile),
 
-    fortaKeystore: asValue(FORTA_KEYSTORE),
-    fortaConfig: asFunction(() => {
-      let config = {}
-      // try to read from config file (could throw error if one does not exist yet i.e. when running init command)
-      try { config = getJsonFile(`./${FORTA_CONFIG_FILENAME}`) } catch (e) {}
-      return config
+    getTraceData: asFunction(provideGetTraceData),
+    traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.traceRpcUrl
+    }).singleton(),
+    traceBlockMethod: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.traceBlockMethod || "trace_block"
+    }).singleton(),
+    traceTransactionMethod: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.traceTransactionMethod || "trace_transaction"
     }).singleton(),
 
     agentController: asClass(AgentController),

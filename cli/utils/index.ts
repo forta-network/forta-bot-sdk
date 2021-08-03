@@ -4,8 +4,9 @@ import { jsonc } from 'jsonc'
 import { BlockTransactionString } from "web3-eth"
 import { Transaction, TransactionReceipt } from "web3-core"
 import { Keccak } from 'sha3'
-import { EventType, TransactionEvent } from "../../sdk"
 import { ShellString } from 'shelljs'
+import { EventType, TransactionEvent } from "../../sdk"
+import { Trace } from '../../sdk/trace'
 
 export type GetJsonFile = (path: string) => any
 export const getJsonFile: GetJsonFile = (path: string) => {
@@ -38,7 +39,13 @@ export const keccak256 = (str: string) => {
   return `0x${hash.digest('hex')}`
 }
 
-export const createTransactionEvent = (transaction: Transaction, receipt: TransactionReceipt, blok: BlockTransactionString, networkId: number) => {
+export const createTransactionEvent = (
+  transaction: Transaction, 
+  receipt: TransactionReceipt, 
+  blok: BlockTransactionString, 
+  networkId: number, 
+  traces: Trace[] = []
+) => {
   const tx = {
     ...transaction,
     gas: transaction.gas.toString(),
@@ -47,6 +54,13 @@ export const createTransactionEvent = (transaction: Transaction, receipt: Transa
     s: '',// TODO
     v: ''// TODO
   }
+  const addresses = {
+    [tx.from]: true
+  }
+  if (tx.to) {
+    addresses[tx.to] = true;
+  }
+
   const rcpt = {
     ...receipt,
     gasUsed: receipt.gasUsed.toString(),
@@ -57,24 +71,27 @@ export const createTransactionEvent = (transaction: Transaction, receipt: Transa
     })),
     contractAddress: receipt.contractAddress ? receipt.contractAddress : null,
     root: '',//TODO
-  }
-  const addresses = {
-    [tx.from]: true
-  }
-  if (tx.to) {
-    addresses[tx.to] = true;
-  }
+  }  
   receipt.logs.forEach(log => addresses[log.address] = true)
+
   const block = {
     ...blok,
     timestamp: typeof blok.timestamp === 'string' ? parseInt(blok.timestamp) : blok.timestamp
   }
+
+  traces.forEach(trace => {
+    addresses[trace.action.address] = true
+    addresses[trace.action.refundAddress] = true
+    addresses[trace.action.to] = true
+    addresses[trace.action.from] = true
+  })
+
   return new TransactionEvent(
     EventType.BLOCK,
     networkId,
     tx,
     rcpt,
-    [], // TODO figure out how to get traces
+    traces,
     addresses,
     block
   )
