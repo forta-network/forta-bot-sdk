@@ -8,5 +8,6 @@
   // "ipfsGatewayUrl": "",                  /* IPFS gateway API for publishing agent manifest e.g. https://ipfs.infura.io:5001 */
   // "ipfsGatewayAuth": "",                 /* Authorization header, if IPFS gateway requires it */
   "handlers": ["./dist"]                        /* Paths to agent handlers */
-  // "debug": true                          /* Debug flag for additional console logging */
+  // "debug": true,                         /* Debug flag for additional console logging */
+  // "traceRpcUrl": ""                      /* JSON-RPC url for fetching trace data during development */
 }

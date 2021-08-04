@@ -14,6 +14,9 @@ interface FortaConfig {
   agentRegistryJsonRpcUrl?: string
   handlers?: string[]
   debug?: boolean
+  traceRpcUrl?: string
+  traceBlockMethod?: string
+  traceTransactionMethod?: string
 }
 
 type HandleTransaction = (txEvent: TransactionEvent) => Promise<Finding[]>

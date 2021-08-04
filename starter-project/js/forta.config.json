@@ -9,4 +9,5 @@
   // "ipfsGatewayAuth": "",                 /* Authorization header, if IPFS gateway requires it */
   "handlers": ["./src"]                        /* Paths to agent handlers */
   // "debug": true                          /* Debug flag for additional console logging */
+  // "traceRpcUrl": ""                      /* JSON-RPC url for fetching trace data during development */
 }
