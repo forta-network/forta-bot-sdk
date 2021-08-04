@@ -1,4 +1,5 @@
 import fs from 'fs'
+import path from 'path'
 import _ from 'lodash'
 import { jsonc } from 'jsonc'
 import { BlockTransactionString } from "web3-eth"
@@ -7,12 +8,12 @@ import { Keccak } from 'sha3'
 import { EventType, TransactionEvent } from "../../sdk"
 import { ShellString } from 'shelljs'
 
-export type GetJsonFile = (path: string) => any
-export const getJsonFile: GetJsonFile = (path: string) => {
-  if (path.startsWith("./")) {
-    path = path.replace("./", process.cwd()+"/")
+export type GetJsonFile = (filePath: string) => any
+export const getJsonFile: GetJsonFile = (filePath: string) => {
+  if (filePath.startsWith(`.${path.sep}`)) {
+    filePath = filePath.replace(`.${path.sep}`, `${process.cwd()}${path.sep}`)
   }
-  const data = fs.readFileSync(path, 'utf8')
+  const data = fs.readFileSync(filePath, 'utf8')
   return jsonc.parse(data)
 }
 
