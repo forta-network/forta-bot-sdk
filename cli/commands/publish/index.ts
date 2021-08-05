@@ -31,9 +31,11 @@ export default function providePublish(
       const { agentId, version } = container.resolve<FortaConfig>("fortaConfig")
       assertIsNonEmptyString(agentId!, 'agentId')
   
-      // make sure we are authenticated against repository
-      const loginResult = shell.exec(`docker login ${imageRepositoryUrl} -u ${imageRepositoryUsername} -p ${imageRepositoryPassword}`)
-      assertShellResult(loginResult, 'error authenticating with image repository')
+      // authenticate against repository if credentials provided
+      if (imageRepositoryUsername && imageRepositoryPassword) {
+        const loginResult = shell.exec(`docker login ${imageRepositoryUrl} -u ${imageRepositoryUsername} -p ${imageRepositoryPassword}`)
+        assertShellResult(loginResult, 'error authenticating with image repository')
+      }
 
       // build the agent image
       console.log('building agent image...')
@@ -45,7 +47,6 @@ export default function providePublish(
       console.log('pushing agent image to repository...')
       const tagResult = shell.exec(`docker tag ${containerTag} ${imageRepositoryUrl}/${containerTag}`)
       assertShellResult(tagResult, 'error tagging agent image')
-      // TODO how to use API key for 'docker push'?
       const pushResult = shell.exec(`docker push ${imageRepositoryUrl}/${containerTag}`)
       assertShellResult(pushResult, 'error pushing agent image')
   
