@@ -91,6 +91,19 @@ export default function configureContainer() {
     imageRepositoryUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.imageRepositoryUrl || "disco.forta.network"
     }),
+    imageRepositoryUsername: asFunction((fortaConfig: FortaConfig) => {
+      if (!fortaConfig.imageRepositoryUsername) {
+        throw new Error(`no imageRepositoryUsername provided in ${FORTA_CONFIG_FILENAME}`)
+      }
+      return fortaConfig.imageRepositoryUsername
+    }),
+    imageRepositoryPassword: asFunction((fortaConfig: FortaConfig) => {
+      if (!fortaConfig.imageRepositoryPassword) {
+        throw new Error(`no imageRepositoryPassword provided in ${FORTA_CONFIG_FILENAME}`)
+      }
+      return fortaConfig.imageRepositoryPassword
+    }),
+
     agentRegistry: asClass(AgentRegistry),
     agentRegistryContractAddress: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.agentRegistryContractAddress || "0x51690d812838e146332EE47c73511E04d12DbBBA"

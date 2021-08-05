@@ -23,12 +23,18 @@ export default function providePublish(
       const web3 = container.resolve<Web3>("web3AgentRegistry")
       const ipfsHttpClient = container.resolve<AxiosInstance>("ipfsHttpClient")
       const imageRepositoryUrl = container.resolve<string>("imageRepositoryUrl")
+      const imageRepositoryUsername = container.resolve<string>("imageRepositoryUsername")
+      const imageRepositoryPassword = container.resolve<string>("imageRepositoryPassword")
       const fortaKeystore = container.resolve<string>("fortaKeystore")
       const agentRegistry = container.resolve<AgentRegistry>("agentRegistry")
       const getKeyfile = container.resolve<GetKeyfile>("getKeyfile")
       const { agentId, version } = container.resolve<FortaConfig>("fortaConfig")
       assertIsNonEmptyString(agentId!, 'agentId')
   
+      // make sure we are authenticated against repository
+      const loginResult = shell.echo(`${imageRepositoryPassword}`).exec(`docker login ${imageRepositoryUrl} -u ${imageRepositoryUsername} --password-stdin`)
+      assertShellResult(loginResult, 'error authenticating with image repository')
+
       // build the agent image
       console.log('building agent image...')
       const containerTag = `${agentId}-intermediate`
