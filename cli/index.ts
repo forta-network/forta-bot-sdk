@@ -4,10 +4,11 @@ import configureContainer from './di.container';
 
 type CommandHandler = (args: any) => void
 
-const diContainer = configureContainer();
-const init = diContainer.resolve<CommandHandler>("init")
-const run = diContainer.resolve<CommandHandler>("run")
-const publish = diContainer.resolve<CommandHandler>("publish")
+function runCommand(commandName: string, cliArgs: any) {
+  const diContainer = configureContainer(cliArgs);
+  const command = diContainer.resolve<CommandHandler>(commandName)
+  command(cliArgs)
+}
 
 yargs
   .command('init', 'Initialize a Forta Agent project', 
@@ -16,7 +17,7 @@ yargs
         description: 'Initialize as Typescript project',
       })
     },
-    init
+    (cliArgs: any) => runCommand("init", cliArgs)
   )
   .command('run', 'Run the Forta Agent with latest blockchain data',
     (yargs: Argv) => {
@@ -34,13 +35,21 @@ yargs
         type: 'string'
       }).option('prod', {
         description: 'Run a server listening for events from a Forta Scanner'
+      }).option('config', {
+        description: 'Specify a config file (default: forta.config.json)',
+        type: 'string',
       })
     },
-    run
+    (cliArgs: any) => runCommand("run", cliArgs)
   )
   .command('publish', 'Publish the Forta Agent to the network',
-    (yargs: Argv) => {},
-    publish
+    (yargs: Argv) => {
+      yargs.option('config', {
+        description: 'Specify a config file (default: forta.config.json)',
+        type: 'string',
+      })
+    },
+    (cliArgs: any) => runCommand("publish", cliArgs)
   )
   .strict()
   .argv
