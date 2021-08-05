@@ -32,7 +32,7 @@ export default function providePublish(
       assertIsNonEmptyString(agentId!, 'agentId')
   
       // make sure we are authenticated against repository
-      const loginResult = shell.echo(`${imageRepositoryPassword}`).exec(`docker login ${imageRepositoryUrl} -u ${imageRepositoryUsername} --password-stdin`)
+      const loginResult = shell.exec(`docker login ${imageRepositoryUrl} -u ${imageRepositoryUsername} -p ${imageRepositoryPassword}`)
       assertShellResult(loginResult, 'error authenticating with image repository')
 
       // build the agent image
