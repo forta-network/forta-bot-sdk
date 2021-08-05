@@ -25,8 +25,6 @@ import { provideCreateKeyfile } from "./utils/create.keyfile"
 import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
 
-const DEFAULT_FORTA_CONFIG_FILENAME = "forta.config.json"
-
 export default function configureContainer(cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
@@ -42,7 +40,7 @@ export default function configureContainer(cliArgs: any) {
 
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     fortaConfigFilename: asFunction(() => {
-      return cliArgs.config || DEFAULT_FORTA_CONFIG_FILENAME
+      return cliArgs.config || "forta.config.json"
     }).singleton(),
     fortaConfig: asFunction((fortaConfigFilename: string) => {
       let config = {}
