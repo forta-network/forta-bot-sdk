@@ -10,6 +10,8 @@ interface FortaConfig {
   ipfsGatewayUrl?: string
   ipfsGatewayAuth?: string
   imageRepositoryUrl?: string
+  imageRepositoryUsername?: string
+  imageRepositoryPassword?: string
   agentRegistryContractAddress?: string
   agentRegistryJsonRpcUrl?: string
   handlers?: string[]
