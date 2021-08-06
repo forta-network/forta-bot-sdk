@@ -25,10 +25,7 @@ import { provideCreateKeyfile } from "./utils/create.keyfile"
 import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
 
-const FORTA_KEYSTORE = join(os.homedir(), ".forta")
-const FORTA_CONFIG_FILENAME = "forta.config.json"
-
-export default function configureContainer() {
+export default function configureContainer(cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
   const bindings = {
@@ -41,11 +38,14 @@ export default function configureContainer() {
     }).singleton(),
     axios: asValue(axios),
 
-    fortaKeystore: asValue(FORTA_KEYSTORE),
-    fortaConfig: asFunction(() => {
+    fortaKeystore: asValue(join(os.homedir(), ".forta")),
+    fortaConfigFilename: asFunction(() => {
+      return cliArgs.config || "forta.config.json"
+    }).singleton(),
+    fortaConfig: asFunction((fortaConfigFilename: string) => {
       let config = {}
       // try to read from config file (could throw error if one does not exist yet i.e. when running init command)
-      try { config = getJsonFile(`./${FORTA_CONFIG_FILENAME}`) } catch (e) {}
+      try { config = getJsonFile(join('.', fortaConfigFilename)) } catch (e) {}
       return config
     }).singleton(),
 
@@ -60,9 +60,9 @@ export default function configureContainer() {
     runFile: asFunction(provideRunFile),
     runLive: asFunction(provideRunLive),
 
-    handlerPaths: asFunction((fortaConfig: FortaConfig) => {
+    handlerPaths: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
       if (!fortaConfig.handlers || !fortaConfig.handlers.length) {
-        throw new Error(`no handlers provided in ${FORTA_CONFIG_FILENAME}`)
+        throw new Error(`no handlers provided in ${fortaConfigFilename}`)
       }
       return fortaConfig.handlers
     }),
@@ -106,9 +106,9 @@ export default function configureContainer() {
       return fortaConfig.agentRegistryJsonRpcUrl || "https://goerli-light.eth.linkpool.io/"
     }),
 
-    jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
+    jsonRpcUrl: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
       if (!fortaConfig.jsonRpcUrl) {
-        throw new Error(`no jsonRpcUrl provided in ${FORTA_CONFIG_FILENAME}`)
+        throw new Error(`no jsonRpcUrl provided in ${fortaConfigFilename}`)
       }
       return fortaConfig.jsonRpcUrl
     }),
@@ -120,15 +120,15 @@ export default function configureContainer() {
     }).singleton(),
     web3AgentRegistry: asFunction((agentRegistryJsonRpcUrl: string) => new Web3(agentRegistryJsonRpcUrl)).singleton(),
 
-    ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig) => {
+    ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
       if (!fortaConfig.ipfsGatewayUrl) {
-        throw new Error(`no ipfsGatewayUrl provided in ${FORTA_CONFIG_FILENAME}`)
+        throw new Error(`no ipfsGatewayUrl provided in ${fortaConfigFilename}`)
       }
       return fortaConfig.ipfsGatewayUrl
     }),
-    ipfsGatewayAuth: asFunction((ipfsGatewayUrl: string, fortaConfig: FortaConfig) => {
+    ipfsGatewayAuth: asFunction((ipfsGatewayUrl: string, fortaConfig: FortaConfig, fortaConfigFilename: string) => {
       if (ipfsGatewayUrl.includes('ipfs.infura.io') && !fortaConfig.ipfsGatewayAuth) {
-        throw new Error(`no ipfsGatewayAuth provided in ${FORTA_CONFIG_FILENAME}`)
+        throw new Error(`no ipfsGatewayAuth provided in ${fortaConfigFilename}`)
       }
       return fortaConfig.ipfsGatewayAuth
     }),
