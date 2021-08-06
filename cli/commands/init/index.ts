@@ -1,4 +1,3 @@
-import fs from 'fs'
 import { join } from 'path'
 import { AwilixContainer } from 'awilix'
 import shelljs from 'shelljs'
@@ -18,6 +17,20 @@ export default function provideInit(
       const shell = container.resolve<typeof shelljs>("shell")
       const fortaKeystore = container.resolve<string>("fortaKeystore")
       const createKeyfile = container.resolve<CreateKeyfile>("createKeyfile")
+
+      // check if current directory is empty
+      const files = shell.ls()
+      if (files.length > 0) {
+        const { proceed } = await prompts({
+          type: 'text',
+          name: 'proceed',
+          message: `The current directory is not empty and files could be overwritten. Are you sure you want to initialize? (type 'yes' to proceed)`
+        })
+        if (proceed !== 'yes') {
+          console.log('aborting initialization')
+          return
+        }
+      }
 
       const isTypescript = !!cliArgs.typescript
       console.log(`initializing ${isTypescript ? "Typescript" : "Javascript"} Forta Agent...`)
