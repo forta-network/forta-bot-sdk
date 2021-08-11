@@ -24,8 +24,9 @@ import { provideGetKeyfile } from "./utils/get.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
 import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
+import { CommandName } from '.'
 
-export default function configureContainer(cliArgs: any) {
+export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
   const bindings = {
@@ -44,8 +45,15 @@ export default function configureContainer(cliArgs: any) {
     }).singleton(),
     fortaConfig: asFunction((fortaConfigFilename: string) => {
       let config = {}
-      // try to read from config file (could throw error if one does not exist yet i.e. when running init command)
-      try { config = getJsonFile(join('.', fortaConfigFilename)) } catch (e) {}
+      // config file will not exist when running "init"
+      if (commandName === "run" || commandName === "publish") {
+        // try to read from config file
+        try { 
+          config = getJsonFile(join('.', fortaConfigFilename)) 
+        } catch (e) {
+          throw new Error(`config file ${fortaConfigFilename} not found`)
+        }
+      }
       return config
     }).singleton(),
 

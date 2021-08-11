@@ -2,10 +2,11 @@
 import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
 
+export type CommandName = "init" | "run" | "publish"
 type CommandHandler = (args: any) => void
 
-function runCommand(commandName: string, cliArgs: any) {
-  const diContainer = configureContainer(cliArgs);
+function runCommand(commandName: CommandName, cliArgs: any) {
+  const diContainer = configureContainer(commandName, cliArgs);
   const command = diContainer.resolve<CommandHandler>(commandName)
   command(cliArgs)
 }
