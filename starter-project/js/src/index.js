@@ -22,7 +22,7 @@ const handleTransaction = async (txEvent) => {
 };
 
 // const handleBlock = async (blockEvent) => {
-//   const findings: Finding[] = [];
+//   const findings = [];
 //   // detect some block condition
 //   return findings;
 // };
