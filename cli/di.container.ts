@@ -100,10 +100,10 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return fortaConfig.imageRepositoryUrl || "disco.forta.network"
     }),
     imageRepositoryUsername: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.imageRepositoryUsername
+      return fortaConfig.imageRepositoryUsername || "discouser"
     }),
     imageRepositoryPassword: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.imageRepositoryPassword
+      return fortaConfig.imageRepositoryPassword || "discopass"
     }),
 
     agentRegistry: asClass(AgentRegistry),
