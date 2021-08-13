@@ -6,7 +6,7 @@ import { BlockTransactionString } from "web3-eth"
 import { Transaction, TransactionReceipt } from "web3-core"
 import { Keccak } from 'sha3'
 import { ShellString } from 'shelljs'
-import { EventType, TransactionEvent } from "../../sdk"
+import { BlockEvent, EventType, TransactionEvent } from "../../sdk"
 import { Trace } from '../../sdk/trace'
 
 export type GetJsonFile = (filePath: string) => any
@@ -44,10 +44,36 @@ export const formatAddress = (address: string) => {
   return _.isString(address) ? address.toLowerCase() : address
 }
 
+export const createBlockEvent = (block: BlockTransactionString, networkId: number) => {
+  const blok = {
+    difficulty: block.difficulty.toString(),
+    extraData: block.extraData,
+    gasLimit: block.gasLimit.toString(),
+    gasUsed: block.gasUsed.toString(),
+    hash: block.hash,
+    logsBloom: block.logsBloom,
+    miner: formatAddress(block.miner),
+    mixHash: '',//TODO
+    nonce: block.nonce,
+    number: block.number,
+    parentHash: block.parentHash,
+    receiptsRoot: block.receiptRoot,
+    sha3Uncles: block.sha3Uncles,
+    size: block.size.toString(),
+    stateRoot: block.stateRoot,
+    timestamp: typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp,
+    totalDifficulty: block.totalDifficulty.toString(),
+    transactions: block.transactions,
+    transactionsRoot: block.transactionRoot,
+    uncles: block.uncles
+  }
+  return new BlockEvent(EventType.BLOCK, networkId, block.hash, block.number, blok)
+}
+
 export const createTransactionEvent = (
   transaction: Transaction, 
   receipt: TransactionReceipt, 
-  blok: BlockTransactionString, 
+  block: BlockTransactionString, 
   networkId: number, 
   traces: Trace[] = []
 ) => {
@@ -96,10 +122,10 @@ export const createTransactionEvent = (
   }  
   receipt.logs.forEach(log => addresses[log.address] = true)
 
-  const block = {
-    hash: blok.hash,
-    number: blok.number,
-    timestamp: typeof blok.timestamp === 'string' ? parseInt(blok.timestamp) : blok.timestamp
+  const blok = {
+    hash: block.hash,
+    number: block.number,
+    timestamp: typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
   }
 
   traces.forEach(trace => {
@@ -120,6 +146,6 @@ export const createTransactionEvent = (
     rcpt,
     traces,
     addresses,
-    block
+    blok
   )
 }
