@@ -24,6 +24,7 @@ import { provideGetKeyfile } from "./utils/get.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
 import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
+import { provideGetPythonAgentHandlers } from './utils/get.python.agent.handlers'
 
 export default function configureContainer(cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -67,6 +68,8 @@ export default function configureContainer(cliArgs: any) {
       return fortaConfig.handlers
     }),
     getAgentHandlers: asFunction(provideGetAgentHandlers),
+    getPythonAgentHandlers: asFunction(provideGetPythonAgentHandlers),
+    pythonFindingMarker: asValue('!*forta_finding*!:'),
     runBlockHandlers: asFunction(provideRunBlockHandlers),
     runTransactionHandlersOnBlock: asFunction(provideRunTransactionHandlersOnBlock),
     runTransactionHandlersOnTransaction: asFunction(provideRunTransactionHandlersOnTransaction),
