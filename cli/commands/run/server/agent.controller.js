@@ -1,5 +1,5 @@
 const { BlockEvent, TransactionEvent } = require("../../../../sdk");
-const { assertExists } = require("../../../utils");
+const { assertExists, formatAddress } = require("../../../utils");
 
 module.exports = class AgentController {
   constructor(getAgentHandlers) {
@@ -95,8 +95,8 @@ module.exports = class AgentController {
 
     const transaction = {
       hash: tx.hash,
-      from: tx.from,
-      to: tx.to ? tx.to : null,
+      from: formatAddress(tx.from),
+      to: tx.to ? formatAddress(tx.to) : null,
       nonce: parseInt(tx.nonce),
       gas: tx.gas,
       gasPrice: tx.gasPrice,
@@ -114,7 +114,7 @@ module.exports = class AgentController {
       cumulativeGasUsed: rcpt.cumulativeGasUsed,
       logsBloom: rcpt.logsBloom,
       logs: rcpt.logs.map((log) => ({
-        address: log.address,
+        address: formatAddress(log.address),
         topics: log.topics,
         data: log.data,
         logIndex: parseInt(log.logIndex),
@@ -124,7 +124,9 @@ module.exports = class AgentController {
         transactionHash: log.transactionHash,
         removed: log.removed,
       })),
-      contractAddress: rcpt.contractAddress ? rcpt.contractAddress : null,
+      contractAddress: rcpt.contractAddress
+        ? formatAddress(rcpt.contractAddress)
+        : null,
       blockNumber: parseInt(rcpt.blockNumber),
       blockHash: rcpt.blockHash,
       transactionIndex: parseInt(rcpt.transactionIndex),
@@ -136,14 +138,14 @@ module.exports = class AgentController {
       : trcs.map((trace) => ({
           action: {
             callType: trace.action.callType,
-            to: trace.action.to,
+            to: formatAddress(trace.action.to),
             input: trace.action.input,
-            from: trace.action.from,
+            from: formatAddress(trace.action.from),
             value: trace.action.value,
             init: trace.action.init,
-            address: trace.action.address,
+            address: formatAddress(trace.action.address),
             balance: trace.action.balance,
-            refundAddress: trace.action.refundAddress,
+            refundAddress: formatAddress(trace.action.refundAddress),
           },
           blockHash: trace.blockHash,
           blockNumber: trace.blockNumber,

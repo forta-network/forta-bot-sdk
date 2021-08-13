@@ -40,6 +40,10 @@ export const keccak256 = (str: string) => {
   return `0x${hash.digest('hex')}`
 }
 
+export const formatAddress = (address: string) => {
+  return _.isString(address) ? address.toLowerCase() : address
+}
+
 export const createTransactionEvent = (
   transaction: Transaction, 
   receipt: TransactionReceipt, 
@@ -48,12 +52,17 @@ export const createTransactionEvent = (
   traces: Trace[] = []
 ) => {
   const tx = {
-    ...transaction,
+    hash: transaction.hash,
+    from: formatAddress(transaction.from),
+    to: transaction.to ? formatAddress(transaction.to) : null,
+    nonce: transaction.nonce,
     gas: transaction.gas.toString(),
+    gasPrice: transaction.gasPrice,
+    value: transaction.value,
     data: transaction.input,
-    r: '',// TODO
-    s: '',// TODO
-    v: ''// TODO
+    r: (transaction as any).r,
+    s: (transaction as any).s,
+    v: (transaction as any).v,
   }
   const addresses = {
     [tx.from]: true
@@ -63,24 +72,41 @@ export const createTransactionEvent = (
   }
 
   const rcpt = {
-    ...receipt,
+    blockNumber: receipt.blockNumber,
+    blockHash: receipt.blockHash,
+    transactionIndex: receipt.transactionIndex,
+    transactionHash: receipt.transactionHash,
+    status: receipt.status,
+    logsBloom: receipt.logsBloom,
+    contractAddress: receipt.contractAddress ? formatAddress(receipt.contractAddress) : null,
     gasUsed: receipt.gasUsed.toString(),
     cumulativeGasUsed: receipt.cumulativeGasUsed.toString(),
     logs: receipt.logs.map(log => ({
-      ...log,
+      address: formatAddress(log.address),
+      topics: log.topics,
+      data: log.data,
+      logIndex: log.logIndex,
+      blockNumber: log.blockNumber,
+      blockHash: log.blockHash,
+      transactionIndex: log.transactionIndex,
+      transactionHash: log.transactionHash,
       removed: false,
     })),
-    contractAddress: receipt.contractAddress ? receipt.contractAddress : null,
-    root: '',//TODO
+    root: (receipt as any).root ?? '',
   }  
   receipt.logs.forEach(log => addresses[log.address] = true)
 
   const block = {
-    ...blok,
+    hash: blok.hash,
+    number: blok.number,
     timestamp: typeof blok.timestamp === 'string' ? parseInt(blok.timestamp) : blok.timestamp
   }
 
   traces.forEach(trace => {
+    trace.action.address = formatAddress(trace.action.address)
+    trace.action.refundAddress = formatAddress(trace.action.refundAddress)
+    trace.action.to = formatAddress(trace.action.to)
+    trace.action.from = formatAddress(trace.action.from)
     addresses[trace.action.address] = true
     addresses[trace.action.refundAddress] = true
     addresses[trace.action.to] = true
