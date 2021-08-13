@@ -28,10 +28,22 @@ export function provideRunTransactionHandlersOnBlock(
 
     const networkId = await web3.eth.net.getId()
     for (const txHash of block.transactions) {
-      const [transaction, receipt] = await Promise.all([
+      let [transaction, receipt] = await Promise.all([
         web3.eth.getTransaction(txHash), 
         web3.eth.getTransactionReceipt(txHash)
       ])
+      // retry once if transaction fetching failed TODO figure out why this happens sometimes
+      if (!transaction) {
+        transaction = await web3.eth.getTransaction(txHash)
+      }
+      // retry once if receipt fetching failed TODO figure out why this happens sometimes
+      if (!receipt) {
+        receipt = await web3.eth.getTransactionReceipt(txHash)
+      }
+      if (!transaction || !receipt) {
+        console.log(`error fetching ${!transaction ? 'transaction' : 'receipt'} for ${txHash}`)
+        continue;
+      }
       const txEvent = createTransactionEvent(transaction, receipt, block, networkId, traceMap[txHash.toLowerCase()])
 
       const findings = []
