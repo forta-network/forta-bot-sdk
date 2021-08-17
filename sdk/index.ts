@@ -1,7 +1,11 @@
 import { Finding, FindingSeverity, FindingType } from "./finding"
 import { BlockEvent } from "./block.event"
+import { Block } from "./block"
 import { TransactionEvent } from "./transaction.event"
 import { getFortaConfig, getJsonRpcUrl } from "./utils"
+import { Log, Receipt } from "./receipt"
+import { Trace, TraceAction, TraceResult } from "./trace"
+import { Transaction } from "./transaction"
 
 interface FortaConfig {
   agentId?: string
@@ -45,6 +49,13 @@ export {
   FindingType,
   BlockEvent,
   TransactionEvent,
+  Block,
+  Transaction,
+  Receipt,
+  Log,
+  Trace,
+  TraceAction,
+  TraceResult,
   EventType,
   Network,
   getFortaConfig,
