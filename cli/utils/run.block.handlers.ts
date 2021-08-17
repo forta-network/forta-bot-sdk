@@ -1,7 +1,7 @@
 import Web3 from "web3";
 import { BlockTransactionString } from "web3-eth"
-import { assertExists } from ".";
-import { BlockEvent, EventType, HandleBlock } from "../../sdk";
+import { assertExists, createBlockEvent } from ".";
+import { HandleBlock } from "../../sdk";
 
 export type RunBlockHandlers = (blockHandlers: HandleBlock[], blockHashOrNumber: string | number) => Promise<BlockTransactionString>
 
@@ -17,7 +17,7 @@ export function provideRunBlockHandlers(
 
     if (blockHandlers.length) {
       const networkId = await web3.eth.net.getId()
-      const blockEvent = new BlockEvent(EventType.BLOCK, networkId, block.hash, block.number);
+      const blockEvent = createBlockEvent(block, networkId)
       const findings = []
       for (const handleBlock of blockHandlers) {
         findings.push(...await handleBlock(blockEvent))
