@@ -108,7 +108,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
 
     agentRegistry: asClass(AgentRegistry),
     agentRegistryContractAddress: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.agentRegistryContractAddress || "0x51690d812838e146332EE47c73511E04d12DbBBA"
+      return fortaConfig.agentRegistryContractAddress || "0xFE1927bF5bc338e4884A0d406e33921e8058d75d"
     }),
     agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.agentRegistryJsonRpcUrl || "https://goerli-light.eth.linkpool.io/"
