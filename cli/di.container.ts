@@ -25,6 +25,7 @@ import { provideCreateKeyfile } from "./utils/create.keyfile"
 import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
 import { CommandName } from '.'
+import provideAddToIpfs from './utils/add.to.ipfs'
 
 export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -68,6 +69,12 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     runFile: asFunction(provideRunFile),
     runLive: asFunction(provideRunLive),
 
+    documentation: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
+      if (!fortaConfig.documentation) {
+        throw new Error(`no documentation provided in ${fortaConfigFilename}`)
+      }
+      return join('.', fortaConfig.documentation)
+    }),
     handlerPaths: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
       if (!fortaConfig.handlers || !fortaConfig.handlers.length) {
         throw new Error(`no handlers provided in ${fortaConfigFilename}`)
@@ -81,6 +88,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     getJsonFile: asValue(getJsonFile),
     getKeyfile: asFunction(provideGetKeyfile),
     createKeyfile: asFunction(provideCreateKeyfile),
+    addToIpfs: asFunction(provideAddToIpfs),
 
     getTraceData: asFunction(provideGetTraceData),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
