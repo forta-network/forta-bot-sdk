@@ -1,4 +1,5 @@
 import os from 'os'
+import fs from 'fs'
 import { join } from "path"
 import { asClass, asFunction, asValue, createContainer, InjectionMode } from "awilix"
 import Web3 from 'web3'
@@ -49,10 +50,12 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       // config file will not exist when running "init"
       if (commandName === "run" || commandName === "publish") {
         // try to read from config file
-        try { 
-          config = getJsonFile(join('.', fortaConfigFilename)) 
+        const filePath = join('.', fortaConfigFilename)
+        if (!fs.existsSync(filePath)) throw new Error(`config file ${fortaConfigFilename} not found`)
+        try {
+          config = getJsonFile(filePath)
         } catch (e) {
-          throw new Error(`config file ${fortaConfigFilename} not found`)
+          throw new Error(`unable to parse config file ${fortaConfigFilename}: ${e.message}`)
         }
       }
       return config
