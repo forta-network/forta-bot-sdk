@@ -4,11 +4,10 @@ import fs from 'fs'
 import prompts from 'prompts'
 import { assertExists, assertIsNonEmptyString, assertShellResult, keccak256 } from '../../utils'
 import Web3 from 'web3'
-import { AxiosInstance } from 'axios'
-import FormData from 'form-data'
 import AgentRegistry from './agent.registry'
 import { GetKeyfile } from '../../utils/get.keyfile'
 import { FortaConfig } from '../../../sdk'
+import { AddToIpfs } from '../../utils/add.to.ipfs'
 
 export default function providePublish(
   container: AwilixContainer
@@ -21,11 +20,12 @@ export default function providePublish(
       // we get RUNTIME errors if certain configuration is missing
       const shell = container.resolve<typeof shelljs>("shell")
       const web3 = container.resolve<Web3>("web3AgentRegistry")
-      const ipfsHttpClient = container.resolve<AxiosInstance>("ipfsHttpClient")
+      const addToIpfs = container.resolve<AddToIpfs>("addToIpfs")
       const imageRepositoryUrl = container.resolve<string>("imageRepositoryUrl")
       const imageRepositoryUsername = container.resolve<string>("imageRepositoryUsername")
       const imageRepositoryPassword = container.resolve<string>("imageRepositoryPassword")
       const fortaKeystore = container.resolve<string>("fortaKeystore")
+      const documentation = container.resolve<string>("documentation")
       const agentRegistry = container.resolve<AgentRegistry>("agentRegistry")
       const getKeyfile = container.resolve<GetKeyfile>("getKeyfile")
       const { agentId, version } = container.resolve<FortaConfig>("fortaConfig")
@@ -79,6 +79,14 @@ export default function providePublish(
       })
       const { publicKey, privateKey } = await getKeyfile(keyfileName, password)
   
+      // upload documentation to ipfs
+      console.log('pushing agent documentation to IPFS...')
+      if (!fs.existsSync(documentation)) {
+        throw new Error(`documentation file ${documentation} not found`)
+      }
+      const documentationFile = fs.readFileSync(documentation, 'utf8')
+      const documentationReference = await addToIpfs(documentationFile)
+
       // create agent manifest and sign it
       const agentIdHash = keccak256(agentId!)
       const manifest = {
@@ -88,17 +96,13 @@ export default function providePublish(
         version,
         timestamp: new Date().toUTCString(),
         imageReference,
+        documentation: documentationReference
       }
       const { signature } = web3.eth.accounts.sign(JSON.stringify(manifest), privateKey);
   
       // add manifest and signature to ipfs
       console.log('pushing agent manifest to IPFS...')
-      const formData = new FormData()
-      formData.append('manifest', JSON.stringify({ manifest, signature }))
-      const { data } = await ipfsHttpClient.post('/api/v0/add', formData, {
-        headers: formData.getHeaders()
-      })
-      const manifestReference = data.Hash
+      const manifestReference = await addToIpfs(JSON.stringify({ manifest, signature }))
   
       // add/update the agent in the registry contract
       web3.eth.accounts.wallet.add(privateKey);//make sure web3 knows about this wallet in order to sign

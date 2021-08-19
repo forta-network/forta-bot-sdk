@@ -23,6 +23,7 @@ interface FortaConfig {
   traceRpcUrl?: string
   traceBlockMethod?: string
   traceTransactionMethod?: string
+  documentation?: string
 }
 
 type HandleTransaction = (txEvent: TransactionEvent) => Promise<Finding[]>
