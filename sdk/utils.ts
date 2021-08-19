@@ -5,7 +5,13 @@ import _ from 'lodash'
 import { Keccak } from 'sha3'
 import { FortaConfig } from '.'
 
-export const getFortaConfig: () => FortaConfig = () => jsonc.parse(fs.readFileSync(join(process.cwd(), 'forta.config.json'), 'utf8'))
+export const getFortaConfig: () => FortaConfig = () => {
+  const configFlagIndex = process.argv.indexOf('--config')
+  const configFile = configFlagIndex == -1 ? undefined : process.argv[configFlagIndex + 1]
+  const configPath = join(process.cwd(), configFile || 'forta.config.json')
+  const data = fs.readFileSync(configPath, 'utf8')
+  return jsonc.parse(data)
+}
 
 export const getJsonRpcUrl = () => {
   // if rpc url provided by Forta Scanner i.e. in production
