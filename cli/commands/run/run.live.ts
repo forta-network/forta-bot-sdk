@@ -6,22 +6,27 @@ import { RunHandlersOnBlock } from '../../utils/run.handlers.on.block';
 export type RunLive = () => Promise<void>
 
 export function provideRunLive(
-  jsonRpcUrl: string,
   web3: Web3, 
   runHandlersOnBlock: RunHandlersOnBlock,
 ): RunLive {
-  assertExists(jsonRpcUrl, 'jsonRpcUrl')
   assertExists(web3, 'web3')
   assertExists(runHandlersOnBlock, 'runHandlersOnBlock')
 
   return async function runLive() {
-    if (!jsonRpcUrl.startsWith('ws')) {
-      throw new Error('jsonRpcUrl must begin with ws:// or wss:// to listen for blockchain data')
-    }
-
     console.log('listening for blockchain data...')
-    web3.eth.subscribe('newBlockHeaders', (error) => { if (error) console.error(error) })
-      .on("data", (blockHeader) => runHandlersOnBlock(blockHeader.number))
-      .on("error", console.error);
+
+    // process the latest block
+    let currBlockNumber = await web3.eth.getBlockNumber()
+    await runHandlersOnBlock(currBlockNumber)
+    currBlockNumber++
+
+    // poll for the latest block every 15s and process each
+    setInterval(async () => {
+      const latestBlockNumber = await web3.eth.getBlockNumber()
+      while (currBlockNumber <= latestBlockNumber) {
+        await runHandlersOnBlock(currBlockNumber)
+        currBlockNumber++
+      }
+    }, 15000)
   }
 }
