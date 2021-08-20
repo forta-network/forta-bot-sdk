@@ -17,9 +17,6 @@ import { provideRunLive } from "./commands/run/run.live"
 import provideRunServer from "./commands/run/server"
 import { getJsonFile } from "./utils"
 import AgentRegistry from "./commands/publish/agent.registry"
-import { provideRunBlockHandlers } from "./utils/run.block.handlers"
-import { provideRunTransactionHandlersOnBlock } from "./utils/run.transaction.handlers.on.block"
-import { provideRunTransactionHandlersOnTransaction } from "./utils/run.transaction.handlers.on.transaction"
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
 import { provideGetKeyfile } from "./utils/get.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
@@ -27,6 +24,8 @@ import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
 import { CommandName } from '.'
 import provideAddToIpfs from './utils/add.to.ipfs'
+import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
+import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transaction'
 
 export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -85,9 +84,8 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return fortaConfig.handlers
     }),
     getAgentHandlers: asFunction(provideGetAgentHandlers),
-    runBlockHandlers: asFunction(provideRunBlockHandlers),
-    runTransactionHandlersOnBlock: asFunction(provideRunTransactionHandlersOnBlock),
-    runTransactionHandlersOnTransaction: asFunction(provideRunTransactionHandlersOnTransaction),
+    runHandlersOnBlock: asFunction(provideRunHandlersOnBlock),
+    runHandlersOnTransaction: asFunction(provideRunHandlersOnTransaction),
     getJsonFile: asValue(getJsonFile),
     getKeyfile: asFunction(provideGetKeyfile),
     createKeyfile: asFunction(provideCreateKeyfile),

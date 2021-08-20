@@ -2,8 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import _ from 'lodash'
 import { jsonc } from 'jsonc'
-import { BlockTransactionString } from "web3-eth"
-import { Transaction, TransactionReceipt } from "web3-core"
+import { BlockTransactionObject } from "web3-eth"
+import { TransactionReceipt } from "web3-core"
 import { Keccak } from 'sha3'
 import { ShellString } from 'shelljs'
 import { BlockEvent, EventType, TransactionEvent } from "../../sdk"
@@ -44,7 +44,8 @@ export const formatAddress = (address: string) => {
   return _.isString(address) ? address.toLowerCase() : address
 }
 
-export const createBlockEvent = (block: BlockTransactionString, networkId: number) => {
+// creates a Forta BlockEvent from a web3 BlockTransactionObject
+export const createBlockEvent = (block: BlockTransactionObject, networkId: number) => {
   const blok = {
     difficulty: block.difficulty.toString(),
     extraData: block.extraData,
@@ -63,20 +64,21 @@ export const createBlockEvent = (block: BlockTransactionString, networkId: numbe
     stateRoot: block.stateRoot,
     timestamp: typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp,
     totalDifficulty: block.totalDifficulty.toString(),
-    transactions: block.transactions,
+    transactions: block.transactions.map(tx => tx.hash),
     transactionsRoot: block.transactionRoot,
     uncles: block.uncles
   }
   return new BlockEvent(EventType.BLOCK, networkId, block.hash, block.number, blok)
 }
 
+// creates a Forta TransactionEvent from a web3 TransactionReceipt and BlockTransactionObject
 export const createTransactionEvent = (
-  transaction: Transaction, 
   receipt: TransactionReceipt, 
-  block: BlockTransactionString, 
+  block: BlockTransactionObject, 
   networkId: number, 
   traces: Trace[] = []
 ) => {
+  const transaction = block.transactions.find(tx => tx.hash === receipt.transactionHash)!
   const tx = {
     hash: transaction.hash,
     from: formatAddress(transaction.from),

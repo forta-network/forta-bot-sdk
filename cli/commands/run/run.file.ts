@@ -27,7 +27,7 @@ export function provideRunFile(
         for (const handleBlock of blockHandlers) {
           findings.push(...await handleBlock(blockEvent))
         }
-        console.log(`${findings.length} findings for block ${blockEvent.hash}: ${JSON.stringify(findings)}`)
+        console.log(`${findings.length} findings for block ${blockEvent.hash} ${findings}`)
       }
     }
 
@@ -38,7 +38,7 @@ export function provideRunFile(
         for (const handleTransaction of transactionHandlers) {
           findings.push(...await handleTransaction(transactionEvent))
         }
-        console.log(`${findings.length} findings for transaction ${transactionEvent.transaction.hash}: ${JSON.stringify(findings)}`)
+        console.log(`${findings.length} findings for transaction ${transactionEvent.transaction.hash} ${findings}`)
       }
     }
   }
