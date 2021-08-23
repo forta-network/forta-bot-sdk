@@ -73,5 +73,9 @@
   "include": [
     "sdk/**/*",
     "cli/**/*"
+  ],
+  "exclude": [
+    "sdk/**/*.spec.ts",
+    "cli/**/*.spec.ts"
   ]
 }
