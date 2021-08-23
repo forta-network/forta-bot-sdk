@@ -1,5 +1,5 @@
 const { BlockEvent, TransactionEvent } = require("../../../../sdk");
-const { assertExists } = require("../../../utils");
+const { assertExists, formatAddress } = require("../../../utils");
 
 module.exports = class AgentController {
   constructor(getAgentHandlers) {
@@ -25,13 +25,7 @@ module.exports = class AgentController {
 
     if (this.blockHandlers.length) {
       try {
-        const { type, network, blockHash, blockNumber } = call.request.event;
-        const blockEvent = new BlockEvent(
-          type,
-          parseInt(network.chainId),
-          blockHash,
-          parseInt(blockNumber)
-        );
+        const blockEvent = this.createBlockEventFromGrpcRequest(call.request);
         for (const handleBlock of this.blockHandlers) {
           findings.push(...(await handleBlock(blockEvent)));
         }
@@ -82,6 +76,41 @@ module.exports = class AgentController {
     });
   }
 
+  createBlockEventFromGrpcRequest(request) {
+    const { type, network, blockHash, blockNumber, block } = request.event;
+
+    const blok = {
+      difficulty: block.difficulty,
+      extraData: block.extraData,
+      gasLimit: block.gasLimit,
+      gasUsed: block.gasUsed,
+      hash: block.hash,
+      logsBloom: block.logsBloom,
+      miner: formatAddress(block.miner),
+      mixHash: block.mixHash,
+      nonce: block.nonce,
+      number: parseInt(block.number),
+      parentHash: block.parentHash,
+      receiptsRoot: block.receiptRoot,
+      sha3Uncles: block.sha3Uncles,
+      size: block.size,
+      stateRoot: block.stateRoot,
+      timestamp: parseInt(block.timestamp),
+      totalDifficulty: block.totalDifficulty,
+      transactions: block.transactions,
+      transactionsRoot: block.transactionRoot,
+      uncles: block.uncles,
+    };
+
+    return new BlockEvent(
+      type,
+      parseInt(network.chainId),
+      blockHash,
+      parseInt(blockNumber),
+      blok
+    );
+  }
+
   createTransactionEventFromGrpcRequest(request) {
     const {
       type,
@@ -90,13 +119,13 @@ module.exports = class AgentController {
       receipt: rcpt,
       traces: trcs,
       addresses,
-      block: blok,
+      block,
     } = request.event;
 
     const transaction = {
       hash: tx.hash,
-      from: tx.from,
-      to: tx.to ? tx.to : null,
+      from: formatAddress(tx.from),
+      to: tx.to ? formatAddress(tx.to) : null,
       nonce: parseInt(tx.nonce),
       gas: tx.gas,
       gasPrice: tx.gasPrice,
@@ -114,7 +143,7 @@ module.exports = class AgentController {
       cumulativeGasUsed: rcpt.cumulativeGasUsed,
       logsBloom: rcpt.logsBloom,
       logs: rcpt.logs.map((log) => ({
-        address: log.address,
+        address: formatAddress(log.address),
         topics: log.topics,
         data: log.data,
         logIndex: parseInt(log.logIndex),
@@ -124,7 +153,9 @@ module.exports = class AgentController {
         transactionHash: log.transactionHash,
         removed: log.removed,
       })),
-      contractAddress: rcpt.contractAddress ? rcpt.contractAddress : null,
+      contractAddress: rcpt.contractAddress
+        ? formatAddress(rcpt.contractAddress)
+        : null,
       blockNumber: parseInt(rcpt.blockNumber),
       blockHash: rcpt.blockHash,
       transactionIndex: parseInt(rcpt.transactionIndex),
@@ -136,14 +167,14 @@ module.exports = class AgentController {
       : trcs.map((trace) => ({
           action: {
             callType: trace.action.callType,
-            to: trace.action.to,
+            to: formatAddress(trace.action.to),
             input: trace.action.input,
-            from: trace.action.from,
+            from: formatAddress(trace.action.from),
             value: trace.action.value,
             init: trace.action.init,
-            address: trace.action.address,
+            address: formatAddress(trace.action.address),
             balance: trace.action.balance,
-            refundAddress: trace.action.refundAddress,
+            refundAddress: formatAddress(trace.action.refundAddress),
           },
           blockHash: trace.blockHash,
           blockNumber: trace.blockNumber,
@@ -160,10 +191,10 @@ module.exports = class AgentController {
           error: trace.error,
         }));
 
-    const block = {
-      hash: blok.blockHash,
-      number: parseInt(blok.blockNumber),
-      timestamp: parseInt(blok.blockTimestamp),
+    const blok = {
+      hash: block.blockHash,
+      number: parseInt(block.blockNumber),
+      timestamp: parseInt(block.blockTimestamp),
     };
 
     return new TransactionEvent(
@@ -173,7 +204,7 @@ module.exports = class AgentController {
       receipt,
       traces,
       addresses,
-      block
+      blok
     );
   }
 };

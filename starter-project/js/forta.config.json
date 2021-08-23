@@ -9,7 +9,8 @@
   // "agentRegistryJsonRpcUrl": "",         /* JSON-RPC url of the network hosting agent registry contract */
   // "ipfsGatewayUrl": "",                  /* IPFS gateway API for publishing agent manifest e.g. https://ipfs.infura.io:5001 */
   // "ipfsGatewayAuth": "",                 /* Authorization header, if IPFS gateway requires it */
-  "handlers": ["./src"]                        /* Paths to agent handlers */
+  "handlers": ["./src"],                    /* Paths to agent handlers */
+  "documentation": "README.md"              /* Agent documentation markdown file */
   // "debug": true                          /* Debug flag for additional console logging */
   // "traceRpcUrl": ""                      /* JSON-RPC url for fetching trace data during development */
 }

@@ -1,4 +1,5 @@
 import os from 'os'
+import fs from 'fs'
 import { join } from "path"
 import { asClass, asFunction, asValue, createContainer, InjectionMode } from "awilix"
 import Web3 from 'web3'
@@ -16,9 +17,6 @@ import { provideRunLive } from "./commands/run/run.live"
 import provideRunServer from "./commands/run/server"
 import { getJsonFile } from "./utils"
 import AgentRegistry from "./commands/publish/agent.registry"
-import { provideRunBlockHandlers } from "./utils/run.block.handlers"
-import { provideRunTransactionHandlersOnBlock } from "./utils/run.transaction.handlers.on.block"
-import { provideRunTransactionHandlersOnTransaction } from "./utils/run.transaction.handlers.on.transaction"
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
 import { provideGetKeyfile } from "./utils/get.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
@@ -26,6 +24,9 @@ import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
 import { provideGetPythonAgentHandlers } from './utils/get.python.agent.handlers'
 import { CommandName } from '.'
+import provideAddToIpfs from './utils/add.to.ipfs'
+import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
+import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transaction'
 
 export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -49,10 +50,12 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       // config file will not exist when running "init"
       if (commandName === "run" || commandName === "publish") {
         // try to read from config file
-        try { 
-          config = getJsonFile(join('.', fortaConfigFilename)) 
+        const filePath = join('.', fortaConfigFilename)
+        if (!fs.existsSync(filePath)) throw new Error(`config file ${fortaConfigFilename} not found`)
+        try {
+          config = getJsonFile(filePath)
         } catch (e) {
-          throw new Error(`config file ${fortaConfigFilename} not found`)
+          throw new Error(`unable to parse config file ${fortaConfigFilename}: ${e.message}`)
         }
       }
       return config
@@ -69,6 +72,12 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     runFile: asFunction(provideRunFile),
     runLive: asFunction(provideRunLive),
 
+    documentation: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
+      if (!fortaConfig.documentation) {
+        throw new Error(`no documentation provided in ${fortaConfigFilename}`)
+      }
+      return join('.', fortaConfig.documentation)
+    }),
     handlerPaths: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
       if (!fortaConfig.handlers || !fortaConfig.handlers.length) {
         throw new Error(`no handlers provided in ${fortaConfigFilename}`)
@@ -78,12 +87,12 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     getAgentHandlers: asFunction(provideGetAgentHandlers),
     getPythonAgentHandlers: asFunction(provideGetPythonAgentHandlers),
     pythonFindingMarker: asValue('!*forta_finding*!:'),
-    runBlockHandlers: asFunction(provideRunBlockHandlers),
-    runTransactionHandlersOnBlock: asFunction(provideRunTransactionHandlersOnBlock),
-    runTransactionHandlersOnTransaction: asFunction(provideRunTransactionHandlersOnTransaction),
+    runHandlersOnBlock: asFunction(provideRunHandlersOnBlock),
+    runHandlersOnTransaction: asFunction(provideRunHandlersOnTransaction),
     getJsonFile: asValue(getJsonFile),
     getKeyfile: asFunction(provideGetKeyfile),
     createKeyfile: asFunction(provideCreateKeyfile),
+    addToIpfs: asFunction(provideAddToIpfs),
 
     getTraceData: asFunction(provideGetTraceData),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
@@ -103,15 +112,15 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return fortaConfig.imageRepositoryUrl || "disco.forta.network"
     }),
     imageRepositoryUsername: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.imageRepositoryUsername
+      return fortaConfig.imageRepositoryUsername || "discouser"
     }),
     imageRepositoryPassword: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.imageRepositoryPassword
+      return fortaConfig.imageRepositoryPassword || "discopass"
     }),
 
     agentRegistry: asClass(AgentRegistry),
     agentRegistryContractAddress: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.agentRegistryContractAddress || "0x51690d812838e146332EE47c73511E04d12DbBBA"
+      return fortaConfig.agentRegistryContractAddress || "0xFE1927bF5bc338e4884A0d406e33921e8058d75d"
     }),
     agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.agentRegistryJsonRpcUrl || "https://goerli-light.eth.linkpool.io/"

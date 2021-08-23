@@ -1,3 +1,4 @@
+import { Block } from "./block";
 import { EventType, Network } from "./index";
 
 export class BlockEvent {
@@ -5,6 +6,7 @@ export class BlockEvent {
     readonly type: EventType,
     readonly network: Network,
     readonly blockHash: string,
-    readonly blockNumber: number
+    readonly blockNumber: number,
+    readonly block: Block
   ) {}
 }

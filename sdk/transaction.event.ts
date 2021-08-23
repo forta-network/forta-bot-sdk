@@ -1,9 +1,14 @@
-import { Block } from "./block"
 import { EventType, Network } from "./index"
 import { Log, Receipt } from "./receipt"
 import { Trace } from "./trace"
 import { Transaction } from "./transaction"
 import { keccak256 } from "./utils"
+
+interface Block {
+  hash: string;
+  number: number;
+  timestamp: number;
+}
 
 export class TransactionEvent {
   constructor(
