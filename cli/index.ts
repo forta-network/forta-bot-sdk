@@ -3,12 +3,16 @@ import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
 
 export type CommandName = "init" | "run" | "publish"
-type CommandHandler = (args: any) => void
+export type CommandHandler = (args: any) => Promise<void>
 
-function runCommand(commandName: CommandName, cliArgs: any) {
+async function runCommand(commandName: CommandName, cliArgs: any) {
   const diContainer = configureContainer(commandName, cliArgs);
   const command = diContainer.resolve<CommandHandler>(commandName)
-  command(cliArgs)
+  try {
+    await command(cliArgs)
+  } catch (e) {
+    console.error(`ERROR: ${e.message}`)
+  }
 }
 
 yargs

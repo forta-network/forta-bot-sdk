@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "tsc && cp -r ./starter-project ./dist && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto",
-    "publish:local": "npm link"
+    "publish:local": "npm link",
+    "test": "jest"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.3.6",

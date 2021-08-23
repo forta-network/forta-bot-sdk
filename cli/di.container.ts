@@ -4,6 +4,7 @@ import { join } from "path"
 import { asClass, asFunction, asValue, createContainer, InjectionMode } from "awilix"
 import Web3 from 'web3'
 import shell from 'shelljs'
+import prompts from 'prompts'
 import axios, { AxiosRequestConfig } from 'axios'
 import provideInit from "./commands/init"
 import provideRun from "./commands/run"
@@ -39,6 +40,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return shell
     }).singleton(),
     axios: asValue(axios),
+    prompt: asValue(prompts),
 
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     fortaConfigFilename: asFunction(() => {
