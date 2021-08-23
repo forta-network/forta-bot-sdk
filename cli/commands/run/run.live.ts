@@ -8,9 +8,11 @@ export type RunLive = () => Promise<void>
 export function provideRunLive(
   web3: Web3, 
   runHandlersOnBlock: RunHandlersOnBlock,
+  setInterval: (callback: any, ms: number) => NodeJS.Timeout
 ): RunLive {
   assertExists(web3, 'web3')
   assertExists(runHandlersOnBlock, 'runHandlersOnBlock')
+  assertExists(setInterval, 'setInterval')
 
   return async function runLive() {
     console.log('listening for blockchain data...')

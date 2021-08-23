@@ -41,6 +41,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     }).singleton(),
     axios: asValue(axios),
     prompt: asValue(prompts),
+    setInterval: asValue(setInterval),
 
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     fortaConfigFilename: asFunction(() => {
