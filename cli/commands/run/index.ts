@@ -1,4 +1,5 @@
 import { AwilixContainer } from 'awilix';
+import { CommandHandler } from '../..';
 import { assertExists } from '../../utils';
 import { RunBlock } from './run.block';
 import { RunBlockRange } from './run.block.range';
@@ -9,7 +10,7 @@ import { RunProdServer } from './server';
 
 export default function provideRun(
   container: AwilixContainer
-) {
+): CommandHandler {
   assertExists(container, 'container')
 
   return async function run(cliArgs: any) {
