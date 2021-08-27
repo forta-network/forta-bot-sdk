@@ -139,12 +139,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       }
       return fortaConfig.jsonRpcUrl
     }),
-    web3: asFunction((jsonRpcUrl: string) => {
-      const provider = jsonRpcUrl.startsWith('ws') ? 
-        new Web3.providers.WebsocketProvider(jsonRpcUrl) : 
-        new Web3.providers.HttpProvider(jsonRpcUrl)
-      return new Web3(provider)
-    }).singleton(),
+    web3: asFunction((jsonRpcUrl: string) =>  new Web3(jsonRpcUrl)).singleton(),
     web3AgentRegistry: asFunction((agentRegistryJsonRpcUrl: string) => new Web3(agentRegistryJsonRpcUrl)).singleton(),
 
     ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {

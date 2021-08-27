@@ -28,6 +28,6 @@ export default function providePushToRegistry(
       await agentRegistry.updateAgent(publicKey, agentIdHash, manifestReference)
     }
 
-    console.log(`${agentExists ? 'updated' : 'added'} agent ${agentIdHash} with reference ${manifestReference}`)
+    console.log(`successfully ${agentExists ? 'updated' : 'added'} agent ${agentIdHash} with manifest ${manifestReference}`)
   }
 }
