@@ -3,7 +3,11 @@ import { join } from 'path'
 import { jsonc } from 'jsonc'
 import _ from 'lodash'
 import { Keccak } from 'sha3'
-import { FortaConfig } from '.'
+import { BlockEvent, EventType, FortaConfig, Network, Trace, TransactionEvent } from '.'
+import { Transaction } from './transaction'
+import { Receipt } from './receipt'
+import { TxEventBlock } from './transaction.event'
+import { Block } from './block'
 
 export const getFortaConfig: () => FortaConfig = () => {
   const configFlagIndex = process.argv.indexOf('--config')
@@ -23,6 +27,44 @@ export const getJsonRpcUrl = () => {
   const { jsonRpcUrl } = getFortaConfig()
   if (!jsonRpcUrl) throw new Error('no jspnRpcUrl found')
   return jsonRpcUrl
+}
+
+// utility function for writing TransactionEvent tests
+export const createTransactionEvent = ({
+  type = EventType.BLOCK,
+  network = Network.MAINNET,
+  transaction,
+  receipt,
+  traces = [],
+  addresses = {},
+  block
+}: {
+  type?: EventType,
+  network?: Network,
+  transaction: Transaction,
+  receipt: Receipt,
+  traces?: Trace[],
+  addresses?: { [key: string]: boolean },
+  block: TxEventBlock
+}) => {
+  return new TransactionEvent(type, network, transaction, receipt, traces, addresses, block)
+}
+
+// utility function for writing BlockEvent tests
+export const createBlockEvent = ({
+  type = EventType.BLOCK,
+  network = Network.MAINNET,
+  blockHash,
+  blockNumber,
+  block
+}: {
+  type?: EventType,
+  network?: Network,
+  blockHash: string,
+  blockNumber: number,
+  block: Block
+}) => {
+  return new BlockEvent(type, network, blockHash, blockNumber, block)
 }
 
 export const assertIsNonEmptyString = (str: string, varName: string) => {
