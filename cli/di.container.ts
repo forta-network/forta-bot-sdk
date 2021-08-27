@@ -16,6 +16,10 @@ import { provideRunBlockRange } from "./commands/run/run.block.range"
 import { provideRunFile } from "./commands/run/run.file"
 import { provideRunLive } from "./commands/run/run.live"
 import provideRunServer from "./commands/run/server"
+import provideGetCredentials from './commands/publish/get.credentials'
+import provideUploadImage from './commands/publish/upload.image'
+import provideUploadManifest from './commands/publish/upload.manifest'
+import providePushToRegistry from './commands/publish/push.to.registry'
 import { getJsonFile } from "./utils"
 import AgentRegistry from "./commands/publish/agent.registry"
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
@@ -75,11 +79,19 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     runFile: asFunction(provideRunFile),
     runLive: asFunction(provideRunLive),
 
+    getCredentials: asFunction(provideGetCredentials),
+    uploadImage: asFunction(provideUploadImage),
+    uploadManifest: asFunction(provideUploadManifest),
+    pushToRegistry: asFunction(providePushToRegistry),
+
     agentId: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.agentId
     }),
     version: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.version
+    }),
+    keyfileName: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.keyfile
     }),
     documentation: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
       if (!fortaConfig.documentation) {

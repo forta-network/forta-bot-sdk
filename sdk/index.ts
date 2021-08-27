@@ -24,6 +24,7 @@ interface FortaConfig {
   traceBlockMethod?: string
   traceTransactionMethod?: string
   documentation?: string
+  keyfile?: string
 }
 
 type HandleTransaction = (txEvent: TransactionEvent) => Promise<Finding[]>
