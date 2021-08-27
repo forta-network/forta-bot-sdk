@@ -31,6 +31,7 @@ import { CommandName } from '.'
 import provideAddToIpfs from './utils/add.to.ipfs'
 import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
 import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transaction'
+import provideAppendToFile from './utils/append.to.file'
 
 export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -112,6 +113,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     getKeyfile: asFunction(provideGetKeyfile),
     createKeyfile: asFunction(provideCreateKeyfile),
     addToIpfs: asFunction(provideAddToIpfs),
+    appendToFile: asFunction(provideAppendToFile),
 
     getTraceData: asFunction(provideGetTraceData),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
