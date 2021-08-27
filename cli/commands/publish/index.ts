@@ -21,5 +21,7 @@ export default function providePublish(
     const imageReference = await uploadImage()
     const manifestReference = await uploadManifest(imageReference, publicKey, privateKey)
     await pushToRegistry(manifestReference, publicKey, privateKey)
+    // invoke process.exit() otherwise a web3 websocket connection can prevent the process from completing
+    process.exit()
   } 
 }

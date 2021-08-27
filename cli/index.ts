@@ -12,6 +12,7 @@ async function executeCommand(commandName: CommandName, cliArgs: any) {
     await command(cliArgs)
   } catch (e) {
     console.error(`ERROR: ${e.message}`)
+    process.exit()
   }
 }
 
