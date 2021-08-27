@@ -42,6 +42,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     axios: asValue(axios),
     prompt: asValue(prompts),
     setInterval: asValue(setInterval),
+    filesystem: asValue(fs),
 
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     fortaConfigFilename: asFunction(() => {
@@ -74,6 +75,12 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     runFile: asFunction(provideRunFile),
     runLive: asFunction(provideRunLive),
 
+    agentId: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.agentId
+    }),
+    version: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.version
+    }),
     documentation: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
       if (!fortaConfig.documentation) {
         throw new Error(`no documentation provided in ${fortaConfigFilename}`)

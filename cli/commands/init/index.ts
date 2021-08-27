@@ -3,13 +3,14 @@ import shelljs from 'shelljs'
 import prompts from 'prompts'
 import { assertExists, assertIsNonEmptyString, assertShellResult } from '../../utils'
 import { CreateKeyfile } from '../../utils/create.keyfile'
+import { CommandHandler } from '../..'
 
 export default function provideInit(
   shell: typeof shelljs,
   prompt: typeof prompts,
   fortaKeystore: string,
   createKeyfile: CreateKeyfile
-) {
+): CommandHandler {
   assertExists(shell, 'shell')
   assertExists(prompt, 'prompt')
   assertIsNonEmptyString(fortaKeystore, 'fortaKeystore')

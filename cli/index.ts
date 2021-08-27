@@ -5,7 +5,7 @@ import configureContainer from './di.container';
 export type CommandName = "init" | "run" | "publish"
 export type CommandHandler = (args: any) => Promise<void>
 
-async function runCommand(commandName: CommandName, cliArgs: any) {
+async function executeCommand(commandName: CommandName, cliArgs: any) {
   const diContainer = configureContainer(commandName, cliArgs);
   const command = diContainer.resolve<CommandHandler>(commandName)
   try {
@@ -22,7 +22,7 @@ yargs
         description: 'Initialize as Typescript project',
       })
     },
-    (cliArgs: any) => runCommand("init", cliArgs)
+    (cliArgs: any) => executeCommand("init", cliArgs)
   )
   .command('run', 'Run the Forta Agent with latest blockchain data',
     (yargs: Argv) => {
@@ -45,7 +45,7 @@ yargs
         type: 'string',
       })
     },
-    (cliArgs: any) => runCommand("run", cliArgs)
+    (cliArgs: any) => executeCommand("run", cliArgs)
   )
   .command('publish', 'Publish the Forta Agent to the network',
     (yargs: Argv) => {
@@ -54,7 +54,7 @@ yargs
         type: 'string',
       })
     },
-    (cliArgs: any) => runCommand("publish", cliArgs)
+    (cliArgs: any) => executeCommand("publish", cliArgs)
   )
   .strict()
   .argv
