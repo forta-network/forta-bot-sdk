@@ -7,6 +7,7 @@ describe("publish", () => {
   const mockUploadImage = jest.fn()
   const mockUploadManifest = jest.fn()
   const mockPushToRegistry = jest.fn()
+  const mockExit = jest.spyOn(process, 'exit').mockImplementation();
 
   beforeAll(() => {
     publish = providePublish(mockGetCredentials, mockUploadImage, mockUploadManifest, mockPushToRegistry)
@@ -33,5 +34,6 @@ describe("publish", () => {
     expect(mockUploadManifest).toHaveBeenCalledBefore(mockPushToRegistry)
     expect(mockPushToRegistry).toHaveBeenCalledTimes(1)
     expect(mockPushToRegistry).toHaveBeenCalledWith(mockManifestRef, mockCredentials.publicKey, mockCredentials.privateKey)
+    expect(mockExit).toHaveBeenCalledTimes(1)
   })
 })

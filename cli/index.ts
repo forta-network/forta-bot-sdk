@@ -6,9 +6,9 @@ export type CommandName = "init" | "run" | "publish"
 export type CommandHandler = (args: any) => Promise<void>
 
 async function executeCommand(commandName: CommandName, cliArgs: any) {
-  const diContainer = configureContainer(commandName, cliArgs);
-  const command = diContainer.resolve<CommandHandler>(commandName)
   try {
+    const diContainer = configureContainer(commandName, cliArgs);
+    const command = diContainer.resolve<CommandHandler>(commandName)
     await command(cliArgs)
   } catch (e) {
     console.error(`ERROR: ${e.message}`)
