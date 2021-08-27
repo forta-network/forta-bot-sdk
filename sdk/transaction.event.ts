@@ -4,7 +4,7 @@ import { Trace } from "./trace"
 import { Transaction } from "./transaction"
 import { keccak256 } from "./utils"
 
-interface Block {
+export interface TxEventBlock {
   hash: string;
   number: number;
   timestamp: number;
@@ -18,7 +18,7 @@ export class TransactionEvent {
     readonly receipt: Receipt,
     readonly traces: Trace[] = [],
     readonly addresses: { [key: string]: boolean },
-    readonly block: Block
+    readonly block: TxEventBlock
   ) {}
 
   get hash() {

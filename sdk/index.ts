@@ -1,8 +1,8 @@
 import { Finding, FindingSeverity, FindingType } from "./finding"
 import { BlockEvent } from "./block.event"
 import { Block } from "./block"
-import { TransactionEvent } from "./transaction.event"
-import { getFortaConfig, getJsonRpcUrl } from "./utils"
+import { TransactionEvent, TxEventBlock } from "./transaction.event"
+import { createBlockEvent, createTransactionEvent, getFortaConfig, getJsonRpcUrl } from "./utils"
 import { Log, Receipt } from "./receipt"
 import { Trace, TraceAction, TraceResult } from "./trace"
 import { Transaction } from "./transaction"
@@ -51,6 +51,7 @@ export {
   FindingType,
   BlockEvent,
   TransactionEvent,
+  TxEventBlock,
   Block,
   Transaction,
   Receipt,
@@ -61,5 +62,7 @@ export {
   EventType,
   Network,
   getFortaConfig,
-  getJsonRpcUrl
+  getJsonRpcUrl,
+  createTransactionEvent,
+  createBlockEvent
  }
