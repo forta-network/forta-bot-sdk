@@ -17,8 +17,8 @@ export default function providePublish(
   assertExists(pushToRegistry, 'pushToRegistry')
 
   return async function publish(cliArgs: any) {
-    const { publicKey, privateKey } = await getCredentials()
     const imageReference = await uploadImage()
+    const { publicKey, privateKey } = await getCredentials()
     const manifestReference = await uploadManifest(imageReference, publicKey, privateKey)
     await pushToRegistry(manifestReference, publicKey, privateKey)
     // invoke process.exit() otherwise a web3 websocket connection can prevent the process from completing

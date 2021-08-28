@@ -4,6 +4,6 @@ export type AppendToFile = (msg: string, file: string) => void
 
 export default function provideAppendToFile() {
   return function appendToFile(msg: string, filename: string) {
-    new ShellString(msg).toEnd(filename)
+    new ShellString(`${msg}\n`).toEnd(filename)
   }
 }
