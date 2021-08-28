@@ -12,7 +12,7 @@
     "forta-agent": "./dist/cli/index.js"
   },
   "scripts": {
-    "build": "tsc && cp -r ./starter-project ./dist && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto",
+    "build": "tsc --p ./tsconfig.build.json && cp -r ./starter-project ./dist && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto",
     "publish:local": "npm link",
     "test": "jest"
   },
