@@ -23,12 +23,12 @@ describe("publish", () => {
 
     await publish({})
 
-    expect(mockGetCredentials).toHaveBeenCalledTimes(1)
-    expect(mockGetCredentials).toHaveBeenCalledWith()
-    expect(mockGetCredentials).toHaveBeenCalledBefore(mockUploadImage)
     expect(mockUploadImage).toHaveBeenCalledTimes(1)
     expect(mockUploadImage).toHaveBeenCalledWith()
-    expect(mockUploadImage).toHaveBeenCalledBefore(mockUploadManifest)
+    expect(mockUploadImage).toHaveBeenCalledBefore(mockGetCredentials)
+    expect(mockGetCredentials).toHaveBeenCalledTimes(1)
+    expect(mockGetCredentials).toHaveBeenCalledWith()
+    expect(mockGetCredentials).toHaveBeenCalledBefore(mockUploadManifest)
     expect(mockUploadManifest).toHaveBeenCalledTimes(1)
     expect(mockUploadManifest).toHaveBeenCalledWith(mockImageRef, mockCredentials.publicKey, mockCredentials.privateKey)
     expect(mockUploadManifest).toHaveBeenCalledBefore(mockPushToRegistry)
