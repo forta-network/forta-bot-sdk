@@ -122,7 +122,7 @@ export const createTransactionEvent = (
     })),
     root: (receipt as any).root ?? '',
   }  
-  receipt.logs.forEach(log => addresses[log.address] = true)
+  rcpt.logs.forEach(log => addresses[log.address] = true)
 
   const blok = {
     hash: block.hash,

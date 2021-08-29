@@ -1,24 +1,20 @@
 const {
-  TransactionEvent,
   FindingType,
   FindingSeverity,
   Finding,
+  createTransactionEvent,
 } = require("forta-agent");
 const { handleTransaction } = require(".");
 
 describe("high gas agent", () => {
-  const createTxEvent = ({ gasUsed }) => {
-    const receipt = {
-      gasUsed,
-    };
-    return new TransactionEvent(null, null, null, receipt, [], {}, null);
-  };
+  const createTxEventWithGasUsed = (gasUsed) =>
+    createTransactionEvent({
+      receipt: { gasUsed },
+    });
 
   describe("handleTransaction", () => {
     it("returns empty findings if gas used is below threshold", async () => {
-      const txEvent = createTxEvent({
-        gasUsed: "1",
-      });
+      const txEvent = createTxEventWithGasUsed("1");
 
       const findings = await handleTransaction(txEvent);
 
@@ -26,9 +22,7 @@ describe("high gas agent", () => {
     });
 
     it("returns a finding if gas used is above threshold", async () => {
-      const txEvent = createTxEvent({
-        gasUsed: "1000001",
-      });
+      const txEvent = createTxEventWithGasUsed("1000001");
 
       const findings = await handleTransaction(txEvent);
 

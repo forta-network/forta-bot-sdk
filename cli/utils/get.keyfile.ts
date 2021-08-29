@@ -1,20 +1,13 @@
 import fs from 'fs'
-import path from 'path'
-import { assertExists } from '.';
 var keythereum = require("keythereum");
 
-// decrypts keyfile specified by keyfileName from keystore using password
-export type GetKeyfile = (keyfileName: string, password: string) => Promise<{ publicKey: string, privateKey: string}>
+// decrypts keyfile specified by keyfilePath using password
+export type GetKeyfile = (keyfilePath: string, password: string) => Promise<{ publicKey: string, privateKey: string}>
 
-export function provideGetKeyfile(
-  fortaKeystore: string
-): GetKeyfile {
-  assertExists(fortaKeystore, 'fortaKeystore')
+export function provideGetKeyfile(): GetKeyfile {
 
-  return async function getKeyfile(keyfileName: string, password: string) {
-    const keyFilePath = path.join(fortaKeystore, keyfileName)
-    const keyObject = JSON.parse(fs.readFileSync(keyFilePath).toString())
-
+  return async function getKeyfile(keyfilePath: string, password: string) {
+    const keyObject = JSON.parse(fs.readFileSync(keyfilePath).toString())
     return {
       publicKey: `0x${keyObject.address}`,
       privateKey: `0x${keythereum.recover(password, keyObject).toString('hex')}`

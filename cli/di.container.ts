@@ -4,6 +4,7 @@ import { join } from "path"
 import { asClass, asFunction, asValue, createContainer, InjectionMode } from "awilix"
 import Web3 from 'web3'
 import shell from 'shelljs'
+import prompts from 'prompts'
 import axios, { AxiosRequestConfig } from 'axios'
 import provideInit from "./commands/init"
 import provideRun from "./commands/run"
@@ -15,6 +16,10 @@ import { provideRunBlockRange } from "./commands/run/run.block.range"
 import { provideRunFile } from "./commands/run/run.file"
 import { provideRunLive } from "./commands/run/run.live"
 import provideRunServer from "./commands/run/server"
+import provideGetCredentials from './commands/publish/get.credentials'
+import provideUploadImage from './commands/publish/upload.image'
+import provideUploadManifest from './commands/publish/upload.manifest'
+import providePushToRegistry from './commands/publish/push.to.registry'
 import { getJsonFile } from "./utils"
 import AgentRegistry from "./commands/publish/agent.registry"
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
@@ -27,6 +32,7 @@ import { CommandName } from '.'
 import provideAddToIpfs from './utils/add.to.ipfs'
 import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
 import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transaction'
+import provideAppendToFile from './utils/append.to.file'
 
 export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -40,6 +46,9 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return shell
     }).singleton(),
     axios: asValue(axios),
+    prompt: asValue(prompts),
+    setInterval: asValue(setInterval),
+    filesystem: asValue(fs),
 
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     fortaConfigFilename: asFunction(() => {
@@ -72,6 +81,20 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     runFile: asFunction(provideRunFile),
     runLive: asFunction(provideRunLive),
 
+    getCredentials: asFunction(provideGetCredentials),
+    uploadImage: asFunction(provideUploadImage),
+    uploadManifest: asFunction(provideUploadManifest),
+    pushToRegistry: asFunction(providePushToRegistry),
+
+    agentId: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.agentId
+    }),
+    version: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.version
+    }),
+    keyfileName: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.keyfile
+    }),
     documentation: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
       if (!fortaConfig.documentation) {
         throw new Error(`no documentation provided in ${fortaConfigFilename}`)
@@ -93,6 +116,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     getKeyfile: asFunction(provideGetKeyfile),
     createKeyfile: asFunction(provideCreateKeyfile),
     addToIpfs: asFunction(provideAddToIpfs),
+    appendToFile: asFunction(provideAppendToFile),
 
     getTraceData: asFunction(provideGetTraceData),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
@@ -132,12 +156,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       }
       return fortaConfig.jsonRpcUrl
     }),
-    web3: asFunction((jsonRpcUrl: string) => {
-      const provider = jsonRpcUrl.startsWith('ws') ? 
-        new Web3.providers.WebsocketProvider(jsonRpcUrl) : 
-        new Web3.providers.HttpProvider(jsonRpcUrl)
-      return new Web3(provider)
-    }).singleton(),
+    web3: asFunction((jsonRpcUrl: string) =>  new Web3(jsonRpcUrl)).singleton(),
     web3AgentRegistry: asFunction((agentRegistryJsonRpcUrl: string) => new Web3(agentRegistryJsonRpcUrl)).singleton(),
 
     ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
