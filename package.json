@@ -14,7 +14,9 @@
   "scripts": {
     "build": "tsc --p ./tsconfig.build.json && cp -r ./starter-project ./dist && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto",
     "publish:local": "npm link",
-    "test": "jest"
+    "test": "jest",
+    "python:publish:local": "python3 -m pip install -e .",
+    "python:build": "python3 -m build"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.3.6",
