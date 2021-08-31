@@ -1,7 +1,8 @@
-from enum import Enum
+from enum import IntEnum
+from .utils import assert_enum_value_in_dict, assert_non_empty_string_in_dict
 
 
-class FindingSeverity(Enum):
+class FindingSeverity(IntEnum):
     Unknown = 0
     Info = 1
     Low = 2
@@ -10,7 +11,7 @@ class FindingSeverity(Enum):
     Critical = 5
 
 
-class FindingType(Enum):
+class FindingType(IntEnum):
     Unknown = 0
     Exploit = 1
     Suspicious = 2
@@ -19,12 +20,16 @@ class FindingType(Enum):
 
 class Finding:
     def __init__(self, dict):
+        assert_non_empty_string_in_dict(dict, 'name')
+        assert_non_empty_string_in_dict(dict, 'description')
+        assert_non_empty_string_in_dict(dict, 'alert_id')
+        assert_enum_value_in_dict(dict, 'severity', FindingSeverity)
+        assert_enum_value_in_dict(dict, 'type', FindingType)
         self.name = dict['name']
         self.description = dict['description']
         self.alert_id = dict['alert_id']
-        self.protocol = dict['protocol']
+        self.protocol = 'ethereum' if 'protocol' not in dict else dict['protocol']
         self.severity = dict['severity']
         self.type = dict['type']
-        self.everest_id = dict['everest_id']
-        self.metadata = dict['metadata']
-        # TODO assert values
+        self.everest_id = '' if 'everest_id' not in dict else dict['everest_id']
+        self.metadata = {} if 'metadata' not in dict else dict['metadata']
