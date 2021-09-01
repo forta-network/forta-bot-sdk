@@ -40,12 +40,13 @@ function hasHandlers(agentPath: string) {
   let hasTransactionHandler = false
   let hasBlockHandler = false
   let line
-  while (line = lineReader.next().toString('ascii')) {
-      if (line.startsWith(`def ${HANDLE_TRANSACTION_METHOD_NAME}`)) {
-        hasTransactionHandler = true
-      } else if (line.startsWith(`def ${HANDLE_BLOCK_METHOD_NAME}`)) {
-        hasBlockHandler = true
-      }
+  while (line = lineReader.next()) {
+    line = line.toString('ascii')
+    if (line.startsWith(`def ${HANDLE_TRANSACTION_METHOD_NAME}`)) {
+      hasTransactionHandler = true
+    } else if (line.startsWith(`def ${HANDLE_BLOCK_METHOD_NAME}`)) {
+      hasBlockHandler = true
+    }
   }
   return { hasTransactionHandler, hasBlockHandler }
 }
@@ -53,17 +54,22 @@ function hasHandlers(agentPath: string) {
 function wrapPythonHandler(agentPath: string, findingMarker: string, methodName: string) {
   // determine what the python module to import will be
   const agentModule = agentPath.replace(`${process.cwd()}${path.sep}`, '').replace('.py', '').replace(path.sep, '.')
+  const eventType = methodName === HANDLE_TRANSACTION_METHOD_NAME ? 'TransactionEvent' : 'BlockEvent'
   // write a wrapper script to invoke the agent handler
   // WARNING! BE CAREFUL OF INDENTATION HERE
   const pythonWrapperScript = `
 import sys
 sys.path.append('${process.cwd()}')
 import json
+from forta_agent import ${eventType}
 import ${agentModule}
 
-event = json.loads(input())
-findings = ${agentModule}.${methodName}(event)
-print('${findingMarker}'+json.dumps(findings))
+while True:
+  eventJson = json.loads(input())
+  hash = eventJson['hash']
+  event = ${eventType}(eventJson)
+  findings = ${agentModule}.${methodName}(event)
+  print(f'${findingMarker}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
 `
   // write the wrapper script to file
   const randomInt = Math.floor(Math.random() * Date.now())
@@ -71,26 +77,39 @@ print('${findingMarker}'+json.dumps(findings))
   fs.writeFileSync(pythonWrapperPath, pythonWrapperScript)
   PythonShell.checkSyntaxFile(pythonWrapperPath)
 
+  const promiseCallbackMap: {[hash: string]: { resolve: (val: any) => void, reject: (err: any) => void } } = {}
+  const pythonWrapper = new PythonShell(pythonWrapperPath)
+    // set event listener for outputs (printed string messages)
+    .on("message", function (message: string) {
+      // use findingMarker to distinguish between returned findings and regular log output
+      if (!message.startsWith(findingMarker)) {
+        console.log(message)
+        return
+      }
+
+      const hashStartIndex = findingMarker.length
+      const hashEndIndex = message.indexOf(':', hashStartIndex)
+      const hash = message.substr(hashStartIndex, hashEndIndex-hashStartIndex)
+      const findingsJson = JSON.parse(message.substr(hashEndIndex+1)) as any[]
+      const findings = findingsJson.map(findingJson => Finding.fromObject(JSON.parse(findingJson)))
+      const { resolve } = promiseCallbackMap[hash]
+      resolve(findings)
+      delete promiseCallbackMap[hash]
+    })
+    .on("stderr", function (err) {
+      // full error message will be printed out line-by-line through multiple invocations of this listener
+      console.log(err)
+      // if (err) reject(err) // TODO which promise should be rejected? we dont know the hash
+    })
+
   return function handler(event: TransactionEvent | BlockEvent) {
     return new Promise((resolve, reject) => {
-      const pythonWrapper = new PythonShell(pythonWrapperPath)
+      // use hash as a key to invoke promise callback
+      const hash = event instanceof TransactionEvent ? event.hash : event.blockHash
+      // store reference to promise callbacks
+      promiseCallbackMap[hash] = { resolve, reject }
       // send event as json string through stdin to python wrapper
-      pythonWrapper.send(JSON.stringify(event))
-      // listen for outputs (printed string messages)
-      pythonWrapper.on("message", function (message) {
-        // use findingMarker to distinguish between returned findings and regular log output
-        if (message.startsWith(findingMarker)) {
-          const findingsJson = JSON.parse(message.substr(findingMarker.length)) as any[]
-          const findings = findingsJson.map(findingJson => Finding.fromObject(findingJson))
-          resolve(findings)
-        } else {
-          console.log(message)
-        }
-      })
-      pythonWrapper.on("stderr", function (err) {
-        console.log(err)
-        if (err) reject(err)
-      })
+      pythonWrapper.send(JSON.stringify({ hash, ...event }))
     })
   } as any
 }
