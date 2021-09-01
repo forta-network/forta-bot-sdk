@@ -5,7 +5,7 @@ class Receipt:
         self.gas_used = dict['gasUsed']
         self.cumulative_gas_used = dict['cumulativeGasUsed']
         self.logs_bloom = dict['logsBloom']
-        self.logs = map(lambda t: Log(t), dict['logs'])
+        self.logs = list(map(lambda t: Log(t), dict['logs']))
         self.contract_address = dict['contractAddress']
         self.block_number = dict['blockNumber']
         self.block_hash = dict['blockHash']

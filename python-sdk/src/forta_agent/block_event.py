@@ -1,4 +1,5 @@
-from . import EventType, Network
+from .event_type import EventType
+from .network import Network
 from .block import Block
 
 

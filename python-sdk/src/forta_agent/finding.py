@@ -1,3 +1,4 @@
+import json
 from enum import IntEnum
 from .utils import assert_enum_value_in_dict, assert_non_empty_string_in_dict
 
@@ -31,5 +32,10 @@ class Finding:
         self.protocol = 'ethereum' if 'protocol' not in dict else dict['protocol']
         self.severity = dict['severity']
         self.type = dict['type']
-        self.everest_id = '' if 'everest_id' not in dict else dict['everest_id']
-        self.metadata = {} if 'metadata' not in dict else dict['metadata']
+        self.everest_id = None if 'everest_id' not in dict else dict['everest_id']
+        self.metadata = None if 'metadata' not in dict else dict['metadata']
+
+    def toJson(self):
+        d = dict(self.__dict__, **
+                 {'alertId': self.alert_id, 'everestId': self.everest_id})
+        return json.dumps({k: v for k, v in d.items() if v or k == 'type' or k == 'severity'})

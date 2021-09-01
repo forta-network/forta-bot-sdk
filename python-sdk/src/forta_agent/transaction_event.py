@@ -1,4 +1,5 @@
-from . import EventType, Network
+from .event_type import EventType
+from .network import Network
 from .transaction import Transaction
 from .receipt import Receipt
 from .trace import Trace
@@ -18,7 +19,7 @@ class TransactionEvent:
         self.network = Network(dict['network'])
         self.transaction = Transaction(dict['transaction'])
         self.receipt = Receipt(dict['receipt'])
-        self.traces = map(lambda t: Trace(t), dict['traces'])
+        self.traces = list(map(lambda t: Trace(t), dict['traces']))
         self.addresses = dict['addresses']
         self.block = TxEventBlock(dict['block'])
 
