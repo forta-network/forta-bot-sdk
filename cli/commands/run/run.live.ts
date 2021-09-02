@@ -18,16 +18,16 @@ export function provideRunLive(
     console.log('listening for blockchain data...')
 
     // process the latest block
-    let currBlockNumber = await web3.eth.getBlockNumber()
-    await runHandlersOnBlock(currBlockNumber)
-    currBlockNumber++
+    let latestBlockNumber = await web3.eth.getBlockNumber()
+    await runHandlersOnBlock(latestBlockNumber)
 
     // poll for the latest block every 15s and process each
     setInterval(async () => {
-      const latestBlockNumber = await web3.eth.getBlockNumber()
-      while (currBlockNumber <= latestBlockNumber) {
-        await runHandlersOnBlock(currBlockNumber)
+      let currBlockNumber = latestBlockNumber
+      latestBlockNumber = await web3.eth.getBlockNumber()
+      while (currBlockNumber < latestBlockNumber) {
         currBlockNumber++
+        await runHandlersOnBlock(currBlockNumber)
       }
     }, 15000)
   }
