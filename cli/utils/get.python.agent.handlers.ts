@@ -68,8 +68,11 @@ while True:
   eventJson = json.loads(input())
   hash = eventJson['hash']
   event = ${eventType}(eventJson)
-  findings = ${agentModule}.${methodName}(event)
-  print(f'${findingMarker}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
+  try:
+    findings = ${agentModule}.${methodName}(event)
+    print(f'${findingMarker}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
+  except Exception as e:
+    print(e, file=sys.stderr)
 `
   // write the wrapper script to file
   const randomInt = Math.floor(Math.random() * Date.now())
@@ -78,7 +81,7 @@ while True:
   PythonShell.checkSyntaxFile(pythonWrapperPath)
 
   const promiseCallbackMap: {[hash: string]: { resolve: (val: any) => void, reject: (err: any) => void } } = {}
-  const pythonWrapper = new PythonShell(pythonWrapperPath)
+  const pythonWrapper = new PythonShell(pythonWrapperPath, { args: process.argv })
     // set event listener for outputs (printed string messages)
     .on("message", function (message: string) {
       // use findingMarker to distinguish between returned findings and regular log output
@@ -97,9 +100,9 @@ while True:
       delete promiseCallbackMap[hash]
     })
     .on("stderr", function (err) {
-      // full error message will be printed out line-by-line through multiple invocations of this listener
-      console.log(err)
-      // if (err) reject(err) // TODO which promise should be rejected? we dont know the hash
+      const hash = Object.keys(promiseCallbackMap)[0]
+      const { reject } = promiseCallbackMap[hash]
+      reject(new Error(`python: ${err}`))
     })
 
   return function handler(event: TransactionEvent | BlockEvent) {
