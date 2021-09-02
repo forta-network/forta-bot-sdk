@@ -101,8 +101,12 @@ while True:
     })
     .on("stderr", function (err) {
       const hash = Object.keys(promiseCallbackMap)[0]
-      const { reject } = promiseCallbackMap[hash]
-      reject(new Error(`python: ${err}`))
+      if (hash && promiseCallbackMap[hash]) {
+        const { reject } = promiseCallbackMap[hash]
+        reject(new Error(`python: ${err}`))
+      } else {
+        console.log(err)
+      }
     })
 
   return function handler(event: TransactionEvent | BlockEvent) {
