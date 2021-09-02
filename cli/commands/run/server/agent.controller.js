@@ -137,7 +137,7 @@ module.exports = class AgentController {
     };
 
     const receipt = {
-      status: rcpt.status === "1",
+      status: rcpt.status === "0x1",
       root: rcpt.root,
       gasUsed: rcpt.gasUsed,
       cumulativeGasUsed: rcpt.cumulativeGasUsed,
