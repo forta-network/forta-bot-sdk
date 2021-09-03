@@ -61,6 +61,7 @@ export class Finding {
     assertIsNonEmptyString(protocol, 'protocol')
     assertIsFromEnum(severity, FindingSeverity, 'severity')
     assertIsFromEnum(type, FindingType, 'type')
+    // TODO assert metadata keys and values are strings
 
     return new Finding(name, description, alertId, protocol, severity, type, everestId, metadata)
   }

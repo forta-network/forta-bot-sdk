@@ -21,6 +21,8 @@ yargs
     (yargs: Argv) => {
       yargs.option('typescript', {
         description: 'Initialize as Typescript project',
+      }).option('python', {
+        description: 'Initialize as Python project'
       })
     },
     (cliArgs: any) => executeCommand("init", cliArgs)

@@ -27,6 +27,7 @@ import { provideGetKeyfile } from "./utils/get.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
 import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
+import { provideGetPythonAgentHandlers } from './utils/get.python.agent.handlers'
 import { CommandName } from '.'
 import provideAddToIpfs from './utils/add.to.ipfs'
 import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
@@ -107,6 +108,8 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return fortaConfig.handlers
     }),
     getAgentHandlers: asFunction(provideGetAgentHandlers),
+    getPythonAgentHandlers: asFunction(provideGetPythonAgentHandlers),
+    pythonFindingMarker: asValue('!*forta_finding*!:'),
     runHandlersOnBlock: asFunction(provideRunHandlersOnBlock),
     runHandlersOnTransaction: asFunction(provideRunHandlersOnTransaction),
     getJsonFile: asValue(getJsonFile),

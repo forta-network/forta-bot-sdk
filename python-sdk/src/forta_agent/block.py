@@ -1,0 +1,23 @@
+class Block:
+    def __init__(self, dict):
+        self.difficulty = dict['difficulty']
+        self.extra_data = dict['extraData']
+        self.gas_limit = dict['gasLimit']
+        self.gas_used = dict['gasUsed']
+        self.hash = dict['hash']
+        self.logs_bloom = dict['logsBloom']
+        self.miner = dict['miner']
+        self.mix_hash = dict['mixHash']
+        self.nonce = dict['nonce']
+        self.number = dict['number']
+        self.parent_hash = dict['parentHash']
+        self.receipts_root = None if 'receiptsRoot' not in dict else dict['receiptsRoot']
+        self.sha3_uncles = dict['sha3Uncles']
+        self.size = dict['size']
+        self.state_root = dict['stateRoot']
+        self.timestamp = dict['timestamp']
+        self.total_difficulty = dict['totalDifficulty']
+        self.transactions = dict['transactions']
+        self.transactions_root = None if 'transactionsRoot' not in dict else dict[
+            'transactionsRoot']
+        self.uncles = dict['uncles']

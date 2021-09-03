@@ -32,20 +32,21 @@ export default function provideInit(
     }
 
     const isTypescript = !!cliArgs.typescript
-    console.log(`initializing ${isTypescript ? "Typescript" : "Javascript"} Forta Agent...`)
+    const isPython = !!cliArgs.python
+    console.log(`initializing ${isPython ? "Python" : isTypescript ? "Typescript" : "Javascript"} Forta Agent...`)
     const starterProjectPath = `${join(__dirname, '..', '..', '..', 'starter-project')}`
     // copy files from starter-project to current directory
     const copyProjectResult = shell.cp('-r', [`${starterProjectPath}/*`, `${starterProjectPath}/.*`], '.')
     assertShellResult(copyProjectResult, 'error copying starter-project folder')
-    // copy files out from js/ts folder
-    const copyJsTsResult = shell.cp('-r', isTypescript ? './ts/*' : './js/*', '.')
-    assertShellResult(copyJsTsResult, `error unpacking ${isTypescript ? 'ts' : 'js'} folder`)
+    // copy files out from js/ts/py folder
+    const copyJsTsPyResult = shell.cp('-r', isPython ? './py/*' : isTypescript ? './ts/*' : './js/*', '.')
+    assertShellResult(copyJsTsPyResult, `error unpacking ${isPython ? 'py' : isTypescript ? 'ts' : 'js'} folder`)
     // rename _gitignore to .gitignore
     // (if we just name it .gitignore, npm publish will rename it to .npmignore 🤷🏻‍♂️)
     const renameGitignoreResult = shell.mv('_gitignore', '.gitignore')
     assertShellResult(renameGitignoreResult, 'error renaming gitignore file')
     // remove unused files/folders
-    const rmResult = shell.rm('-rf', 'js', 'ts', '.npmignore')
+    const rmResult = shell.rm('-rf', 'js', 'ts', 'py', '.npmignore')
     assertShellResult(rmResult, 'error cleaning up files')
 
     // create keyfile if one doesnt already exist
