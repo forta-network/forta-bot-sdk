@@ -14,7 +14,7 @@
     "publish": "forta-agent publish"
   },
   "dependencies": {
-    "forta-agent": "^0.0.12"
+    "forta-agent": "^0.0.13"
   },
   "devDependencies": {
     "nodemon": "^2.0.8"
