@@ -5,8 +5,8 @@ from .block import Block
 
 class BlockEvent:
     def __init__(self, dict):
-        self.type = EventType(dict['type'])
-        self.network = Network(dict['network'])
-        self.block_hash = dict['blockHash']
-        self.block_number = dict['blockNumber']
-        self.block = Block(dict['block'])
+        self.type = EventType(dict.get('type', EventType.BLOCK))
+        self.network = Network(dict.get('network', Network.MAINNET))
+        self.block_hash = dict.get('blockHash', dict.get('block_hash'))
+        self.block_number = dict.get('blockNumber', dict.get('block_number'))
+        self.block = Block(dict.get('block', {}))

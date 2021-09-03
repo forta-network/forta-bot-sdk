@@ -1,13 +1,13 @@
 class Transaction:
     def __init__(self, dict):
-        self.hash = dict['hash']
-        self.from_ = dict['from']
-        self.to = dict['to']
-        self.nonce = dict['nonce']
-        self.gas = dict['gas']
-        self.gas_price = dict['gasPrice']
-        self.value = dict['value']
-        self.data = dict['data']
-        self.r = dict['r']
-        self.s = dict['s']
-        self.v = dict['v']
+        self.hash = dict.get('hash')
+        self.from_ = dict.get('from')
+        self.to = dict.get('to')
+        self.nonce = dict.get('nonce')
+        self.gas = dict.get('gas')
+        self.gas_price = dict.get('gasPrice', dict.get('gas_price'))
+        self.value = dict.get('value')
+        self.data = dict.get('data')
+        self.r = dict.get('r')
+        self.s = dict.get('s')
+        self.v = dict.get('v')

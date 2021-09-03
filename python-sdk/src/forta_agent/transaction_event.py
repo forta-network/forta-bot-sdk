@@ -8,20 +8,20 @@ from .utils import keccak256
 
 class TxEventBlock:
     def __init__(self, dict):
-        self.hash = dict['hash']
-        self.number = dict['number']
-        self.timestamp = dict['timestamp']
+        self.hash = dict.get('hash')
+        self.number = dict.get('number')
+        self.timestamp = dict.get('timestamp')
 
 
 class TransactionEvent:
     def __init__(self, dict):
-        self.type = EventType(dict['type'])
-        self.network = Network(dict['network'])
-        self.transaction = Transaction(dict['transaction'])
-        self.receipt = Receipt(dict['receipt'])
-        self.traces = list(map(lambda t: Trace(t), dict['traces']))
-        self.addresses = dict['addresses']
-        self.block = TxEventBlock(dict['block'])
+        self.type = EventType(dict.get('type', EventType.BLOCK))
+        self.network = Network(dict.get('network', Network.MAINNET))
+        self.transaction = Transaction(dict.get('transaction', {}))
+        self.receipt = Receipt(dict.get('receipt', {}))
+        self.traces = list(map(lambda t: Trace(t), dict.get('traces', [])))
+        self.addresses = dict.get('addresses', {})
+        self.block = TxEventBlock(dict.get('block', {}))
 
     @property
     def hash(self):
