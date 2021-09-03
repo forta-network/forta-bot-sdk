@@ -100,12 +100,11 @@ while True:
       delete promiseCallbackMap[hash]
     })
     .on("stderr", function (err) {
+      console.log(err)
       const hash = Object.keys(promiseCallbackMap)[0]
       if (hash && promiseCallbackMap[hash]) {
         const { reject } = promiseCallbackMap[hash]
         reject(new Error(`python: ${err}`))
-      } else {
-        console.log(err)
       }
     })
 
