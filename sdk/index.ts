@@ -18,7 +18,6 @@ interface FortaConfig {
   imageRepositoryPassword?: string
   agentRegistryContractAddress?: string
   agentRegistryJsonRpcUrl?: string
-  handlers?: string[]
   debug?: boolean
   traceRpcUrl?: string
   traceBlockMethod?: string

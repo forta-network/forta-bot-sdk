@@ -5,6 +5,7 @@ import { asClass, asFunction, asValue, createContainer, InjectionMode } from "aw
 import Web3 from 'web3'
 import shell from 'shelljs'
 import prompts from 'prompts'
+import { jsonc } from 'jsonc'
 import axios, { AxiosRequestConfig } from 'axios'
 import provideInit from "./commands/init"
 import provideRun from "./commands/run"
@@ -59,12 +60,13 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       // config file will not exist when running "init"
       if (commandName === "run" || commandName === "publish") {
         // try to read from config file
-        const filePath = join('.', fortaConfigFilename)
-        if (!fs.existsSync(filePath)) throw new Error(`config file ${fortaConfigFilename} not found`)
-        try {
-          config = getJsonFile(filePath)
-        } catch (e) {
-          throw new Error(`unable to parse config file ${fortaConfigFilename}: ${e.message}`)
+        const filePath = join(process.cwd(), fortaConfigFilename)
+        if (fs.existsSync(filePath)) {// there wont be a config file when running in production container
+          try {
+            config = getJsonFile(filePath)
+          } catch (e) {
+            throw new Error(`unable to parse config file ${fortaConfigFilename}: ${e.message}`)
+          }
         }
       }
       return config
@@ -101,11 +103,21 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       }
       return join('.', fortaConfig.documentation)
     }),
-    handlerPaths: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
-      if (!fortaConfig.handlers || !fortaConfig.handlers.length) {
-        throw new Error(`no handlers provided in ${fortaConfigFilename}`)
+    handlerPaths: asFunction(() => {
+      const projectDir = process.cwd()
+      // default js agent
+      let agentPath = join(projectDir, "src", "agent")
+      // check if typescript agent
+      if (fs.existsSync(join(projectDir, "src", "agent.ts"))) {
+        const tsConfigPath = join(projectDir, "tsconfig.json")
+        const { compilerOptions } = jsonc.parse(fs.readFileSync(tsConfigPath, 'utf8'))
+        agentPath = join(projectDir, compilerOptions.outDir, "agent")
       }
-      return fortaConfig.handlers
+      // check if python agent
+      else if (fs.existsSync(join(projectDir, "src", "agent.py"))) {
+        agentPath = join(projectDir, "src", "agent.py")
+      }
+      return [agentPath]
     }),
     getAgentHandlers: asFunction(provideGetAgentHandlers),
     getPythonAgentHandlers: asFunction(provideGetPythonAgentHandlers),

@@ -4,7 +4,7 @@ const {
   Finding,
   createTransactionEvent,
 } = require("forta-agent");
-const { handleTransaction } = require(".");
+const { handleTransaction } = require("./agent");
 
 describe("high gas agent", () => {
   const createTxEventWithGasUsed = (gasUsed) =>
