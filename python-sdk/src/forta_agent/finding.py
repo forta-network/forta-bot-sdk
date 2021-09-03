@@ -29,11 +29,11 @@ class Finding:
         self.name = dict['name']
         self.description = dict['description']
         self.alert_id = dict['alert_id']
-        self.protocol = 'ethereum' if 'protocol' not in dict else dict['protocol']
+        self.protocol = dict.get('protocol', 'ethereum')
         self.severity = dict['severity']
         self.type = dict['type']
-        self.everest_id = None if 'everest_id' not in dict else dict['everest_id']
-        self.metadata = None if 'metadata' not in dict else dict['metadata']
+        self.everest_id = dict.get('everest_id')
+        self.metadata = dict.get('metadata')
 
     def toJson(self):
         d = dict(self.__dict__, **

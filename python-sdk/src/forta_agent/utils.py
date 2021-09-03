@@ -20,8 +20,18 @@ def get_json_rpc_url():
 
     config = get_forta_config()
     if "jsonRpcUrl" not in config:
-        raise Exception("no jspnRpcUrl found")
+        raise Exception("no jsonRpcUrl found")
     return config["jsonRpcUrl"]
+
+
+def create_block_event(dict):
+    from .block_event import BlockEvent  # avoid circular import
+    return BlockEvent(dict)
+
+
+def create_transaction_event(dict):
+    from .transaction_event import TransactionEvent  # avoid circular import
+    return TransactionEvent(dict)
 
 
 def assert_non_empty_string_in_dict(dict, key):

@@ -7,4 +7,4 @@ from .receipt import Receipt, Log
 from .trace import Trace, TraceAction, TraceResult
 from .event_type import EventType
 from .network import Network
-from .utils import get_forta_config, get_json_rpc_url
+from .utils import get_forta_config, get_json_rpc_url, create_block_event, create_transaction_event
