@@ -5,7 +5,7 @@ import {
   HandleTransaction,
   createTransactionEvent
 } from "forta-agent"
-import agent from "."
+import agent from "./agent"
 
 describe("high gas agent", () => {
   let handleTransaction: HandleTransaction
