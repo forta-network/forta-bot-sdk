@@ -15,8 +15,12 @@ class TxEventBlock:
 
 class TransactionEvent:
     def __init__(self, dict):
-        self.type = EventType(dict.get('type', EventType.BLOCK))
-        self.network = Network(dict.get('network', Network.MAINNET))
+        typeVal = dict.get('type', "BLOCK")
+        self.type = EventType[typeVal] if type(
+            typeVal) == str else EventType(typeVal)
+        networkVal = dict.get('network', "MAINNET")
+        self.network = Network[networkVal] if type(
+            networkVal) == str else Network(networkVal)
         self.transaction = Transaction(dict.get('transaction', {}))
         self.receipt = Receipt(dict.get('receipt', {}))
         self.traces = list(map(lambda t: Trace(t), dict.get('traces', [])))

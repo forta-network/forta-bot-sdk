@@ -1,3 +1,6 @@
+from .utils import hex_to_int
+
+
 class Trace:
     def __init__(self, dict):
         self.action = TraceAction(dict.get('action', {}))
@@ -21,7 +24,7 @@ class TraceAction:
         self.to = dict.get('to')
         self.input = dict.get('input')
         self.from_ = dict.get('from')
-        self.value = dict.get('value')
+        self.value = hex_to_int(dict.get('value'))
         self.init = dict.get('init')
         self.address = dict.get('address')
         self.balance = dict.get('balance')
@@ -31,6 +34,6 @@ class TraceAction:
 
 class TraceResult:
     def __init__(self, dict):
-        self.gas_used = dict.get('gasUsed', dict.get('gas_used'))
+        self.gas_used = hex_to_int(dict.get('gasUsed', dict.get('gas_used')))
         self.address = dict.get('address')
         self.code = dict.get('code')

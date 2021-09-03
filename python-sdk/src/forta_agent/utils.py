@@ -49,6 +49,10 @@ def assert_key_in_dict(dict, key):
     assert key in dict, f'{key} is required'
 
 
+def hex_to_int(strVal):
+    return int(strVal, 16) if strVal and type(strVal) == str and strVal.startswith('0x') else int(strVal, 10)
+
+
 def keccak256(val):
     hash = sha3.keccak_256()
     hash.update(bytes(val, encoding='utf-8'))
