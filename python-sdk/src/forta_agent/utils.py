@@ -50,7 +50,9 @@ def assert_key_in_dict(dict, key):
 
 
 def hex_to_int(strVal):
-    return int(strVal, 16) if strVal and type(strVal) == str and strVal.startswith('0x') else int(strVal, 10)
+    if not strVal:
+        return strVal
+    return int(strVal, 16) if type(strVal) == str and strVal.startswith('0x') else int(strVal, 10)
 
 
 def keccak256(val):
