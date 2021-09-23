@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import { Trace } from "../../sdk";
+import { HandleBlock, HandleTransaction, Trace } from "../../sdk";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetTraceData } from "./get.trace.data";
 import { assertExists, createBlockEvent, createTransactionEvent } from ".";
@@ -15,8 +15,17 @@ export function provideRunHandlersOnBlock(
   assertExists(getAgentHandlers, 'getAgentHandlers')
   assertExists(getTraceData, 'getTraceData')
 
+  let blockHandlers: HandleBlock[]
+  let transactionHandlers: HandleTransaction[]
+
   return async function runHandlersOnBlock(blockHashOrNumber: string | number) {
-    const { blockHandlers, transactionHandlers } = await getAgentHandlers()
+    // only get the agent handlers once
+    if (!blockHandlers && !transactionHandlers) {
+      const agentHandlers = await getAgentHandlers()
+      blockHandlers = agentHandlers.blockHandlers
+      transactionHandlers = agentHandlers.transactionHandlers
+    }
+
     if (!blockHandlers.length && !transactionHandlers.length) {
       throw new Error("no block/transaction handlers found")
     }

@@ -134,7 +134,7 @@ describe("init", () => {
     expect(mockShell.cp).toHaveBeenCalledTimes(2)
     expect(mockShell.mv).toHaveBeenCalledTimes(1)
     expect(mockShell.rm).toHaveBeenCalledTimes(1)
-    expect(mockShell.rm).toHaveBeenCalledWith('-rf', 'js', 'ts', '.npmignore')
+    expect(mockShell.rm).toHaveBeenCalledWith('-rf', 'js', 'ts', 'py', '.npmignore')
   })
 
   it("prompts user for password to encrypt new keyfile if one does not exist", async () => {

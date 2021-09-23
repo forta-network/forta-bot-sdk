@@ -14,11 +14,7 @@ module.exports = class AgentController {
 
   async EvaluateBlock(call, callback) {
     // console.log(`${new Date().toISOString()}    evaluateBlock ${call.request.event.blockHash}`);
-
-    if (!this.blockHandlers) {
-      const { blockHandlers } = await this.getAgentHandlers();
-      this.blockHandlers = blockHandlers;
-    }
+    await this.ensureHandlersInitialized();
 
     const findings = [];
     let status = "SUCCESS";
@@ -45,11 +41,7 @@ module.exports = class AgentController {
 
   async EvaluateTx(call, callback) {
     // console.log(`${new Date().toISOString()}    evaluateTx ${call.request.event.transaction.hash}`);
-
-    if (!this.transactionHandlers) {
-      const { transactionHandlers } = await this.getAgentHandlers();
-      this.transactionHandlers = transactionHandlers;
-    }
+    await this.ensureHandlersInitialized();
 
     const findings = [];
     let status = "SUCCESS";
@@ -74,6 +66,14 @@ module.exports = class AgentController {
         timestamp: new Date().toISOString(),
       },
     });
+  }
+
+  async ensureHandlersInitialized() {
+    if (!this.blockHandlers && !this.transactionHandlers) {
+      const agentHandlers = await this.getAgentHandlers();
+      this.blockHandlers = agentHandlers.blockHandlers;
+      this.transactionHandlers = agentHandlers.transactionHandlers;
+    }
   }
 
   createBlockEventFromGrpcRequest(request) {

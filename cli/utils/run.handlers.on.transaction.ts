@@ -1,5 +1,6 @@
 import Web3 from "web3";
 import { assertExists, createTransactionEvent } from ".";
+import { HandleTransaction } from "../../sdk";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetTraceData } from "./get.trace.data";
 
@@ -14,8 +15,15 @@ export function provideRunHandlersOnTransaction(
   assertExists(getAgentHandlers, 'getAgentHandlers')
   assertExists(getTraceData, 'getTraceData')
 
+  let transactionHandlers: HandleTransaction[]
+  
   return async function runHandlersOnTransaction(txHash: string) {
-    const { transactionHandlers } = await getAgentHandlers()
+    // only get the agent handlers once
+    if (!transactionHandlers) {
+      const agentHandlers = await getAgentHandlers()
+      transactionHandlers = agentHandlers.transactionHandlers
+    }
+
     if (!transactionHandlers.length) {
       throw new Error("no transaction handlers found")
     }
