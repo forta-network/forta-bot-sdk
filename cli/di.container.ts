@@ -164,6 +164,8 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     jsonRpcUrl: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
       if (!fortaConfig.jsonRpcUrl) {
         throw new Error(`no jsonRpcUrl provided in ${fortaConfigFilename}`)
+      } else if (!fortaConfig.jsonRpcUrl.startsWith("http")) {
+        throw new Error(`jsonRpcUrl must begin with http or https`)
       }
       return fortaConfig.jsonRpcUrl
     }),
