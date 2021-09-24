@@ -13,7 +13,6 @@ module.exports = class AgentController {
   }
 
   async EvaluateBlock(call, callback) {
-    // console.log(`${new Date().toISOString()}    evaluateBlock ${call.request.event.blockHash}`);
     await this.ensureHandlersInitialized();
 
     const findings = [];
@@ -26,6 +25,12 @@ module.exports = class AgentController {
           findings.push(...(await handleBlock(blockEvent)));
         }
       } catch (e) {
+        console.log(
+          `${new Date().toISOString()}    evaluateBlock ${
+            call.request.event.blockHash
+          }`
+        );
+        console.log(e);
         status = "ERROR";
       }
     }
@@ -40,7 +45,6 @@ module.exports = class AgentController {
   }
 
   async EvaluateTx(call, callback) {
-    // console.log(`${new Date().toISOString()}    evaluateTx ${call.request.event.transaction.hash}`);
     await this.ensureHandlersInitialized();
 
     const findings = [];
@@ -55,6 +59,12 @@ module.exports = class AgentController {
           findings.push(...(await handleTransaction(txEvent)));
         }
       } catch (e) {
+        console.log(
+          `${new Date().toISOString()}    evaluateTx ${
+            call.request.event.transaction.hash
+          }`
+        );
+        console.log(e);
         status = "ERROR";
       }
     }
