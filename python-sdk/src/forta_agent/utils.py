@@ -50,7 +50,7 @@ def assert_key_in_dict(dict, key):
 
 
 def hex_to_int(strVal):
-    if not strVal:
+    if not strVal or type(strVal) == int:
         return strVal
     return int(strVal, 16) if type(strVal) == str and strVal.startswith('0x') else int(strVal, 10)
 
