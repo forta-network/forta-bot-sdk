@@ -45,7 +45,8 @@ export const formatAddress = (address: string) => {
 }
 
 // creates a Forta BlockEvent from a web3 BlockTransactionObject
-export const createBlockEvent = (block: BlockTransactionObject, networkId: number) => {
+export type CreateBlockEvent = (block: BlockTransactionObject, networkId: number) => BlockEvent
+export const createBlockEvent: CreateBlockEvent = (block: BlockTransactionObject, networkId: number) => {
   const blok = {
     difficulty: block.difficulty.toString(),
     extraData: block.extraData,
