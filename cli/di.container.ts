@@ -21,7 +21,7 @@ import provideGetCredentials from './commands/publish/get.credentials'
 import provideUploadImage from './commands/publish/upload.image'
 import provideUploadManifest from './commands/publish/upload.manifest'
 import providePushToRegistry from './commands/publish/push.to.registry'
-import { getJsonFile } from "./utils"
+import { createTransactionEvent, getJsonFile } from "./utils"
 import AgentRegistry from "./commands/publish/agent.registry"
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
 import { provideGetKeyfile } from "./utils/get.keyfile"
@@ -118,12 +118,13 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       }
       return [agentPath]
     }),
-    getAgentHandlers: asFunction(provideGetAgentHandlers),
+    getAgentHandlers: asFunction(provideGetAgentHandlers).singleton(),
     getPythonAgentHandlers: asFunction(provideGetPythonAgentHandlers),
     pythonFindingMarker: asValue('!*forta_finding*!:'),
     runHandlersOnBlock: asFunction(provideRunHandlersOnBlock),
     runHandlersOnTransaction: asFunction(provideRunHandlersOnTransaction),
     getJsonFile: asValue(getJsonFile),
+    createTransactionEvent: asValue(createTransactionEvent),
     getKeyfile: asFunction(provideGetKeyfile),
     createKeyfile: asFunction(provideCreateKeyfile),
     addToIpfs: asFunction(provideAddToIpfs),

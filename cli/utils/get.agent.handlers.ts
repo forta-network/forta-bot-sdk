@@ -13,10 +13,17 @@ export function provideGetAgentHandlers(
   assertExists(handlerPaths, 'handlerPaths')
   assertExists(getPythonAgentHandlers, 'getPythonAgentHandlers')
 
+  let blockHandlers: HandleBlock[]
+  let transactionHandlers: HandleTransaction[]
+
   return async function getAgentHandlers() {
-    const transactionHandlers: HandleTransaction[] = []
-    const blockHandlers: HandleBlock[] = []
-  
+    // only get the agent handlers once
+    if (blockHandlers && transactionHandlers) {
+      return { blockHandlers, transactionHandlers }
+    }
+
+    transactionHandlers = []
+    blockHandlers = []
     try {
       for (let handlerPath of handlerPaths) {
         if (handlerPath.startsWith(`.${path.sep}`)) {
@@ -38,6 +45,6 @@ export function provideGetAgentHandlers(
       throw new Error(`issue getting agent handlers: ${e.message}`)
     }
     
-    return { transactionHandlers, blockHandlers}
+    return { blockHandlers, transactionHandlers }
   }
 }

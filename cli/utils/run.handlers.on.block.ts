@@ -15,17 +15,8 @@ export function provideRunHandlersOnBlock(
   assertExists(getAgentHandlers, 'getAgentHandlers')
   assertExists(getTraceData, 'getTraceData')
 
-  let blockHandlers: HandleBlock[]
-  let transactionHandlers: HandleTransaction[]
-
   return async function runHandlersOnBlock(blockHashOrNumber: string | number) {
-    // only get the agent handlers once
-    if (!blockHandlers && !transactionHandlers) {
-      const agentHandlers = await getAgentHandlers()
-      blockHandlers = agentHandlers.blockHandlers
-      transactionHandlers = agentHandlers.transactionHandlers
-    }
-
+    const { blockHandlers, transactionHandlers } = await getAgentHandlers()
     if (!blockHandlers.length && !transactionHandlers.length) {
       throw new Error("no block/transaction handlers found")
     }

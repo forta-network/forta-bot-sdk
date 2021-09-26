@@ -72,7 +72,8 @@ export const createBlockEvent = (block: BlockTransactionObject, networkId: numbe
 }
 
 // creates a Forta TransactionEvent from a web3 TransactionReceipt and BlockTransactionObject
-export const createTransactionEvent = (
+export type CreateTransactionEvent = (receipt: TransactionReceipt, block: BlockTransactionObject, networkId: number, traces: Trace[]) => TransactionEvent
+export const createTransactionEvent: CreateTransactionEvent = (
   receipt: TransactionReceipt, 
   block: BlockTransactionObject, 
   networkId: number, 
