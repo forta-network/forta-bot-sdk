@@ -50,6 +50,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     prompt: asValue(prompts),
     setInterval: asValue(setInterval),
     filesystem: asValue(fs),
+    dynamicImport: asFunction((path: string) => import(path)),
 
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     fortaConfigFilename: asFunction(() => {
@@ -102,12 +103,13 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       }
       return join('.', fortaConfig.documentation)
     }),
-    handlerPaths: asFunction(() => {
+    agentPath: asFunction(() => {
       const projectDir = process.cwd()
       // default js agent
       let agentPath = join(projectDir, "src", "agent")
       // check if typescript agent
       if (fs.existsSync(join(projectDir, "src", "agent.ts"))) {
+        // point to compiled javascript agent in output folder
         const tsConfigPath = join(projectDir, "tsconfig.json")
         const { compilerOptions } = jsonc.parse(fs.readFileSync(tsConfigPath, 'utf8'))
         agentPath = join(projectDir, compilerOptions.outDir, "agent")
@@ -116,7 +118,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       else if (fs.existsSync(join(projectDir, "src", "agent.py"))) {
         agentPath = join(projectDir, "src", "agent.py")
       }
-      return [agentPath]
+      return agentPath
     }),
     getAgentHandlers: asFunction(provideGetAgentHandlers).singleton(),
     getPythonAgentHandlers: asFunction(provideGetPythonAgentHandlers),
