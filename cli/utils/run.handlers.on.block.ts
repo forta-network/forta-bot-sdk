@@ -1,19 +1,23 @@
 import Web3 from "web3";
-import { HandleBlock, HandleTransaction, Trace } from "../../sdk";
+import { Trace } from "../../sdk";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetTraceData } from "./get.trace.data";
-import { assertExists, createBlockEvent, createTransactionEvent } from ".";
+import { assertExists, CreateBlockEvent, CreateTransactionEvent } from ".";
 
 export type RunHandlersOnBlock = (blockHashOrNumber: string | number) => Promise<void>
 
 export function provideRunHandlersOnBlock(
   web3: Web3,
   getAgentHandlers: GetAgentHandlers,
-  getTraceData: GetTraceData
+  getTraceData: GetTraceData,
+  createBlockEvent: CreateBlockEvent,
+  createTransactionEvent: CreateTransactionEvent
 ): RunHandlersOnBlock {
   assertExists(web3, 'web3')
   assertExists(getAgentHandlers, 'getAgentHandlers')
   assertExists(getTraceData, 'getTraceData')
+  assertExists(createBlockEvent, 'createBlockEvent')
+  assertExists(createTransactionEvent, 'createTransactionEvent')
 
   return async function runHandlersOnBlock(blockHashOrNumber: string | number) {
     const { blockHandlers, transactionHandlers } = await getAgentHandlers()
@@ -22,11 +26,11 @@ export function provideRunHandlersOnBlock(
     }
 
     console.log(`fetching block ${blockHashOrNumber}...`)
+    const networkId = await web3.eth.net.getId()
     const block = await web3.eth.getBlock(blockHashOrNumber, true)
 
     // run block handlers
     if (blockHandlers.length) {
-      const networkId = await web3.eth.net.getId()
       const blockEvent = createBlockEvent(block, networkId)
       const findings = []
       for (const handleBlock of blockHandlers) {
@@ -37,7 +41,7 @@ export function provideRunHandlersOnBlock(
 
     if (!transactionHandlers.length) return
     
-    // run transaction handlers on all block transactions
+    // get trace data for block and build map for each transaction
     const traces = await getTraceData(block.number)
     const traceMap: { [txHash: string]: Trace[]} = {}
     traces.forEach(trace => {
@@ -47,7 +51,7 @@ export function provideRunHandlersOnBlock(
       traceMap[txHash].push(trace)
     })
 
-    const networkId = await web3.eth.net.getId()
+    // run transaction handlers on all block transactions
     for (const transaction of block.transactions) {
       let receipt = await web3.eth.getTransactionReceipt(transaction.hash)
       // retry once if receipt fetching failed TODO figure out why this happens sometimes
