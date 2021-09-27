@@ -55,18 +55,18 @@ export const createBlockEvent: CreateBlockEvent = (block: BlockTransactionObject
     hash: block.hash,
     logsBloom: block.logsBloom,
     miner: formatAddress(block.miner),
-    mixHash: '',//TODO
+    mixHash: (block as any).mixHash,
     nonce: block.nonce,
     number: block.number,
     parentHash: block.parentHash,
-    receiptsRoot: block.receiptRoot,
+    receiptsRoot: (block as any).receiptsRoot,
     sha3Uncles: block.sha3Uncles,
     size: block.size.toString(),
     stateRoot: block.stateRoot,
     timestamp: typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp,
     totalDifficulty: block.totalDifficulty.toString(),
     transactions: block.transactions.map(tx => tx.hash),
-    transactionsRoot: block.transactionRoot,
+    transactionsRoot: (block as any).transactionsRoot,
     uncles: block.uncles
   }
   return new BlockEvent(EventType.BLOCK, networkId, block.hash, block.number, blok)
