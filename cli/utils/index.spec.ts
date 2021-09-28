@@ -159,30 +159,30 @@ describe("createTransactionEvent", () => {
       "type": "0x2"
   } as any
     const traces: any = [{
-      blockHash: "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
-      blockNumber: 13309526,
-      result: {
-        gasUsed: "12345",
-        address: "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
-        code: "1"
+      "blockHash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
+      "blockNumber": 13309526,
+      "result": {
+        "gasUsed": "12345",
+        "address": "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
+        "code": "1"
       },
-      action: {
-        callType: "someType",
-        to: "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
-        input: "0xinput",
-        from: "0xc9F7bc0ed37b821A34bfd508069c75460d6efb37",
-        value: "500",
-        init: "xyz",
-        address: "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB38",
-        balance: "100",
-        refundAddress: "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB56"
+      "action": {
+        "callType": "someType",
+        "to": "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
+        "input": "0xinput",
+        "from": "0xc9F7bc0ed37b821A34bfd508069c75460d6efb37",
+        "value": "500",
+        "init": "xyz",
+        "address": "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB38",
+        "balance": "100",
+        "refundAddress": "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB56"
       },
-      subtraces: 5,
-      traceAddress: [1, 2],
-      transactionHash: "0xfadb14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147fb28",
-      transactionPosition: 1,
-      type: "call",
-      error: ""
+      "subtraces": 5,
+      "traceAddress": [1, 2],
+      "transactionHash": "0xfadb14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147fb28",
+      "transactionPosition": 1,
+      "type": "call",
+      "error": ""
     }]
 
     const txEvent = createTransactionEvent(web3Receipt, web3Block, networkId, traces)

@@ -101,14 +101,14 @@ module.exports = class AgentController {
       nonce: block.nonce,
       number: parseInt(block.number),
       parentHash: block.parentHash,
-      receiptsRoot: block.receiptRoot,
+      receiptsRoot: block.receiptsRoot,
       sha3Uncles: block.sha3Uncles,
       size: block.size,
       stateRoot: block.stateRoot,
       timestamp: parseInt(block.timestamp),
       totalDifficulty: block.totalDifficulty,
       transactions: block.transactions,
-      transactionsRoot: block.transactionRoot,
+      transactionsRoot: block.transactionsRoot,
       uncles: block.uncles,
     };
 
