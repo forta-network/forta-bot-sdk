@@ -1,5 +1,5 @@
-import { createBlockEvent, formatAddress, keccak256 } from "."
-import { BlockEvent, EventType, Network } from "../../sdk"
+import { createBlockEvent, createTransactionEvent, formatAddress, keccak256 } from "."
+import { BlockEvent, EventType, Network, TransactionEvent } from "../../sdk"
 
 describe("keccak256", () => {
   it("generates correct hash", () => {
@@ -98,6 +98,150 @@ describe("createBlockEvent", () => {
       transactions: web3Block.transactions.map((tx: any) => tx.hash),
       transactionsRoot: web3Block.transactionsRoot,
       uncles: web3Block.uncles
+    })
+  })
+})
+
+describe("createTransactionEvent", () => {
+  it("returns correctly formatted TransactionEvent", () => {
+    const networkId = 1
+    const web3Block = {
+      "hash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
+      "number": 13309526,
+      "timestamp": 1632768366,
+      "transactions": [
+          {
+              "accessList": [],
+              "blockHash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
+              "blockNumber": 13309526,
+              "chainId": "0x1",
+              "from": "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
+              "gas": 634772,
+              "gasPrice": "120102274187",
+              "hash": "0xfadb14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147fb28",
+              "input": "0x530ed69400000000000000000000000000000000000000000000000000000000000000050000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000418ed8709d206b533ab0b6fc526987bff7ec7b5eae527062bb09af80f7f578231c0734276e7d4675fdf7c9fbe540578891cf9fac872d8663c7c634afb01c39f9931c00000000000000000000000000000000000000000000000000000000000000",
+              "maxFeePerGas": "0x228a814e70",
+              "maxPriorityFeePerGas": "0x59682f00",
+              "nonce": 387,
+              "r": "0x2724a8ec2e2f3f634f04e954cf3b966bf9f734ada1611a44cd435441c83742e1",
+              "s": "0x7ae8047b83dc285a32f9fe6fb0b84927fc789e2a411ea2616deb3efd7c77a9a2",
+              "to": "0x127E479Ac59A1EA76AfdEDf830fEcc2909aA4cAE",
+              "transactionIndex": 0,
+              "type": "0x2",
+              "v": "0x0",
+              "value": "400000000000000000"
+          }
+      ],
+    } as any
+    const web3Receipt = {
+      "blockHash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
+      "blockNumber": 13309526,
+      "contractAddress": "0x351d579AC59a1ea76afdedf567becc3518ee5deb",
+      "cumulativeGasUsed": 634772,
+      "effectiveGasPrice": "0x1bf6a7448b",
+      "from": "0xc9f7bc0ed37b821a34bfd508059c75460d6efb37",
+      "gasUsed": 634772,
+      "logs": [{
+        "address": "0xB9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
+        "topics": ["topic1"],
+        "data": "0xdata",
+        "logIndex": 1,
+        "blockNumber": 13309526,
+        "blockHash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
+        "transactionIndex": 1,
+        "transactionHash": "0xfadb14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147fb28"
+      }],
+      "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "status": false,
+      "to": "0x127e479ac59a1ea76afdedf830fecc2909aa4cae",
+      "transactionHash": "0xfadb14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147fb28",
+      "transactionIndex": 0,
+      "type": "0x2"
+  } as any
+    const traces: any = [{
+      blockHash: "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
+      blockNumber: 13309526,
+      result: {
+        gasUsed: "12345",
+        address: "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
+        code: "1"
+      },
+      action: {
+        callType: "someType",
+        to: "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
+        input: "0xinput",
+        from: "0xc9F7bc0ed37b821A34bfd508069c75460d6efb37",
+        value: "500",
+        init: "xyz",
+        address: "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB38",
+        balance: "100",
+        refundAddress: "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB56"
+      },
+      subtraces: 5,
+      traceAddress: [1, 2],
+      transactionHash: "0xfadb14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147fb28",
+      transactionPosition: 1,
+      type: "call",
+      error: ""
+    }]
+
+    const txEvent = createTransactionEvent(web3Receipt, web3Block, networkId, traces)
+
+    expect(txEvent).toBeInstanceOf(TransactionEvent)
+    expect(txEvent.type).toEqual(EventType.BLOCK)
+    expect(txEvent.network).toEqual(Network.MAINNET)
+    const web3Tx = web3Block.transactions[0]
+    expect(txEvent.transaction).toStrictEqual({
+      hash: web3Tx.hash,
+      from: formatAddress(web3Tx.from),
+      to: formatAddress(web3Tx.to),
+      nonce: web3Tx.nonce,
+      gas: web3Tx.gas.toString(),
+      gasPrice: web3Tx.gasPrice,
+      value: web3Tx.value,
+      data: web3Tx.input,
+      r: web3Tx.r,
+      s: web3Tx.s,
+      v: web3Tx.v
+    })
+    const web3Log = web3Receipt.logs[0]
+    expect(txEvent.receipt).toStrictEqual({
+      blockNumber: web3Receipt.blockNumber,
+      blockHash: web3Receipt.blockHash,
+      transactionIndex: web3Receipt.transactionIndex,
+      transactionHash: web3Receipt.transactionHash,
+      status: web3Receipt.status,
+      logsBloom: web3Receipt.logsBloom,
+      contractAddress: formatAddress(web3Receipt.contractAddress),
+      gasUsed: web3Receipt.gasUsed.toString(),
+      cumulativeGasUsed: web3Receipt.cumulativeGasUsed.toString(),
+      root: '',
+      logs: [{
+        address: formatAddress(web3Log.address),
+        topics: web3Log.topics,
+        data: web3Log.data,
+        logIndex: web3Log.logIndex,
+        blockNumber: web3Log.blockNumber,
+        blockHash: web3Log.blockHash,
+        transactionIndex: web3Log.transactionIndex,
+        transactionHash: web3Log.transactionHash,
+        removed: false
+      }]
+    })
+    const traceAction = traces[0].action
+    expect(txEvent.addresses).toStrictEqual({
+      [formatAddress(web3Tx.from)]: true,
+      [formatAddress(web3Tx.to)]: true,
+      [formatAddress(web3Log.address)]: true,
+      [formatAddress(traceAction.address)]: true,
+      [formatAddress(traceAction.refundAddress)]: true,
+      [formatAddress(traceAction.to)]: true,
+      [formatAddress(traceAction.from)]: true,
+    })
+    expect(txEvent.block).toStrictEqual({
+      hash: web3Block.hash,
+      number: web3Block.number,
+      timestamp: web3Block.timestamp
     })
   })
 })
