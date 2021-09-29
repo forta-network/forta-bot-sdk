@@ -12,32 +12,26 @@ export function provideRunFile(
   assertExists(getJsonFile, 'getJsonFile')
 
   return async function runFile(filePath: string) {
-    const { blockHandlers, transactionHandlers } = await getAgentHandlers()
-    if (!blockHandlers.length && !transactionHandlers.length) {
-      throw new Error("no block/transaction handlers found")
+    const { handleBlock, handleTransaction } = await getAgentHandlers()
+    if (!handleBlock && !handleTransaction) {
+      throw new Error("no block/transaction handler found")
     }
     
     console.log('parsing file data...')
     const { transactionEvents, blockEvents } = getJsonFile(filePath)
 
-    if (blockHandlers.length && blockEvents?.length) {
+    if (handleBlock && blockEvents?.length) {
       console.log('running block events...')
       for (const blockEvent of blockEvents) {
-        const findings = []
-        for (const handleBlock of blockHandlers) {
-          findings.push(...await handleBlock(blockEvent))
-        }
+        const findings = await handleBlock(blockEvent)
         console.log(`${findings.length} findings for block ${blockEvent.hash} ${findings}`)
       }
     }
 
-    if (transactionHandlers.length && transactionEvents?.length) {
+    if (handleTransaction && transactionEvents?.length) {
       console.log('running transaction events...')
       for (const transactionEvent of transactionEvents) {
-        const findings = [];
-        for (const handleTransaction of transactionHandlers) {
-          findings.push(...await handleTransaction(transactionEvent))
-        }
+        const findings = await handleTransaction(transactionEvent)
         console.log(`${findings.length} findings for transaction ${transactionEvent.transaction.hash} ${findings}`)
       }
     }

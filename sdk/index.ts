@@ -26,6 +26,7 @@ interface FortaConfig {
   keyfile?: string
 }
 
+type Initialize = () => Promise<void>
 type HandleTransaction = (txEvent: TransactionEvent) => Promise<Finding[]>
 type HandleBlock = (blockEvent: BlockEvent) => Promise<Finding[]>
 
@@ -43,6 +44,7 @@ enum Network {
 
 export {
   FortaConfig,
+  Initialize,
   HandleTransaction,
   HandleBlock,
   Finding,

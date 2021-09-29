@@ -9,28 +9,23 @@ import { assertIsNonEmptyString } from "."
 // imports python agent handlers from file wrapped in javascript
 export type GetPythonAgentHandlers = (pythonAgentPath: string) => Promise<{ handleTransaction?: HandleTransaction, handleBlock? : HandleBlock }>
 
+const INITIALIZE_MARKER = "!*initialize*!"
+const FINDING_MARKER = "!*forta_finding*!:"
+const INITIALIZE_METHOD_NAME = "initialize"
 const HANDLE_TRANSACTION_METHOD_NAME = 'handle_transaction'
 const HANDLE_BLOCK_METHOD_NAME = 'handle_block'
 
-export function provideGetPythonAgentHandlers(pythonFindingMarker: string): GetPythonAgentHandlers {
-  assertIsNonEmptyString(pythonFindingMarker, 'pythonFindingMarker')
-
+export function provideGetPythonAgentHandlers(): GetPythonAgentHandlers {
   return async function getPythonAgentHandlers(pythonAgentPath: string) {
     // determine whether this agent has block/transaction handlers
-    const { hasBlockHandler, hasTransactionHandler } = hasHandlers(pythonAgentPath)
+    const { hasInitializeHandler, hasBlockHandler, hasTransactionHandler } = hasHandlers(pythonAgentPath)
     if (!hasBlockHandler && !hasTransactionHandler) throw new Error(`no handlers found in ${pythonAgentPath}`)
 
-    let handleTransaction, handleBlock
-    if (hasTransactionHandler) {
-      handleTransaction = wrapPythonHandler(pythonAgentPath, pythonFindingMarker, HANDLE_TRANSACTION_METHOD_NAME)
-    }
-    if (hasBlockHandler) {
-      handleBlock = wrapPythonHandler(pythonAgentPath, pythonFindingMarker, HANDLE_BLOCK_METHOD_NAME)
-    }
-
+    const pythonHandler = getPythonHandler(pythonAgentPath)
     return {
-      handleBlock,
-      handleTransaction
+      initialize: hasInitializeHandler ? pythonHandler : undefined,
+      handleBlock: hasBlockHandler ? pythonHandler : undefined,
+      handleTransaction: hasTransactionHandler ? pythonHandler : undefined
     }
   }
 }
@@ -39,6 +34,7 @@ function hasHandlers(agentPath: string) {
   const lineReader = new ReadLines(agentPath)
   let hasTransactionHandler = false
   let hasBlockHandler = false
+  let hasInitializeHandler = false
   let line
   while (line = lineReader.next()) {
     line = line.toString('ascii')
@@ -46,31 +42,43 @@ function hasHandlers(agentPath: string) {
       hasTransactionHandler = true
     } else if (line.startsWith(`def ${HANDLE_BLOCK_METHOD_NAME}`)) {
       hasBlockHandler = true
+    } else if (line.startsWith(`def ${INITIALIZE_METHOD_NAME}`)) {
+      hasInitializeHandler = true
     }
   }
-  return { hasTransactionHandler, hasBlockHandler }
+  return { hasTransactionHandler, hasBlockHandler, hasInitializeHandler }
 }
 
-function wrapPythonHandler(agentPath: string, findingMarker: string, methodName: string) {
+function getPythonHandler(agentPath: string) {
   // determine what the python module to import will be
   const agentModule = agentPath.replace(`${process.cwd()}${path.sep}`, '').replace('.py', '').replace(path.sep, '.')
-  const eventType = methodName === HANDLE_TRANSACTION_METHOD_NAME ? 'TransactionEvent' : 'BlockEvent'
-  // write a wrapper script to invoke the agent handler
+  
+  // write a wrapper script to invoke the agent handlers
   // WARNING! BE CAREFUL OF INDENTATION HERE
   const pythonWrapperScript = `
 import sys
 sys.path.append('${process.cwd()}')
 import json
-from forta_agent import ${eventType}
+from forta_agent import BlockEvent, TransactionEvent
 import ${agentModule}
 
 while True:
-  eventJson = json.loads(input())
-  hash = eventJson['hash']
-  event = ${eventType}(eventJson)
   try:
-    findings = ${agentModule}.${methodName}(event)
-    print(f'${findingMarker}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
+    msgJson = json.loads(input())
+    msgType = msgJson['msgType']
+    if msgType == '${INITIALIZE_METHOD_NAME}':
+      ${agentModule}.${INITIALIZE_METHOD_NAME}()
+      print(f'${INITIALIZE_MARKER}')
+    elif msgType == '${HANDLE_TRANSACTION_METHOD_NAME}':
+      hash = msgJson['hash']
+      event = TransactionEvent(msgJson)
+      findings = ${agentModule}.${HANDLE_TRANSACTION_METHOD_NAME}(event)
+      print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
+    elif msgType == '${HANDLE_BLOCK_METHOD_NAME}':
+      hash = msgJson['hash']
+      event = BlockEvent(msgJson)
+      findings = ${agentModule}.${HANDLE_BLOCK_METHOD_NAME}(event)
+      print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
   except Exception as e:
     print(e, file=sys.stderr)
 `
@@ -84,13 +92,18 @@ while True:
   const pythonWrapper = new PythonShell(pythonWrapperPath, { args: process.argv })
     // set event listener for outputs (printed string messages)
     .on("message", function (message: string) {
-      // use findingMarker to distinguish between returned findings and regular log output
-      if (!message.startsWith(findingMarker)) {
+      // use findingMarker/initializeMarker to distinguish between returned findings and regular log output
+      if (message.startsWith(INITIALIZE_MARKER)) {
+        const { resolve } = promiseCallbackMap['init']
+        resolve(undefined)
+        delete promiseCallbackMap['init']
+        return
+      } else if (!message.startsWith(FINDING_MARKER)) {
         console.log(message)
         return
       }
 
-      const hashStartIndex = findingMarker.length
+      const hashStartIndex = FINDING_MARKER.length
       const hashEndIndex = message.indexOf(':', hashStartIndex)
       const hash = message.substr(hashStartIndex, hashEndIndex-hashStartIndex)
       const findingsJson = JSON.parse(message.substr(hashEndIndex+1)) as any[]
@@ -108,14 +121,24 @@ while True:
       }
     })
 
-  return function handler(event: TransactionEvent | BlockEvent) {
+  return function handler(event: TransactionEvent | BlockEvent | undefined) {
     return new Promise((resolve, reject) => {
-      // use hash as a key to invoke promise callback
-      const hash = event instanceof TransactionEvent ? event.hash : event.blockHash
-      // store reference to promise callbacks
+      let msgType, hash
+      if (!event) {
+        msgType = INITIALIZE_METHOD_NAME
+        hash = 'init'
+      } else if (event instanceof BlockEvent) {
+        msgType = HANDLE_BLOCK_METHOD_NAME
+        hash = event.blockHash
+      } else {
+        msgType = HANDLE_TRANSACTION_METHOD_NAME
+        hash = event.hash
+      }
+
+      // store reference to promise callbacks (use hash as a key to invoke promise callback on completion)
       promiseCallbackMap[hash] = { resolve, reject }
       // send event as json string through stdin to python wrapper
-      pythonWrapper.send(JSON.stringify({ hash, ...event }))
+      pythonWrapper.send(JSON.stringify({ msgType, hash, ...event }))
     })
   } as any
 }

@@ -50,7 +50,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     prompt: asValue(prompts),
     setInterval: asValue(setInterval),
     filesystem: asValue(fs),
-    dynamicImport: asFunction((path: string) => import(path)),
+    dynamicImport: asValue((path: string) => import(path)),
 
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     fortaConfigFilename: asFunction(() => {
@@ -122,7 +122,6 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     }),
     getAgentHandlers: asFunction(provideGetAgentHandlers).singleton(),
     getPythonAgentHandlers: asFunction(provideGetPythonAgentHandlers),
-    pythonFindingMarker: asValue('!*forta_finding*!:'),
     runHandlersOnBlock: asFunction(provideRunHandlersOnBlock),
     runHandlersOnTransaction: asFunction(provideRunHandlersOnTransaction),
     getJsonFile: asValue(getJsonFile),

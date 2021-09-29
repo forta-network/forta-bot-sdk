@@ -22,22 +22,22 @@ describe("runHandlersOnTransaction", () => {
     )
   })
 
-  it("throws error if no transaction handlers found", async () => {
-    mockGetAgentHandlers.mockReturnValueOnce({ transactionHandlers: [] })
+  it("throws error if no transaction handler found", async () => {
+    mockGetAgentHandlers.mockReturnValueOnce({ })
 
     try {
       await runHandlersOnTransaction(mockTxHash)
     } catch (e) {
-      expect(e.message).toEqual('no transaction handlers found')
+      expect(e.message).toEqual('no transaction handler found')
     }
 
     expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
   })
 
-  it("invokes transaction handlers with transaction event", async () => {
+  it("invokes transaction handler with transaction event", async () => {
     mockGetAgentHandlers.mockReset()
     const mockHandleTransaction = jest.fn().mockReturnValue([])
-    mockGetAgentHandlers.mockReturnValueOnce({ transactionHandlers: [mockHandleTransaction] })
+    mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
     const mockNetworkId = 1
     mockWeb3.eth.net.getId.mockReturnValueOnce(mockNetworkId)
     const mockReceipt = { blockHash: '0xabc', transactionHash: mockTxHash }

@@ -3,13 +3,11 @@ import { formatAddress } from "../../../utils"
 import AgentController from "./agent.controller"
 
 describe("AgentController", () => {
-  let agentController: AgentController
+  // cheating here by using any so that we can invoke initializeAgentHandlers() for synchronous testing
+  let agentController: any
   const mockHandleBlock = jest.fn()
   const mockHandleTransaction = jest.fn()
-  const mockGetAgentHandlers = jest.fn().mockReturnValue({ 
-    blockHandlers: [mockHandleBlock], 
-    transactionHandlers: [mockHandleTransaction]
-  })
+  const mockGetAgentHandlers = jest.fn()
   const mockCallback = jest.fn()
   const mockFinding = { some: 'finding' }
   const systemTime = new Date()
@@ -148,15 +146,24 @@ describe("AgentController", () => {
     jest.useRealTimers()
   })
 
+  describe("constructor", () => {
+    it("should invoke getAgentHandlers", () => {
+      mockGetAgentHandlers.mockReturnValueOnce({})
+      new AgentController(mockGetAgentHandlers)
+  
+      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
+    })
+  })
+
   describe("Initialize", () => {
     it("invokes callback with success response", async () => {
+      mockGetAgentHandlers.mockReturnValueOnce({})
       agentController = new AgentController(mockGetAgentHandlers)
 
       await agentController.Initialize({}, mockCallback)
 
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, { status: "SUCCESS" })
-      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -164,8 +171,9 @@ describe("AgentController", () => {
     const mockBlockRequest = generateBlockRequest()
 
     it("invokes callback with error response if error occurs", async () => {
+      mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
       agentController = new AgentController(mockGetAgentHandlers)
-      mockGetAgentHandlers.mockReturnValue({ blockHandlers: [mockHandleBlock] })
+      await agentController.initializeAgentHandlers()
       const mockRequest = { 
         request: {
           event: {
@@ -184,12 +192,11 @@ describe("AgentController", () => {
           timestamp: systemTime.toISOString(),
         },
       })
-      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
     })
 
     it("invokes callback with success response and empty findings if no block handlers", async () => {
+      mockGetAgentHandlers.mockReturnValue({ })
       agentController = new AgentController(mockGetAgentHandlers)
-      mockGetAgentHandlers.mockReturnValue({ blockHandlers: [] })
 
       await agentController.EvaluateBlock({}, mockCallback)
 
@@ -201,14 +208,14 @@ describe("AgentController", () => {
           timestamp: systemTime.toISOString(),
         },
       })
-      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
     })
 
     it("invokes callback with success response and findings from block handlers", async () => {
-      agentController = new AgentController(mockGetAgentHandlers)
       const mockFinding = { some: 'finding' }
       mockHandleBlock.mockReturnValue([mockFinding])
-      mockGetAgentHandlers.mockReturnValue({ blockHandlers: [mockHandleBlock] })
+      mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
+      agentController = new AgentController(mockGetAgentHandlers)
+      await agentController.initializeAgentHandlers()
 
       await agentController.EvaluateBlock(mockBlockRequest, mockCallback)
 
@@ -220,7 +227,6 @@ describe("AgentController", () => {
           timestamp: systemTime.toISOString(),
         },
       })
-      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
       expect(mockHandleBlock).toHaveBeenCalledTimes(1)
       const blockEvent: BlockEvent = mockHandleBlock.mock.calls[0][0]
       expect(blockEvent).toBeInstanceOf(BlockEvent)
@@ -252,22 +258,15 @@ describe("AgentController", () => {
         uncles: grpcBlock.uncles
       })
     })
-
-    it("initializes agent handlers only once", async () => {
-      await agentController.EvaluateBlock(mockBlockRequest, mockCallback)
-
-      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(0)
-      expect(mockHandleBlock).toHaveBeenCalledTimes(1)
-      expect(mockCallback).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe("EvaluateTx", () => {
     const mockTxRequest = generateTxRequest()
 
     it("invokes callback with error response if error occurs", async () => {
+      mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
       agentController = new AgentController(mockGetAgentHandlers)
-      mockGetAgentHandlers.mockReturnValue({ transactionHandlers: [mockHandleTransaction] })
+      await agentController.initializeAgentHandlers()
       const mockRequest = { 
         request: {
           event: {
@@ -288,12 +287,11 @@ describe("AgentController", () => {
           timestamp: systemTime.toISOString(),
         },
       })
-      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
     })
 
     it("invokes callback with success response and empty findings if no transaction handlers", async () => {
+      mockGetAgentHandlers.mockReturnValue({ })
       agentController = new AgentController(mockGetAgentHandlers)
-      mockGetAgentHandlers.mockReturnValue({ transactionHandlers: [] })
 
       await agentController.EvaluateTx({}, mockCallback)
 
@@ -305,13 +303,13 @@ describe("AgentController", () => {
           timestamp: systemTime.toISOString(),
         },
       })
-      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
     })
 
     it("invokes callback with success response and findings from transaction handlers", async () => {
-      agentController = new AgentController(mockGetAgentHandlers)
       mockHandleTransaction.mockReturnValue([mockFinding])
-      mockGetAgentHandlers.mockReturnValue({ transactionHandlers: [mockHandleTransaction] })
+      mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
+      agentController = new AgentController(mockGetAgentHandlers)
+      await agentController.initializeAgentHandlers()
 
       await agentController.EvaluateTx(mockTxRequest, mockCallback)
 
@@ -323,7 +321,6 @@ describe("AgentController", () => {
           timestamp: systemTime.toISOString(),
         },
       })
-      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
       expect(mockHandleTransaction).toHaveBeenCalledTimes(1)
       const txEvent: TransactionEvent = mockHandleTransaction.mock.calls[0][0]
       expect(txEvent).toBeInstanceOf(TransactionEvent)
@@ -402,14 +399,6 @@ describe("AgentController", () => {
         number: parseInt(grpcBlock.blockNumber),
         timestamp: parseInt(grpcBlock.blockTimestamp),
       })
-    })
-
-    it("initializes agent handlers only once", async () => {
-      await agentController.EvaluateTx(mockTxRequest, mockCallback)
-
-      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(0)
-      expect(mockHandleTransaction).toHaveBeenCalledTimes(1)
-      expect(mockCallback).toHaveBeenCalledTimes(1)
     })
   })
 })
