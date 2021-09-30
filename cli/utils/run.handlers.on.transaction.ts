@@ -17,9 +17,9 @@ export function provideRunHandlersOnTransaction(
   assertExists(createTransactionEvent, 'createTransactionEvent')
 
   return async function runHandlersOnTransaction(txHash: string) {
-    const { transactionHandlers } = await getAgentHandlers()
-    if (!transactionHandlers.length) {
-      throw new Error("no transaction handlers found")
+    const { handleTransaction } = await getAgentHandlers()
+    if (!handleTransaction) {
+      throw new Error("no transaction handler found")
     }
       
     const networkId = await web3.eth.net.getId()
@@ -28,10 +28,7 @@ export function provideRunHandlersOnTransaction(
     const traces = await getTraceData(receipt.transactionHash)
     const txEvent = createTransactionEvent(receipt, block, networkId, traces)
 
-    const findings = []
-    for (const handleTransaction of transactionHandlers) {
-      findings.push(...await handleTransaction(txEvent))
-    }
+    const findings = await handleTransaction(txEvent)
     console.log(`${findings.length} findings for transaction ${txHash} ${findings}`)
   }
 }

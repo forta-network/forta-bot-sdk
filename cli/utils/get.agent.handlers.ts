@@ -1,9 +1,15 @@
-import { HandleBlock, HandleTransaction } from "../../sdk"
+import { HandleBlock, HandleTransaction, Initialize } from "../../sdk"
 import { assertExists, assertIsNonEmptyString } from "."
 import { GetPythonAgentHandlers } from './get.python.agent.handlers'
 
+type AgentHandlers = { 
+  initialize?: Initialize,
+  handleTransaction?: HandleTransaction,
+  handleBlock?: HandleBlock
+}
+
 // imports agent handlers from project
-export type GetAgentHandlers = () => Promise<{ transactionHandlers: HandleTransaction[], blockHandlers: HandleBlock[] }>
+export type GetAgentHandlers = () => Promise<AgentHandlers>
 
 export function provideGetAgentHandlers(
   agentPath: string,
@@ -14,32 +20,33 @@ export function provideGetAgentHandlers(
   assertExists(getPythonAgentHandlers, 'getPythonAgentHandlers')
   assertExists(dynamicImport, 'dynamicImport')
 
-  let blockHandlers: HandleBlock[]
-  let transactionHandlers: HandleTransaction[]
+  let agentHandlers: AgentHandlers
 
   return async function getAgentHandlers() {
     // only get the agent handlers once
-    if (blockHandlers && transactionHandlers) {
-      return { blockHandlers, transactionHandlers }
+    if (agentHandlers) {
+      return agentHandlers
     }
 
-    transactionHandlers = []
-    blockHandlers = []
     try {
       if (agentPath.endsWith(".py")) {
-        const { handleTransaction, handleBlock} = await getPythonAgentHandlers(agentPath)
-        if (handleTransaction) transactionHandlers.push(handleTransaction)
-        if (handleBlock) blockHandlers.push(handleBlock)
+        agentHandlers = await getPythonAgentHandlers(agentPath)
       } else {
-        const handlers = await dynamicImport(agentPath)
-        const { handleTransaction, handleBlock } = handlers.default
-        if (handleTransaction) transactionHandlers.push(handleTransaction)
-        if (handleBlock) blockHandlers.push(handleBlock)
+        agentHandlers = (await dynamicImport(agentPath)).default
       }
     } catch (e) {
       throw new Error(`issue getting agent handlers: ${e.message}`)
     }
     
-    return { blockHandlers, transactionHandlers }
+    if (agentHandlers.initialize) {
+      try {
+        console.log('initializing agent...')
+        await agentHandlers.initialize()
+      } catch (e) {
+        throw new Error(`error initializing agent: ${e.message}`)
+      }
+    }
+
+    return agentHandlers
   }
 }

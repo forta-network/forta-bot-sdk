@@ -11,12 +11,12 @@ describe("runFile", () => {
   })
 
   it("throws error if no handlers found", async () => {
-    mockGetAgentHandlers.mockReturnValueOnce({ blockHandlers: [], transactionHandlers: [] })
+    mockGetAgentHandlers.mockReturnValueOnce({})
 
     try {
       await runFile(mockFilePath)
     } catch (e) {
-      expect(e.message).toEqual('no block/transaction handlers found')
+      expect(e.message).toEqual('no block/transaction handler found')
     }
 
     expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
@@ -24,11 +24,11 @@ describe("runFile", () => {
 
   it("runs handlers against each event provided in file", async () => {
     mockGetAgentHandlers.mockReset()
-    const mockHandleBlock = jest.fn()
-    const mockHandleTransaction = jest.fn()
+    const mockHandleBlock = jest.fn().mockReturnValue([])
+    const mockHandleTransaction = jest.fn().mockReturnValue([])
     mockGetAgentHandlers.mockReturnValueOnce({
-      blockHandlers: [mockHandleBlock],
-      transactionHandlers: [mockHandleTransaction] 
+      handleBlock: mockHandleBlock,
+      handleTransaction: mockHandleTransaction
     })
     const blockEvent1 = { "hash": "0xabc" }
     const blockEvent2 = { "hash": "0xdef" }

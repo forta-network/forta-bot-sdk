@@ -20,26 +20,23 @@ export function provideRunHandlersOnBlock(
   assertExists(createTransactionEvent, 'createTransactionEvent')
 
   return async function runHandlersOnBlock(blockHashOrNumber: string | number) {
-    const { blockHandlers, transactionHandlers } = await getAgentHandlers()
-    if (!blockHandlers.length && !transactionHandlers.length) {
-      throw new Error("no block/transaction handlers found")
+    const { handleBlock, handleTransaction } = await getAgentHandlers()
+    if (!handleBlock && !handleTransaction) {
+      throw new Error("no block/transaction handler found")
     }
 
     console.log(`fetching block ${blockHashOrNumber}...`)
     const networkId = await web3.eth.net.getId()
     const block = await web3.eth.getBlock(blockHashOrNumber, true)
 
-    // run block handlers
-    if (blockHandlers.length) {
+    // run block handler
+    if (handleBlock) {
       const blockEvent = createBlockEvent(block, networkId)
-      const findings = []
-      for (const handleBlock of blockHandlers) {
-        findings.push(...await handleBlock(blockEvent))
-      }
+      const findings = await handleBlock(blockEvent)
       console.log(`${findings.length} findings for block ${block.hash} ${findings}`)
     }
 
-    if (!transactionHandlers.length) return
+    if (!handleTransaction) return
     
     // get trace data for block and build map for each transaction
     const traces = await getTraceData(block.number)
@@ -51,7 +48,7 @@ export function provideRunHandlersOnBlock(
       traceMap[txHash].push(trace)
     })
 
-    // run transaction handlers on all block transactions
+    // run transaction handler on all block transactions
     for (const transaction of block.transactions) {
       let receipt = await web3.eth.getTransactionReceipt(transaction.hash)
       // retry once if receipt fetching failed TODO figure out why this happens sometimes
@@ -64,10 +61,7 @@ export function provideRunHandlersOnBlock(
       }
       const txEvent = createTransactionEvent(receipt, block, networkId, traceMap[transaction.hash.toLowerCase()])
 
-      const findings = []
-      for (const handleTransaction of transactionHandlers) {
-        findings.push(...await handleTransaction(txEvent))
-      }
+      const findings = await handleTransaction(txEvent)
       console.log(`${findings.length} findings for transaction ${transaction.hash} ${findings}`)
     }
   }

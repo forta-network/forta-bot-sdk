@@ -25,12 +25,12 @@ describe("runHandlersOnBlock", () => {
   })
 
   it("throws an error if no handlers found", async () => {
-    mockGetAgentHandlers.mockReturnValueOnce({ blockHandlers: [], transactionHandlers: [] })
+    mockGetAgentHandlers.mockReturnValueOnce({ })
 
     try {
       await runHandlersOnBlock(mockBlockHash)
     } catch (e) {
-      expect(e.message).toEqual('no block/transaction handlers found')
+      expect(e.message).toEqual('no block/transaction handler found')
     }
 
     expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
@@ -40,7 +40,7 @@ describe("runHandlersOnBlock", () => {
     mockGetAgentHandlers.mockReset()
     const mockHandleBlock = jest.fn().mockReturnValue([])
     const mockHandleTransaction = jest.fn().mockReturnValue([])
-    mockGetAgentHandlers.mockReturnValueOnce({ blockHandlers: [mockHandleBlock], transactionHandlers: [mockHandleTransaction]})
+    mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
     const mockNetworkId = 1
     mockWeb3.eth.net.getId.mockReturnValueOnce(mockNetworkId)
     const mockBlock = { hash: mockBlockHash, number: 7, transactions: [{ hash: mockTxHash }] }

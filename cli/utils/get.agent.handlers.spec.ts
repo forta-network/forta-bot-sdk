@@ -39,24 +39,20 @@ describe("getAgentHandlers", () => {
     }})
     getAgentHandlers = provideGetAgentHandlers(mockAgentPath, mockGetPythonAgentHandlers, mockDynamicImport)
 
-    const { blockHandlers, transactionHandlers } = await getAgentHandlers()
+    const { handleBlock, handleTransaction } = await getAgentHandlers()
 
-    expect(blockHandlers).toHaveLength(1)
-    expect(blockHandlers[0]).toBe(mockHandleBlock)
-    expect(transactionHandlers).toHaveLength(1)
-    expect(transactionHandlers[0]).toBe(mockHandleTransaction)
+    expect(handleBlock).toBe(mockHandleBlock)
+    expect(handleTransaction).toBe(mockHandleTransaction)
     expect(mockDynamicImport).toHaveBeenCalledTimes(1)
     expect(mockDynamicImport).toHaveBeenCalledWith(mockAgentPath)
     expect(mockGetPythonAgentHandlers).toHaveBeenCalledTimes(0)
   })
 
   it("should not import handlers again if already imported", async () => {
-    const { blockHandlers, transactionHandlers } = await getAgentHandlers()
+    const { handleBlock, handleTransaction } = await getAgentHandlers()
 
-    expect(blockHandlers).toHaveLength(1)
-    expect(blockHandlers[0]).toBe(mockHandleBlock)
-    expect(transactionHandlers).toHaveLength(1)
-    expect(transactionHandlers[0]).toBe(mockHandleTransaction)
+    expect(handleBlock).toBe(mockHandleBlock)
+    expect(handleTransaction).toBe(mockHandleTransaction)
     expect(mockDynamicImport).toHaveBeenCalledTimes(0)
     expect(mockGetPythonAgentHandlers).toHaveBeenCalledTimes(0)
   })
@@ -68,12 +64,10 @@ describe("getAgentHandlers", () => {
     })
     getAgentHandlers = provideGetAgentHandlers(mockPythonAgentPath, mockGetPythonAgentHandlers, mockDynamicImport)
 
-    const { blockHandlers, transactionHandlers } = await getAgentHandlers()
+    const { handleBlock, handleTransaction } = await getAgentHandlers()
 
-    expect(blockHandlers).toHaveLength(1)
-    expect(blockHandlers[0]).toBe(mockHandleBlock)
-    expect(transactionHandlers).toHaveLength(1)
-    expect(transactionHandlers[0]).toBe(mockHandleTransaction)
+    expect(handleBlock).toBe(mockHandleBlock)
+    expect(handleTransaction).toBe(mockHandleTransaction)
     expect(mockGetPythonAgentHandlers).toHaveBeenCalledTimes(1)
     expect(mockGetPythonAgentHandlers).toHaveBeenCalledWith(mockPythonAgentPath)
     expect(mockDynamicImport).toHaveBeenCalledTimes(0)
