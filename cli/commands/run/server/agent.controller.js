@@ -72,10 +72,14 @@ module.exports = class AgentController {
   }
 
   async initializeAgentHandlers() {
-    // getAgentHandlers will also call any initialize handler
-    const agentHandlers = await this.getAgentHandlers();
-    this.handleBlock = agentHandlers.handleBlock;
-    this.handleTransaction = agentHandlers.handleTransaction;
+    try {
+      // getAgentHandlers will also call any initialize handler
+      const agentHandlers = await this.getAgentHandlers();
+      this.handleBlock = agentHandlers.handleBlock;
+      this.handleTransaction = agentHandlers.handleTransaction;
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   createBlockEventFromGrpcRequest(request) {
