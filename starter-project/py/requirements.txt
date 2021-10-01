@@ -1,1 +1,1 @@
-forta_agent>=0.0.4
+forta_agent>=0.0.5
