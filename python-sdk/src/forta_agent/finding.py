@@ -17,6 +17,7 @@ class FindingType(IntEnum):
     Exploit = 1
     Suspicious = 2
     Degraded = 3
+    Info = 4
 
 
 class Finding:

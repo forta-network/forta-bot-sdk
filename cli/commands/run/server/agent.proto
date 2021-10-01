@@ -56,6 +56,7 @@ message Finding {
     EXPLOIT = 1;
     SUSPICIOUS = 2;
     DEGRADED = 3;
+    INFORMATION = 4;
   }
 
   string protocol = 1;
@@ -73,6 +74,8 @@ message EvaluateTxResponse {
   repeated Error errors = 2;
   repeated Finding findings = 3;
   map<string, string> metadata = 4;
+  string timestamp = 5;
+  uint32 latencyMs = 6;
 }
 
 message EvaluateBlockResponse {
@@ -80,6 +83,8 @@ message EvaluateBlockResponse {
   repeated Error errors = 2;
   repeated Finding findings = 3;
   map<string, string> metadata = 4;
+  string timestamp = 5;
+  uint32 latencyMs = 6;
 }
 
 message BlockEvent {
@@ -195,6 +200,7 @@ message TransactionEvent {
     string gasUsed = 1;
     string address = 2;
     string code = 3;
+    string output = 4;
   }
 
   message Trace {

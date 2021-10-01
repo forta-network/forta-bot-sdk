@@ -132,15 +132,40 @@ export const createTransactionEvent: CreateTransactionEvent = (
     timestamp: typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
   }
 
+  const trcs: Trace[] = []
   traces.forEach(trace => {
-    trace.action.address = formatAddress(trace.action.address)
-    trace.action.refundAddress = formatAddress(trace.action.refundAddress)
-    trace.action.to = formatAddress(trace.action.to)
-    trace.action.from = formatAddress(trace.action.from)
-    addresses[trace.action.address] = true
-    addresses[trace.action.refundAddress] = true
-    addresses[trace.action.to] = true
-    addresses[trace.action.from] = true
+    addresses[formatAddress(trace.action.address)] = true
+    addresses[formatAddress(trace.action.refundAddress)] = true
+    addresses[formatAddress(trace.action.to)] = true
+    addresses[formatAddress(trace.action.from)] = true
+
+    trcs.push({
+      action: {
+        callType: trace.action.callType,
+        to: formatAddress(trace.action.to),
+        input: trace.action.input,
+        from: formatAddress(trace.action.from),
+        value: trace.action.value,
+        init: trace.action.init,
+        address: formatAddress(trace.action.address),
+        balance: trace.action.balance,
+        refundAddress: formatAddress(trace.action.refundAddress),
+      },
+      blockHash: trace.blockHash,
+      blockNumber: trace.blockNumber,
+      result: {
+        gasUsed: trace.result?.gasUsed,
+        address: trace.result?.address,
+        code: trace.result?.code,
+        output: trace.result?.output
+      },
+      subtraces: trace.subtraces,
+      traceAddress: trace.traceAddress,
+      transactionHash: trace.transactionHash,
+      transactionPosition: trace.transactionPosition,
+      type: trace.type,
+      error: trace.error,
+    })
   })
 
   return new TransactionEvent(
@@ -148,7 +173,7 @@ export const createTransactionEvent: CreateTransactionEvent = (
     networkId,
     tx,
     rcpt,
-    traces,
+    trcs,
     addresses,
     blok
   )

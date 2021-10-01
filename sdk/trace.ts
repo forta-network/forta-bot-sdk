@@ -27,4 +27,5 @@ export interface TraceResult {
   gasUsed: string;
   address: string;
   code: string;
+  output: string;
 }
