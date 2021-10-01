@@ -157,14 +157,15 @@ describe("createTransactionEvent", () => {
       "transactionHash": "0xfadb14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147fb28",
       "transactionIndex": 0,
       "type": "0x2"
-  } as any
+    } as any
     const traces: any = [{
       "blockHash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
       "blockNumber": 13309526,
       "result": {
         "gasUsed": "12345",
         "address": "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
-        "code": "1"
+        "code": "1",
+        "output": "0x01"
       },
       "action": {
         "callType": "someType",
@@ -228,6 +229,33 @@ describe("createTransactionEvent", () => {
         removed: false
       }]
     })
+    expect(txEvent.traces).toStrictEqual(traces.map((trace: any) => ({
+      action: {
+        callType: trace.action.callType,
+        to: formatAddress(trace.action.to),
+        input: trace.action.input,
+        from: formatAddress(trace.action.from),
+        value: trace.action.value,
+        init: trace.action.init,
+        address: formatAddress(trace.action.address),
+        balance: trace.action.balance,
+        refundAddress: formatAddress(trace.action.refundAddress),
+      },
+      blockHash: trace.blockHash,
+      blockNumber: trace.blockNumber,
+      result: {
+        gasUsed: trace.result.gasUsed,
+        address: trace.result.address,
+        code: trace.result.code,
+        output: trace.result.output
+      },
+      subtraces: trace.subtraces,
+      traceAddress: trace.traceAddress,
+      transactionHash: trace.transactionHash,
+      transactionPosition: trace.transactionPosition,
+      type: trace.type,
+      error: trace.error,
+    })))
     const traceAction = traces[0].action
     expect(txEvent.addresses).toStrictEqual({
       [formatAddress(web3Tx.from)]: true,

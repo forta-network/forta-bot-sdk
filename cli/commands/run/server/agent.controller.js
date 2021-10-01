@@ -185,9 +185,10 @@ module.exports = class AgentController {
           blockHash: trace.blockHash,
           blockNumber: trace.blockNumber,
           result: {
-            gasUsed: trace.result.gasUsed,
-            address: trace.result.address,
-            code: trace.result.code,
+            gasUsed: trace.result?.gasUsed,
+            address: trace.result?.address,
+            code: trace.result?.code,
+            output: trace.result?.output,
           },
           subtraces: trace.subtraces,
           traceAddress: trace.traceAddress,

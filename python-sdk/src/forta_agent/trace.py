@@ -37,3 +37,4 @@ class TraceResult:
         self.gas_used = hex_to_int(dict.get('gasUsed', dict.get('gas_used')))
         self.address = dict.get('address')
         self.code = dict.get('code')
+        self.output = dict.get('output')

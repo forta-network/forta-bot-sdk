@@ -97,7 +97,8 @@ describe("AgentController", () => {
           "result": {
             "gasUsed": "12345",
             "address": "0xC9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
-            "code": "1"
+            "code": "1",
+            "output": "0x001"
           },
           "action": {
             "callType": "someType",
@@ -383,6 +384,7 @@ describe("AgentController", () => {
           gasUsed: trace.result.gasUsed,
           address: trace.result.address,
           code: trace.result.code,
+          output: trace.result.output
         },
         subtraces: trace.subtraces,
         traceAddress: trace.traceAddress,

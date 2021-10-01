@@ -13,7 +13,8 @@ export enum FindingType {
   Unknown,
   Exploit,
   Suspicious,
-  Degraded
+  Degraded,
+  Info
 }
 
 export class Finding {

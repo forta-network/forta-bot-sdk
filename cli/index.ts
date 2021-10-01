@@ -11,7 +11,7 @@ async function executeCommand(commandName: CommandName, cliArgs: any) {
     const command = diContainer.resolve<CommandHandler>(commandName)
     await command(cliArgs)
   } catch (e) {
-    console.error(`ERROR: ${e.message}`)
+    console.error(`ERROR: ${e}`)
     process.exit()
   }
 }
