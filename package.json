@@ -3,6 +3,11 @@
   "version": "0.0.18",
   "license": "MIT",
   "description": "Forta Agent SDK and CLI tool",
+  "homepage": "https://forta.org/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/forta-protocol/forta-agent-sdk"
+  },
   "main": "dist/sdk/index.js",
   "types": "dist/sdk/index.d.ts",
   "files": [
