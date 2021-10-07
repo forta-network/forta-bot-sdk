@@ -1,4 +1,5 @@
 import { join } from 'path'
+import fs from 'fs'
 import shelljs from 'shelljs'
 import prompts from 'prompts'
 import { assertExists, assertIsNonEmptyString, assertShellResult } from '../../utils'
@@ -8,12 +9,16 @@ import { CommandHandler } from '../..'
 export default function provideInit(
   shell: typeof shelljs,
   prompt: typeof prompts,
+  filesystem: typeof fs,
   fortaKeystore: string,
+  configFilename: string,
   createKeyfile: CreateKeyfile
 ): CommandHandler {
   assertExists(shell, 'shell')
   assertExists(prompt, 'prompt')
+  assertExists(filesystem, 'filesystem')
   assertIsNonEmptyString(fortaKeystore, 'fortaKeystore')
+  assertIsNonEmptyString(configFilename, 'configFilename')
   assertExists(createKeyfile, 'createKeyfile')
 
   return async function init(cliArgs: any) {
@@ -49,8 +54,17 @@ export default function provideInit(
     const rmResult = shell.rm('-rf', 'js', 'ts', 'py', '.npmignore')
     assertShellResult(rmResult, 'error cleaning up files')
 
+    // create global forta.config.json if doesnt already exist
+    if (!filesystem.existsSync(join(fortaKeystore, configFilename))) {
+      console.log(`creating ${configFilename}...`)
+      const copyConfigResult = shell.cp(join(__dirname, configFilename), fortaKeystore)
+      assertShellResult(copyConfigResult, `error creating ${configFilename}`)
+    } else {
+      console.log(`found existing ${configFilename} in ${fortaKeystore}`)
+    }
+
     // create keyfile if one doesnt already exist
-    const keyfiles = shell.ls(fortaKeystore)
+    const keyfiles = shell.ls(fortaKeystore).filter(filename => filename !== configFilename)
     if (!keyfiles.length) {
       console.log('creating new keyfile...')
       const { password } = await prompt({
