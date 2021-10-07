@@ -11,7 +11,11 @@ describe("init", () => {
     rm: jest.fn()
   } as any
   const mockPrompt = jest.fn() as any
+  const mockFilesystem = {
+    existsSync: jest.fn()
+  } as any
   const mockFortaKeystore = "/some/keystore/path"
+  const mockConfigFilename = "forta.config.json"
   const mockCreateKeyfile = jest.fn()
   const mockCliArgs = {}
   const starterProjectPath = `${join(__dirname, '..', '..', '..', 'starter-project')}`
@@ -26,7 +30,7 @@ describe("init", () => {
   }
 
   beforeAll(() => {
-    init = provideInit(mockShell, mockPrompt, mockFortaKeystore, mockCreateKeyfile)
+    init = provideInit(mockShell, mockPrompt, mockFilesystem, mockFortaKeystore, mockConfigFilename, mockCreateKeyfile)
   })
 
   beforeEach(() => resetMocks())
@@ -137,7 +141,7 @@ describe("init", () => {
     expect(mockShell.rm).toHaveBeenCalledWith('-rf', 'js', 'ts', 'py', '.npmignore')
   })
 
-  it("prompts user for password to encrypt new keyfile if one does not exist", async () => {
+  it("throws error if unable to create forta.config.json", async () => {
     mockShell.ls.mockReturnValue([])
     const copyProjectResult = { code: 0 }
     const copyJsTsResult = { code: 0 }
@@ -146,8 +150,38 @@ describe("init", () => {
     mockShell.mv.mockReturnValueOnce(renameGitignoreResult)
     const removeUnusedResult = { code: 0 }
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
+    const copyConfigResult = { code: -1, stderr: 'some shell error'}
+    mockShell.cp.mockReturnValueOnce(copyConfigResult)
+    mockFilesystem.existsSync.mockReturnValueOnce(false)
+
+    try {
+      await init(mockCliArgs)
+    } catch (e) {
+      expect(e.message).toEqual(`error creating ${mockConfigFilename}: ${copyConfigResult.stderr}`)
+    }
+
+    expect(mockShell.ls).toHaveBeenCalledTimes(1)
+    expect(mockShell.cp).toHaveBeenCalledTimes(3)
+    expect(mockShell.mv).toHaveBeenCalledTimes(1)
+    expect(mockShell.rm).toHaveBeenCalledTimes(1)
+    expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(1)
+    expect(mockFilesystem.existsSync).toHaveBeenCalledWith(join(mockFortaKeystore, mockConfigFilename))
+    expect(mockShell.cp).toHaveBeenNthCalledWith(3, join(__dirname, mockConfigFilename), mockFortaKeystore)
+  })
+
+  it("prompts user for password to encrypt new keyfile if one does not exist", async () => {
+    mockShell.ls.mockReturnValue([])
+    const copyProjectResult = { code: 0 }
+    const copyJsTsResult = { code: 0 }
+    const copyConfigResult = { code: 0 }
+    mockShell.cp.mockReturnValueOnce(copyProjectResult).mockReturnValueOnce(copyJsTsResult).mockReturnValueOnce(copyConfigResult)
+    const renameGitignoreResult = { code: 0 }
+    mockShell.mv.mockReturnValueOnce(renameGitignoreResult)
+    const removeUnusedResult = { code: 0 }
+    mockShell.rm.mockReturnValueOnce(removeUnusedResult)
     const password = 'some password'
     mockPrompt.mockReturnValueOnce({ password })
+    mockFilesystem.existsSync.mockReturnValueOnce(true)
 
     await init(mockCliArgs)
 
@@ -170,11 +204,13 @@ describe("init", () => {
     mockShell.ls.mockReturnValueOnce([]).mockReturnValueOnce(['existingKeyfile'])
     const copyProjectResult = { code: 0 }
     const copyJsTsResult = { code: 0 }
-    mockShell.cp.mockReturnValueOnce(copyProjectResult).mockReturnValueOnce(copyJsTsResult)
+    const copyConfigResult = { code: 0 }
+    mockShell.cp.mockReturnValueOnce(copyProjectResult).mockReturnValueOnce(copyJsTsResult).mockReturnValueOnce(copyConfigResult)
     const renameGitignoreResult = { code: 0 }
     mockShell.mv.mockReturnValueOnce(renameGitignoreResult)
     const removeUnusedResult = { code: 0 }
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
+    mockFilesystem.existsSync.mockReturnValueOnce(true)
 
     await init(mockCliArgs)
 

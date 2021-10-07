@@ -34,6 +34,7 @@ import provideAddToIpfs from './utils/add.to.ipfs'
 import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
 import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transaction'
 import provideAppendToFile from './utils/append.to.file'
+import provideGetFortaConfig, { GetFortaConfig } from './utils/get.forta.config'
 
 export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -51,25 +52,14 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     setInterval: asValue(setInterval),
     filesystem: asValue(fs),
     dynamicImport: asValue((path: string) => import(path)),
+    commandName: asValue(commandName),
 
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
-    fortaConfigFilename: asFunction(() => {
-      return cliArgs.config || "forta.config.json"
-    }).singleton(),
-    fortaConfig: asFunction((fortaConfigFilename: string, isProduction: boolean) => {
-      let config = {}
-      // config file will not exist when running "init" or when running in production
-      if (commandName === "init" || isProduction) return config
-      
-      // try to read from config file
-      const filePath = join(process.cwd(), fortaConfigFilename)
-      if (!fs.existsSync(filePath)) throw new Error(`config file ${fortaConfigFilename} not found`)
-      try {
-        config = getJsonFile(filePath)
-      } catch (e) {
-        throw new Error(`unable to parse config file ${fortaConfigFilename}: ${e.message}`)
-      }
-      return config
+    getFortaConfig: asFunction(provideGetFortaConfig),
+    fortaConfig: asFunction((getFortaConfig: GetFortaConfig) => getFortaConfig()).singleton(),
+    configFilename: asValue("forta.config.json"),
+    localConfigFilename: asFunction((configFilename: string) => {
+      return cliArgs.config || configFilename
     }).singleton(),
 
     init: asFunction(provideInit),
@@ -88,20 +78,23 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     uploadManifest: asFunction(provideUploadManifest),
     pushToRegistry: asFunction(providePushToRegistry),
 
-    agentId: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.agentId
+    packageJson: asFunction(() => {
+      try {
+        const packageJsonPath = join(process.cwd(), "package.json")
+        return getJsonFile(packageJsonPath)
+      } catch (e) {
+        throw new Error(`unable to parse package.json: ${e.message}`)
+      }
+    }).singleton(),
+    agentId: asFunction((packageJson: any) => {
+      return packageJson.name
     }),
-    version: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.version
+    version: asFunction((packageJson: any) => {
+      return packageJson.version
     }),
+    documentation: asValue(join(process.cwd(), 'README.md')),
     keyfileName: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.keyfile
-    }),
-    documentation: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
-      if (!fortaConfig.documentation) {
-        throw new Error(`no documentation provided in ${fortaConfigFilename}`)
-      }
-      return join('.', fortaConfig.documentation)
     }),
     agentPath: asFunction(() => {
       const projectDir = process.cwd()
@@ -164,9 +157,9 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return fortaConfig.agentRegistryJsonRpcUrl || "https://goerli-light.eth.linkpool.io/"
     }),
 
-    jsonRpcUrl: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
+    jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       if (!fortaConfig.jsonRpcUrl) {
-        throw new Error(`no jsonRpcUrl provided in ${fortaConfigFilename}`)
+        throw new Error(`no jsonRpcUrl provided in config`)
       } else if (!fortaConfig.jsonRpcUrl.startsWith("http")) {
         throw new Error(`jsonRpcUrl must begin with http or https`)
       }
@@ -175,15 +168,15 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     web3: asFunction((jsonRpcUrl: string) =>  new Web3(jsonRpcUrl)).singleton(),
     web3AgentRegistry: asFunction((agentRegistryJsonRpcUrl: string) => new Web3(agentRegistryJsonRpcUrl)).singleton(),
 
-    ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig, fortaConfigFilename: string) => {
+    ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig) => {
       if (!fortaConfig.ipfsGatewayUrl) {
-        throw new Error(`no ipfsGatewayUrl provided in ${fortaConfigFilename}`)
+        throw new Error(`no ipfsGatewayUrl provided in config`)
       }
       return fortaConfig.ipfsGatewayUrl
     }),
-    ipfsGatewayAuth: asFunction((ipfsGatewayUrl: string, fortaConfig: FortaConfig, fortaConfigFilename: string) => {
+    ipfsGatewayAuth: asFunction((ipfsGatewayUrl: string, fortaConfig: FortaConfig) => {
       if (ipfsGatewayUrl.includes('ipfs.infura.io') && !fortaConfig.ipfsGatewayAuth) {
-        throw new Error(`no ipfsGatewayAuth provided in ${fortaConfigFilename}`)
+        throw new Error(`no ipfsGatewayAuth provided in config`)
       }
       return fortaConfig.ipfsGatewayAuth
     }),

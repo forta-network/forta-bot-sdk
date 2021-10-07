@@ -1,3 +1,4 @@
+import os from 'os'
 import fs from 'fs'
 import { join } from 'path'
 import { jsonc } from 'jsonc'
@@ -10,11 +11,20 @@ import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
 
 export const getFortaConfig: () => FortaConfig = () => {
+  let config = {}
+  // try to read from global config
+  const globalConfigPath = join(os.homedir(), '.forta', 'forta.config.json')
+  if (fs.existsSync(globalConfigPath)) {
+    config = Object.assign(config, jsonc.parse(fs.readFileSync(globalConfigPath, 'utf8')))
+  }
+  // try to read from local project config
   const configFlagIndex = process.argv.indexOf('--config')
   const configFile = configFlagIndex == -1 ? undefined : process.argv[configFlagIndex + 1]
-  const configPath = join(process.cwd(), configFile || 'forta.config.json')
-  const data = fs.readFileSync(configPath, 'utf8')
-  return jsonc.parse(data)
+  const localConfigPath = join(process.cwd(), configFile || 'forta.config.json')
+  if (fs.existsSync(localConfigPath)) {
+    config = Object.assign(config, jsonc.parse(fs.readFileSync(localConfigPath, 'utf8')))
+  }
+  return config
 }
 
 export const getJsonRpcUrl = () => {
@@ -26,6 +36,7 @@ export const getJsonRpcUrl = () => {
   // else, use the rpc url from forta.config.json
   const { jsonRpcUrl } = getFortaConfig()
   if (!jsonRpcUrl) throw new Error('no jspnRpcUrl found')
+  if (!jsonRpcUrl.startsWith("http")) throw new Error('jsonRpcUrl must begin with http(s)')
   return jsonRpcUrl
 }
 

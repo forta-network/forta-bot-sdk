@@ -5,13 +5,24 @@ import sha3
 
 
 def get_forta_config():
+    config = {}
+    # try to read global config
+    global_config_path = os.path.join(
+        os.path.expanduser('~'), '.forta', 'forta.config.json')
+    if os.path.isfile(global_config_path):
+        global_config = JsoncParser.parse_file(global_config_path)
+        config = {**config, **global_config}
+    # try to read local project config
     config_flag_index = sys.argv.index(
         '--config') if '--config' in sys.argv else -1
-    config_file = None if config_flag_index == - \
+    local_config_file = None if config_flag_index == - \
         1 else sys.argv[config_flag_index + 1]
-    config_path = os.path.join(
-        os.getcwd(), config_file if config_file else 'forta.config.json')
-    return JsoncParser.parse_file(config_path)
+    local_config_path = os.path.join(
+        os.getcwd(), local_config_file if local_config_file else 'forta.config.json')
+    if os.path.isfile(local_config_path):
+        local_config = JsoncParser.parse_file(local_config_path)
+        config = {**config, **local_config}
+    return config
 
 
 def get_json_rpc_url():
@@ -21,6 +32,8 @@ def get_json_rpc_url():
     config = get_forta_config()
     if "jsonRpcUrl" not in config:
         raise Exception("no jsonRpcUrl found")
+    if not str(config.get("jsonRpcUrl")).startswith("http"):
+        raise Exception("jsonRpcUrl must begin with http(s)")
     return config["jsonRpcUrl"]
 
 
