@@ -11,12 +11,12 @@ export default function provideUploadImage(
   imageRepositoryUrl: string,
   imageRepositoryUsername: string,
   imageRepositoryPassword: string,
-  agentId: string
+  agentName: string
 ): UploadImage {
   assertExists(shell, 'shell')
   assertExists(prompt, 'prompt')
   assertIsNonEmptyString(imageRepositoryUrl, 'imageRepositoryUrl')
-  assertIsNonEmptyString(agentId, 'agentId')
+  assertIsNonEmptyString(agentName, 'agentName')
 
   return async function uploadImage() {
     // authenticate against repository if credentials provided
@@ -27,7 +27,7 @@ export default function provideUploadImage(
 
     // build the agent image
     console.log('building agent image...')
-    const containerTag = `${agentId}-intermediate`
+    const containerTag = `${agentName}-intermediate`
     const buildResult = shell.exec(`docker build --tag ${containerTag} .`)
     assertShellResult(buildResult, 'error building agent image')
 
