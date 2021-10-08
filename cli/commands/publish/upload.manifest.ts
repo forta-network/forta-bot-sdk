@@ -10,6 +10,7 @@ export default function provideUploadManifest(
   web3AgentRegistry: Web3,
   filesystem: typeof fs,
   addToIpfs: AddToIpfs,
+  agentName: string,
   agentId: string,
   version: string,
   documentation: string,
@@ -17,6 +18,7 @@ export default function provideUploadManifest(
   assertExists(web3AgentRegistry, 'web3AgentRegistry')
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
+  assertIsNonEmptyString(agentName, 'agentName')
   assertIsNonEmptyString(agentId, 'agentId')
   assertIsNonEmptyString(version, 'version')
   assertIsNonEmptyString(documentation, 'documentation')
@@ -31,11 +33,11 @@ export default function provideUploadManifest(
     const documentationReference = await addToIpfs(documentationFile)
 
     // create agent manifest
-    const agentIdHash = keccak256(agentId)
     const manifest = {
       from: publicKey,
-      agentId,
-      agentIdHash,
+      name: agentName,
+      agentId: agentName,
+      agentIdHash: agentId,
       version,
       timestamp: new Date().toUTCString(),
       imageReference,

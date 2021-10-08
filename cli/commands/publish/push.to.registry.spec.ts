@@ -12,8 +12,7 @@ describe("pushToRegistry", () => {
     createAgent: jest.fn(),
     updateAgent: jest.fn()
   } as any
-  const mockAgentId = "agentId"
-  const mockAgentIdHash = keccak256(mockAgentId)
+  const mockAgentId = "0xagentId"
   const mockManifestRef = "abc123"
   const mockPublicKey = "0x123"
   const mockPrivateKey = "0xabc"
@@ -43,13 +42,13 @@ describe("pushToRegistry", () => {
     expect(mockWeb3.eth.accounts.wallet.add).toHaveBeenCalledWith(mockPrivateKey)
     expect(mockWeb3.eth.accounts.wallet.add).toHaveBeenCalledBefore(mockAgentRegistry.agentExists)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentIdHash)
+    expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledBefore(mockAgentRegistry.createAgent)
     expect(mockAgentRegistry.createAgent).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.createAgent).toHaveBeenCalledWith(mockPublicKey, mockAgentIdHash, mockManifestRef)
+    expect(mockAgentRegistry.createAgent).toHaveBeenCalledWith(mockPublicKey, mockAgentId, mockManifestRef)
     expect(mockAgentRegistry.updateAgent).toHaveBeenCalledTimes(0)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
-    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully added agent ${mockAgentIdHash} with manifest ${mockManifestRef}`, 'publish.log')
+    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully added agent id ${mockAgentId} with manifest ${mockManifestRef}!`, 'publish.log')
     jest.useRealTimers()
   })
 
@@ -64,13 +63,13 @@ describe("pushToRegistry", () => {
     expect(mockWeb3.eth.accounts.wallet.add).toHaveBeenCalledWith(mockPrivateKey)
     expect(mockWeb3.eth.accounts.wallet.add).toHaveBeenCalledBefore(mockAgentRegistry.agentExists)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentIdHash)
+    expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledBefore(mockAgentRegistry.updateAgent)
     expect(mockAgentRegistry.updateAgent).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.updateAgent).toHaveBeenCalledWith(mockPublicKey, mockAgentIdHash, mockManifestRef)
+    expect(mockAgentRegistry.updateAgent).toHaveBeenCalledWith(mockPublicKey, mockAgentId, mockManifestRef)
     expect(mockAgentRegistry.createAgent).toHaveBeenCalledTimes(0)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
-    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully updated agent ${mockAgentIdHash} with manifest ${mockManifestRef}`, 'publish.log')
+    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully updated agent id ${mockAgentId} with manifest ${mockManifestRef}!`, 'publish.log')
     jest.useRealTimers()
   })
 })

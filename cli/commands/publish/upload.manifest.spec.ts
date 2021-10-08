@@ -11,7 +11,8 @@ describe("uploadManifest", () => {
     readFileSync: jest.fn()
   } as any
   const mockAddToIpfs = jest.fn()
-  const mockAgentId = "agentId"
+  const mockAgentName = "agentName"
+  const mockAgentId = "0xagentId"
   const mockVersion = "0.1"
   const mockDocumentation = "README.md"
   const mockImageRef = "123abc"
@@ -19,7 +20,7 @@ describe("uploadManifest", () => {
   const mockPrivateKey = "0xabc"
 
   beforeAll(() => {
-    uploadManifest = provideUploadManifest(mockWeb3, mockFilesystem, mockAddToIpfs, mockAgentId, mockVersion, mockDocumentation)
+    uploadManifest = provideUploadManifest(mockWeb3, mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentId, mockVersion, mockDocumentation)
   })
 
   it("throws error if documentation not found", async () => {
@@ -46,8 +47,9 @@ describe("uploadManifest", () => {
     mockAddToIpfs.mockReturnValueOnce(mockDocumentationRef)
     const mockManifest = {
       from: mockPublicKey,
-      agentId: mockAgentId,
-      agentIdHash: keccak256(mockAgentId),
+      name: mockAgentName,
+      agentId: mockAgentName,
+      agentIdHash: mockAgentId,
       version: mockVersion,
       timestamp: systemTime.toUTCString(),
       imageReference: mockImageRef,
