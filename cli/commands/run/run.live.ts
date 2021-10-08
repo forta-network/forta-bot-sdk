@@ -25,7 +25,8 @@ export function provideRunLive(
     setInterval(async () => {
       let currBlockNumber = latestBlockNumber
       latestBlockNumber = await web3.eth.getBlockNumber()
-      while (currBlockNumber < latestBlockNumber) {
+      const endBlockNumber = latestBlockNumber
+      while (currBlockNumber < endBlockNumber) {
         currBlockNumber++
         await runHandlersOnBlock(currBlockNumber)
       }
