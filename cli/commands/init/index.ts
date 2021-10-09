@@ -5,6 +5,7 @@ import prompts from 'prompts'
 import { assertExists, assertIsNonEmptyString, assertShellResult } from '../../utils'
 import { CreateKeyfile } from '../../utils/create.keyfile'
 import { CommandHandler } from '../..'
+import { ListKeyfiles } from '../../utils/list.keyfiles'
 
 export default function provideInit(
   shell: typeof shelljs,
@@ -12,6 +13,7 @@ export default function provideInit(
   filesystem: typeof fs,
   fortaKeystore: string,
   configFilename: string,
+  listKeyfiles: ListKeyfiles,
   createKeyfile: CreateKeyfile
 ): CommandHandler {
   assertExists(shell, 'shell')
@@ -19,6 +21,7 @@ export default function provideInit(
   assertExists(filesystem, 'filesystem')
   assertIsNonEmptyString(fortaKeystore, 'fortaKeystore')
   assertIsNonEmptyString(configFilename, 'configFilename')
+  assertExists(listKeyfiles, 'listKeyfiles')
   assertExists(createKeyfile, 'createKeyfile')
 
   return async function init(cliArgs: any) {
@@ -64,7 +67,7 @@ export default function provideInit(
     }
 
     // create keyfile if one doesnt already exist
-    const keyfiles = shell.ls(fortaKeystore).filter(filename => filename !== configFilename)
+    const keyfiles = listKeyfiles()
     if (!keyfiles.length) {
       console.log('creating new keyfile...')
       const { password } = await prompt({

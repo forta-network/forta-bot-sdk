@@ -4,21 +4,22 @@ import shelljs from "shelljs"
 import prompts from "prompts"
 import { assertExists, assertIsNonEmptyString } from "../../utils"
 import { GetKeyfile } from '../../utils/get.keyfile'
+import { ListKeyfiles } from '../../utils/list.keyfiles'
 
 // gets agent public and private key after prompting user for password
 export type GetCredentials = () => Promise<{ publicKey: string, privateKey: string }>
 
 export default function provideGetCredentials(
-  shell: typeof shelljs,
   prompt: typeof prompts,
   filesystem: typeof fs,
+  listKeyfiles: ListKeyfiles,
   getKeyfile: GetKeyfile,
   fortaKeystore: string,
   keyfileName?: string
 ): GetCredentials {
-  assertExists(shell, 'shell')
   assertExists(prompt, 'prompt')
   assertExists(filesystem, 'filesystem')
+  assertExists(listKeyfiles, 'listKeyfiles')
   assertExists(getKeyfile, 'getKeyfile')
   assertIsNonEmptyString(fortaKeystore, 'fortaKeystore')
 
@@ -29,8 +30,8 @@ export default function provideGetCredentials(
 
       // if a keyfile name is not specified in config
       if (!keyfileName) {
-        // assuming only one file in keystore
-        [ keyfileName ] = shell.ls(fortaKeystore)
+        // assuming only one keyfile in keystore
+        [ keyfileName ] = listKeyfiles()
       }
 
       const keyfilePath = path.join(fortaKeystore, keyfileName)
