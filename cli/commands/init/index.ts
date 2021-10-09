@@ -57,6 +57,12 @@ export default function provideInit(
     const rmResult = shell.rm('-rf', 'js', 'ts', 'py', '.npmignore')
     assertShellResult(rmResult, 'error cleaning up files')
 
+    // make sure keystore folder exists
+    if (!filesystem.existsSync(fortaKeystore)) {
+      const createKeystoreResult = shell.mkdir(fortaKeystore)
+      assertShellResult(createKeystoreResult, `error creating keystore folder ${fortaKeystore}`)
+    }
+    
     // create global forta.config.json if doesnt already exist
     if (!filesystem.existsSync(join(fortaKeystore, configFilename))) {
       console.log(`creating ${configFilename}...`)
