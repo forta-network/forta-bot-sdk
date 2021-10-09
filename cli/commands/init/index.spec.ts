@@ -8,7 +8,8 @@ describe("init", () => {
     ls: jest.fn(),
     cp: jest.fn(),
     mv: jest.fn(),
-    rm: jest.fn()
+    rm: jest.fn(),
+    mkdir: jest.fn()
   } as any
   const mockPrompt = jest.fn() as any
   const mockFilesystem = {
@@ -26,7 +27,9 @@ describe("init", () => {
     mockShell.cp.mockReset()
     mockShell.mv.mockReset()
     mockShell.rm.mockReset()
+    mockShell.mkdir.mockReset()
     mockPrompt.mockReset()
+    mockFilesystem.existsSync.mockReset()
     mockListKeyfiles.mockReset()
     mockCreateKeyfile.mockReset()
   }
@@ -144,6 +147,35 @@ describe("init", () => {
     expect(mockShell.rm).toHaveBeenCalledWith('-rf', 'js', 'ts', 'py', '.npmignore')
   })
 
+  it("throws error if unable to create keystore folder", async () => {
+    mockShell.ls.mockReturnValue([])
+    const copyProjectResult = { code: 0 }
+    const copyJsTsResult = { code: 0 }
+    mockShell.cp.mockReturnValueOnce(copyProjectResult).mockReturnValueOnce(copyJsTsResult)
+    const renameGitignoreResult = { code: 0 }
+    mockShell.mv.mockReturnValueOnce(renameGitignoreResult)
+    const removeUnusedResult = { code: 0 }
+    mockShell.rm.mockReturnValueOnce(removeUnusedResult)
+    mockFilesystem.existsSync.mockReturnValueOnce(false)
+    const createKeystoreResult = { code: -1, stderr: 'some shell error'}
+    mockShell.mkdir.mockReturnValueOnce(createKeystoreResult)
+
+    try {
+      await init(mockCliArgs)
+    } catch (e) {
+      expect(e.message).toEqual(`error creating keystore folder ${mockFortaKeystore}: ${createKeystoreResult.stderr}`)
+    }
+
+    expect(mockShell.ls).toHaveBeenCalledTimes(1)
+    expect(mockShell.cp).toHaveBeenCalledTimes(2)
+    expect(mockShell.mv).toHaveBeenCalledTimes(1)
+    expect(mockShell.rm).toHaveBeenCalledTimes(1)
+    expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(1)
+    expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(1, mockFortaKeystore)
+    expect(mockShell.mkdir).toHaveBeenCalledTimes(1)
+    expect(mockShell.mkdir).toHaveBeenNthCalledWith(1, mockFortaKeystore)
+  })
+
   it("throws error if unable to create forta.config.json", async () => {
     mockShell.ls.mockReturnValue([])
     const copyProjectResult = { code: 0 }
@@ -153,9 +185,11 @@ describe("init", () => {
     mockShell.mv.mockReturnValueOnce(renameGitignoreResult)
     const removeUnusedResult = { code: 0 }
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
+    const createKeystoreResult = { code: 0 }
+    mockShell.mkdir.mockReturnValueOnce(createKeystoreResult)
+    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(false)
     const copyConfigResult = { code: -1, stderr: 'some shell error'}
     mockShell.cp.mockReturnValueOnce(copyConfigResult)
-    mockFilesystem.existsSync.mockReturnValueOnce(false)
 
     try {
       await init(mockCliArgs)
@@ -167,8 +201,9 @@ describe("init", () => {
     expect(mockShell.cp).toHaveBeenCalledTimes(3)
     expect(mockShell.mv).toHaveBeenCalledTimes(1)
     expect(mockShell.rm).toHaveBeenCalledTimes(1)
-    expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(1)
-    expect(mockFilesystem.existsSync).toHaveBeenCalledWith(join(mockFortaKeystore, mockConfigFilename))
+    expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(2)
+    expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(2, join(mockFortaKeystore, mockConfigFilename))
+    expect(mockShell.mkdir).toHaveBeenCalledTimes(0)
     expect(mockShell.cp).toHaveBeenNthCalledWith(3, join(__dirname, mockConfigFilename), mockFortaKeystore)
   })
 
@@ -185,7 +220,7 @@ describe("init", () => {
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
     const password = 'some password'
     mockPrompt.mockReturnValueOnce({ password })
-    mockFilesystem.existsSync.mockReturnValueOnce(true)
+    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(true)
 
     await init(mockCliArgs)
 
@@ -193,6 +228,7 @@ describe("init", () => {
     expect(mockShell.cp).toHaveBeenCalledTimes(2)
     expect(mockShell.mv).toHaveBeenCalledTimes(1)
     expect(mockShell.rm).toHaveBeenCalledTimes(1)
+    expect(mockShell.mkdir).toHaveBeenCalledTimes(0)
     expect(mockPrompt).toHaveBeenCalledTimes(1)
     expect(mockPrompt).toHaveBeenLastCalledWith({
       type: 'password',
@@ -216,7 +252,7 @@ describe("init", () => {
     mockShell.mv.mockReturnValueOnce(renameGitignoreResult)
     const removeUnusedResult = { code: 0 }
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
-    mockFilesystem.existsSync.mockReturnValueOnce(true)
+    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(true)
 
     await init(mockCliArgs)
 
@@ -224,6 +260,7 @@ describe("init", () => {
     expect(mockShell.cp).toHaveBeenCalledTimes(2)
     expect(mockShell.mv).toHaveBeenCalledTimes(1)
     expect(mockShell.rm).toHaveBeenCalledTimes(1)
+    expect(mockShell.mkdir).toHaveBeenCalledTimes(0)
     expect(mockPrompt).toHaveBeenCalledTimes(0)
     expect(mockListKeyfiles).toHaveBeenCalledTimes(1)
     expect(mockListKeyfiles).toHaveBeenCalledWith()
