@@ -3,27 +3,26 @@ import provideGetCredentials, { GetCredentials } from "./get.credentials"
 
 describe("getCredentials", () => {
   let getCredentials: GetCredentials
-  const mockShell = {
-    ls: jest.fn()
-  } as any
   const mockPrompt = jest.fn() as any
   const mockFilesystem = {
     existsSync: jest.fn()
   } as any
+  const mockListKeyfiles = jest.fn()
   const mockGetKeyfile = jest.fn()
   const mockFortaKeystore = "some/key/store"
   const mockKeyfileName = "keyfileName"
   const mockKeyfilePath = path.join(mockFortaKeystore, mockKeyfileName)
 
   const resetMocks = () => {
-    mockShell.ls.mockReset()
     mockFilesystem.existsSync.mockReset()
     mockPrompt.mockReset()
+    mockListKeyfiles.mockReset()
     mockGetKeyfile.mockReset()
   }
 
   beforeAll(() => {
-    getCredentials = provideGetCredentials(mockShell, mockPrompt, mockFilesystem, mockGetKeyfile, mockFortaKeystore, mockKeyfileName)
+    getCredentials = provideGetCredentials(
+      mockPrompt, mockFilesystem, mockListKeyfiles, mockGetKeyfile, mockFortaKeystore, mockKeyfileName)
   })
 
   beforeEach(() => resetMocks())
@@ -72,7 +71,7 @@ describe("getCredentials", () => {
     expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(2)
     expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(1, mockFortaKeystore)
     expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(2, mockKeyfilePath)
-    expect(mockShell.ls).toHaveBeenCalledTimes(0)
+    expect(mockListKeyfiles).toHaveBeenCalledTimes(0)
     expect(mockPrompt).toHaveBeenCalledTimes(1)
     expect(mockPrompt).toHaveBeenCalledWith({
       type: 'password',
@@ -88,14 +87,14 @@ describe("getCredentials", () => {
     mockFilesystem.existsSync.mockReturnValueOnce(true)
     const mockKeyfileName2 = 'mockKeyfileName2'
     const mockKeyfilePath2 = path.join(mockFortaKeystore, mockKeyfileName2)
-    mockShell.ls.mockReturnValueOnce([mockKeyfileName2])
+    mockListKeyfiles.mockReturnValueOnce([mockKeyfileName2])
     const mockPassword = 'password'
     mockPrompt.mockReturnValueOnce({ password: mockPassword })
     const mockPublicKey = "0x123"
     const mockPrivateKey = "0x456"
     mockGetKeyfile.mockReturnValueOnce({ publicKey: mockPublicKey, privateKey: mockPrivateKey })
 
-    getCredentials = provideGetCredentials(mockShell, mockPrompt, mockFilesystem, mockGetKeyfile, mockFortaKeystore)
+    getCredentials = provideGetCredentials(mockPrompt, mockFilesystem, mockListKeyfiles, mockGetKeyfile, mockFortaKeystore)
     const { publicKey, privateKey } = await getCredentials()
 
     expect(publicKey).toBe(mockPublicKey)
@@ -103,7 +102,8 @@ describe("getCredentials", () => {
     expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(2)
     expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(1, mockFortaKeystore)
     expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(2, mockKeyfilePath2)
-    expect(mockShell.ls).toHaveBeenCalledTimes(1)
+    expect(mockListKeyfiles).toHaveBeenCalledTimes(1)
+    expect(mockListKeyfiles).toHaveBeenCalledWith()
     expect(mockPrompt).toHaveBeenCalledTimes(1)
     expect(mockPrompt).toHaveBeenCalledWith({
       type: 'password',

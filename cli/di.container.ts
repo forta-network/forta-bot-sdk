@@ -35,6 +35,7 @@ import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
 import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transaction'
 import provideAppendToFile from './utils/append.to.file'
 import provideGetFortaConfig, { GetFortaConfig } from './utils/get.forta.config'
+import provideListKeyfiles from './utils/list.keyfiles'
 
 export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -119,6 +120,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     createTransactionEvent: asValue(createTransactionEvent),
     getKeyfile: asFunction(provideGetKeyfile),
     createKeyfile: asFunction(provideCreateKeyfile),
+    listKeyfiles: asFunction(provideListKeyfiles),
     addToIpfs: asFunction(provideAddToIpfs),
     appendToFile: asFunction(provideAppendToFile),
 

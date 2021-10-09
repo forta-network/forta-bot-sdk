@@ -16,6 +16,7 @@ describe("init", () => {
   } as any
   const mockFortaKeystore = "/some/keystore/path"
   const mockConfigFilename = "forta.config.json"
+  const mockListKeyfiles = jest.fn()
   const mockCreateKeyfile = jest.fn()
   const mockCliArgs = {}
   const starterProjectPath = `${join(__dirname, '..', '..', '..', 'starter-project')}`
@@ -26,11 +27,13 @@ describe("init", () => {
     mockShell.mv.mockReset()
     mockShell.rm.mockReset()
     mockPrompt.mockReset()
+    mockListKeyfiles.mockReset()
     mockCreateKeyfile.mockReset()
   }
 
   beforeAll(() => {
-    init = provideInit(mockShell, mockPrompt, mockFilesystem, mockFortaKeystore, mockConfigFilename, mockCreateKeyfile)
+    init = provideInit(
+      mockShell, mockPrompt, mockFilesystem, mockFortaKeystore, mockConfigFilename, mockListKeyfiles, mockCreateKeyfile)
   })
 
   beforeEach(() => resetMocks())
@@ -171,6 +174,7 @@ describe("init", () => {
 
   it("prompts user for password to encrypt new keyfile if one does not exist", async () => {
     mockShell.ls.mockReturnValue([])
+    mockListKeyfiles.mockReturnValueOnce([])
     const copyProjectResult = { code: 0 }
     const copyJsTsResult = { code: 0 }
     const copyConfigResult = { code: 0 }
@@ -185,8 +189,7 @@ describe("init", () => {
 
     await init(mockCliArgs)
 
-    expect(mockShell.ls).toHaveBeenCalledTimes(2)
-    expect(mockShell.ls).toHaveBeenNthCalledWith(2, mockFortaKeystore)
+    expect(mockShell.ls).toHaveBeenCalledTimes(1)
     expect(mockShell.cp).toHaveBeenCalledTimes(2)
     expect(mockShell.mv).toHaveBeenCalledTimes(1)
     expect(mockShell.rm).toHaveBeenCalledTimes(1)
@@ -196,12 +199,15 @@ describe("init", () => {
       name: 'password',
       message: `Enter password to encrypt new keyfile`
     })
+    expect(mockListKeyfiles).toHaveBeenCalledTimes(1)
+    expect(mockListKeyfiles).toHaveBeenCalledWith()
     expect(mockCreateKeyfile).toHaveBeenCalledTimes(1)
     expect(mockCreateKeyfile).toHaveBeenCalledWith(password)
   })
 
   it("does not prompt user for password if keyfile already exists", async () => {
-    mockShell.ls.mockReturnValueOnce([]).mockReturnValueOnce(['existingKeyfile'])
+    mockShell.ls.mockReturnValueOnce([])
+    mockListKeyfiles.mockReturnValueOnce(['existingKeyfile'])
     const copyProjectResult = { code: 0 }
     const copyJsTsResult = { code: 0 }
     const copyConfigResult = { code: 0 }
@@ -214,12 +220,13 @@ describe("init", () => {
 
     await init(mockCliArgs)
 
-    expect(mockShell.ls).toHaveBeenCalledTimes(2)
-    expect(mockShell.ls).toHaveBeenNthCalledWith(2, mockFortaKeystore)
+    expect(mockShell.ls).toHaveBeenCalledTimes(1)
     expect(mockShell.cp).toHaveBeenCalledTimes(2)
     expect(mockShell.mv).toHaveBeenCalledTimes(1)
     expect(mockShell.rm).toHaveBeenCalledTimes(1)
     expect(mockPrompt).toHaveBeenCalledTimes(0)
+    expect(mockListKeyfiles).toHaveBeenCalledTimes(1)
+    expect(mockListKeyfiles).toHaveBeenCalledWith()
     expect(mockCreateKeyfile).toHaveBeenCalledTimes(0)
   })
 })
