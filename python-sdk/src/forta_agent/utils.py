@@ -1,7 +1,9 @@
-import sys
 import os
-from jsonc_parser.parser import JsoncParser
 import sha3
+import sys
+
+from enum import Enum
+from jsonc_parser.parser import JsoncParser
 
 
 def get_forta_config():
@@ -47,25 +49,33 @@ def create_transaction_event(dict):
     return TransactionEvent(dict)
 
 
-def assert_non_empty_string_in_dict(dict, key):
-    assert_key_in_dict(dict, key)
-    assert isinstance(dict[key], str) and len(
-        dict[key]) > 0, f'{key} must be non-empty string'
+def is_valid_key(func: callable):
+
+    def wrap(dict: dict, key: str or int, *args, **kwargs):
+        if not key in dict:
+            raise KeyError(f'{key} is requierd!')
+        else:
+            return func(dict, key, *args, **kwargs)
+    return wrap
 
 
-def assert_enum_value_in_dict(dict, key, enum):
-    assert_key_in_dict(dict, key)
-    assert isinstance(dict[key], enum), f'{key} must be valid enum value'
+@is_valid_key
+def is_valid_string(dict: dict, key: int or str):
+    if not (isinstance(dict[key], str) and len(dict[key]) > 0):
+        raise KeyError(f'The key <{key}> must not be an empty str!')
 
 
-def assert_key_in_dict(dict, key):
-    assert key in dict, f'{key} is required'
+@is_valid_key
+def is_valid_enum(dict: dict, key: int or str, enum):
+    if not isinstance(dict[key], enum):
+        raise KeyError(f'The key <{key}> must be valid enum value!')
 
 
-def hex_to_int(strVal):
-    if not strVal or type(strVal) == int:
-        return strVal
-    return int(strVal, 16) if type(strVal) == str and strVal.startswith('0x') else int(strVal, 10)
+def hex_to_int(value: str) -> int:
+    if not (isinstance(value, str) and len(value) > 0):
+        raise TypeError('The value must not be an empty str!')
+    else:
+        return int(value, 16) if value.startswith('0x') else int(value, 10)
 
 
 def keccak256(val):
