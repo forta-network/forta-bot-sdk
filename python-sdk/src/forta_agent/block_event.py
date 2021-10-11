@@ -11,6 +11,12 @@ class BlockEvent:
         networkVal = dict.get('network', "MAINNET")
         self.network = Network[networkVal] if type(
             networkVal) == str else Network(networkVal)
-        self.block_hash = dict.get('blockHash', dict.get('block_hash'))
-        self.block_number = dict.get('blockNumber', dict.get('block_number'))
         self.block = Block(dict.get('block', {}))
+
+    @property
+    def block_hash(self):
+        return self.block.hash
+
+    @property
+    def block_number(self):
+        return self.block.number

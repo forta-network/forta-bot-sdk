@@ -83,7 +83,7 @@ module.exports = class AgentController {
   }
 
   createBlockEventFromGrpcRequest(request) {
-    const { type, network, blockHash, blockNumber, block } = request.event;
+    const { type, network, block } = request.event;
 
     const blok = {
       difficulty: block.difficulty,
@@ -111,8 +111,6 @@ module.exports = class AgentController {
     return new BlockEvent(
       type,
       parseInt(network.chainId),
-      blockHash,
-      parseInt(blockNumber),
       blok
     );
   }

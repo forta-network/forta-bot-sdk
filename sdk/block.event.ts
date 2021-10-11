@@ -5,8 +5,14 @@ export class BlockEvent {
   constructor(
     readonly type: EventType,
     readonly network: Network,
-    readonly blockHash: string,
-    readonly blockNumber: number,
     readonly block: Block
   ) {}
+
+  get blockHash() {
+    return this.block.hash
+  }
+
+  get blockNumber() {
+    return this.block.number
+  }
 }
