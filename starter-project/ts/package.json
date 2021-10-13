@@ -12,6 +12,8 @@
     "range": "npm run build && forta-agent run --range",
     "file": "npm run build && forta-agent run --file",
     "publish": "forta-agent publish",
+    "disable": "forta-agent disable",
+    "enable": "forta-agent enable",
     "test": "jest"
   },
   "dependencies": {

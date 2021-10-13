@@ -10,6 +10,8 @@ import axios, { AxiosRequestConfig } from 'axios'
 import provideInit from "./commands/init"
 import provideRun from "./commands/run"
 import providePublish from "./commands/publish"
+import provideDisable from './commands/disable'
+import provideEnable from './commands/enable'
 import AgentController from "./commands/run/server/agent.controller"
 import { provideRunTransaction } from "./commands/run/run.transaction"
 import { provideRunBlock } from "./commands/run/run.block"
@@ -17,15 +19,15 @@ import { provideRunBlockRange } from "./commands/run/run.block.range"
 import { provideRunFile } from "./commands/run/run.file"
 import { provideRunLive } from "./commands/run/run.live"
 import provideRunServer from "./commands/run/server"
-import provideGetCredentials from './commands/publish/get.credentials'
 import provideUploadImage from './commands/publish/upload.image'
 import provideUploadManifest from './commands/publish/upload.manifest'
 import providePushToRegistry from './commands/publish/push.to.registry'
 import { createBlockEvent, createTransactionEvent, getJsonFile, keccak256 } from "./utils"
-import AgentRegistry from "./commands/publish/agent.registry"
+import AgentRegistry from "./contracts/agent.registry"
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
 import { provideGetKeyfile } from "./utils/get.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
+import provideGetCredentials from './utils/get.credentials'
 import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
 import { provideGetPythonAgentHandlers } from './utils/get.python.agent.handlers'
@@ -66,6 +68,8 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     init: asFunction(provideInit),
     run: asFunction(provideRun),
     publish: asFunction(providePublish),
+    disable: asFunction(provideDisable),
+    enable: asFunction(provideEnable),
 
     runProdServer: asFunction(provideRunServer),
     runTransaction: asFunction(provideRunTransaction),
@@ -153,7 +157,12 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return fortaConfig.agentRegistryContractAddress || "0xFE1927bF5bc338e4884A0d406e33921e8058d75d"
     }),
     agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.agentRegistryJsonRpcUrl || "https://goerli-light.eth.linkpool.io/"
+      if (!fortaConfig.agentRegistryJsonRpcUrl) {
+        throw new Error(`no agentRegistryJsonRpcUrl in config`)
+      } else if (!fortaConfig.agentRegistryJsonRpcUrl.startsWith("http")) {
+        throw new Error(`agentRegistryJsonRpcUrl must begin with http or https`)
+      }
+      return fortaConfig.agentRegistryJsonRpcUrl
     }),
 
     jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {

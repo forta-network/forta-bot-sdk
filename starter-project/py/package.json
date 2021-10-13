@@ -12,6 +12,8 @@
     "range": "forta-agent run --range",
     "file": "forta-agent run --file",
     "publish": "forta-agent publish",
+    "disable": "forta-agent disable",
+    "enable": "forta-agent enable",
     "test": "python3 -m pytest"
   },
   "dependencies": {
