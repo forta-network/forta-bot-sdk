@@ -1,9 +1,10 @@
+
+import { CommandHandler } from '../..'
 import { assertExists } from '../../utils'
-import { GetCredentials } from './get.credentials'
+import { GetCredentials } from '../../utils/get.credentials'
 import { UploadImage } from './upload.image'
 import { UploadManifest } from './upload.manifest'
 import { PushToRegistry } from './push.to.registry'
-import { CommandHandler } from '../..'
 
 export default function providePublish(
   getCredentials: GetCredentials,

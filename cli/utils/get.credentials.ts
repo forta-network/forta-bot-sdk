@@ -1,10 +1,9 @@
 import fs from 'fs'
 import path from 'path'
-import shelljs from "shelljs"
 import prompts from "prompts"
-import { assertExists, assertIsNonEmptyString } from "../../utils"
-import { GetKeyfile } from '../../utils/get.keyfile'
-import { ListKeyfiles } from '../../utils/list.keyfiles'
+import { assertExists, assertIsNonEmptyString } from "."
+import { GetKeyfile } from './get.keyfile'
+import { ListKeyfiles } from './list.keyfiles'
 
 // gets agent public and private key after prompting user for password
 export type GetCredentials = () => Promise<{ publicKey: string, privateKey: string }>

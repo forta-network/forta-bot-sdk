@@ -48,7 +48,7 @@ describe("pushToRegistry", () => {
     expect(mockAgentRegistry.createAgent).toHaveBeenCalledWith(mockPublicKey, mockAgentId, mockManifestRef)
     expect(mockAgentRegistry.updateAgent).toHaveBeenCalledTimes(0)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
-    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully added agent id ${mockAgentId} with manifest ${mockManifestRef}!`, 'publish.log')
+    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully added agent id ${mockAgentId} with manifest ${mockManifestRef}`, 'publish.log')
     jest.useRealTimers()
   })
 
@@ -69,7 +69,7 @@ describe("pushToRegistry", () => {
     expect(mockAgentRegistry.updateAgent).toHaveBeenCalledWith(mockPublicKey, mockAgentId, mockManifestRef)
     expect(mockAgentRegistry.createAgent).toHaveBeenCalledTimes(0)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
-    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully updated agent id ${mockAgentId} with manifest ${mockManifestRef}!`, 'publish.log')
+    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully updated agent id ${mockAgentId} with manifest ${mockManifestRef}`, 'publish.log')
     jest.useRealTimers()
   })
 })

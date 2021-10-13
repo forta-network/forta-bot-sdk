@@ -1,7 +1,7 @@
 import Web3 from "web3"
-import { assertExists, assertIsNonEmptyString, keccak256 } from "../../utils"
+import { assertExists, assertIsNonEmptyString } from "../../utils"
 import { AppendToFile } from '../../utils/append.to.file'
-import AgentRegistry from "./agent.registry"
+import AgentRegistry from "../../contracts/agent.registry"
 
 // adds or updates agent to registry contract
 export type PushToRegistry = (manifestReference: string, publicKey: string, privateKey: string) => Promise<void>
@@ -30,7 +30,7 @@ export default function providePushToRegistry(
       await agentRegistry.updateAgent(publicKey, agentId, manifestReference)
     }
 
-    const logMessage = `successfully ${agentExists ? 'updated' : 'added'} agent id ${agentId} with manifest ${manifestReference}!`
+    const logMessage = `successfully ${agentExists ? 'updated' : 'added'} agent id ${agentId} with manifest ${manifestReference}`
     console.log(logMessage)
     appendToFile(`${new Date().toUTCString()}: ${logMessage}`, 'publish.log')
   }
