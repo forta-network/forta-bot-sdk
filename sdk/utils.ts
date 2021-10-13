@@ -65,17 +65,13 @@ export const createTransactionEvent = ({
 export const createBlockEvent = ({
   type = EventType.BLOCK,
   network = Network.MAINNET,
-  blockHash,
-  blockNumber,
   block
 }: {
   type?: EventType,
   network?: Network,
-  blockHash: string,
-  blockNumber: number,
   block: Block
 }) => {
-  return new BlockEvent(type, network, blockHash, blockNumber, block)
+  return new BlockEvent(type, network, block)
 }
 
 export const assertIsNonEmptyString = (str: string, varName: string) => {
