@@ -69,7 +69,7 @@ export const createBlockEvent: CreateBlockEvent = (block: BlockTransactionObject
     transactionsRoot: (block as any).transactionsRoot,
     uncles: block.uncles
   }
-  return new BlockEvent(EventType.BLOCK, networkId, block.hash, block.number, blok)
+  return new BlockEvent(EventType.BLOCK, networkId, blok)
 }
 
 // creates a Forta TransactionEvent from a web3 TransactionReceipt and BlockTransactionObject
