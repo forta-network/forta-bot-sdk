@@ -16,14 +16,14 @@ describe("disable", () => {
   const mockGetCredentials = jest.fn()
   const mockAgentRegistry = {
     agentExists: jest.fn(),
-    isDisabled: jest.fn(),
+    isEnabled: jest.fn(),
     disableAgent: jest.fn()
   } as any
   const mockAgentId = "0xagentid"
 
   const resetMocks = () => {
     mockAgentRegistry.agentExists.mockReset()
-    mockAgentRegistry.isDisabled.mockReset()
+    mockAgentRegistry.isEnabled.mockReset()
     mockAgentRegistry.disableAgent.mockReset()
   }
 
@@ -52,14 +52,14 @@ describe("disable", () => {
 
   it("does nothing if agent already disabled", async () => {
     mockAgentRegistry.agentExists.mockReturnValueOnce(true)
-    mockAgentRegistry.isDisabled.mockReturnValueOnce(true)
+    mockAgentRegistry.isEnabled.mockReturnValueOnce(false)
 
     await disable({})
 
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
-    expect(mockAgentRegistry.isDisabled).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.isDisabled).toHaveBeenCalledWith(mockAgentId)
+    expect(mockAgentRegistry.isEnabled).toHaveBeenCalledTimes(1)
+    expect(mockAgentRegistry.isEnabled).toHaveBeenCalledWith(mockAgentId)
     expect(mockAgentRegistry.disableAgent).toHaveBeenCalledTimes(0)
   })
 
@@ -67,7 +67,7 @@ describe("disable", () => {
     const systemTime = new Date()
     jest.useFakeTimers('modern').setSystemTime(systemTime)
     mockAgentRegistry.agentExists.mockReturnValueOnce(true)
-    mockAgentRegistry.isDisabled.mockReturnValueOnce(false)
+    mockAgentRegistry.isEnabled.mockReturnValueOnce(true)
     const mockPublicKey = "0x123"
     const mockPrivateKey = "0x456"
     mockGetCredentials.mockReturnValueOnce({ publicKey: mockPublicKey, privateKey: mockPrivateKey })
@@ -76,8 +76,8 @@ describe("disable", () => {
 
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
-    expect(mockAgentRegistry.isDisabled).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.isDisabled).toHaveBeenCalledWith(mockAgentId)
+    expect(mockAgentRegistry.isEnabled).toHaveBeenCalledTimes(1)
+    expect(mockAgentRegistry.isEnabled).toHaveBeenCalledWith(mockAgentId)
     expect(mockGetCredentials).toHaveBeenCalledTimes(1)
     expect(mockGetCredentials).toHaveBeenCalledWith()
     expect(mockWeb3AgentRegistry.eth.accounts.wallet.add).toHaveBeenCalledTimes(1)

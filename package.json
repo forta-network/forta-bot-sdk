@@ -21,7 +21,7 @@
     "publish": "npm run build && npm publish",
     "publish:local": "npm link",
     "test": "jest",
-    "python:publish": "python3 -m twine upload ./python-sdk/dist/*",
+    "python:publish": "npm run python:build && python3 -m twine upload ./python-sdk/dist/*",
     "python:publish:local": "python3 -m pip install -e ./python-sdk",
     "python:build": "python3 -m build ./python-sdk"
   },
