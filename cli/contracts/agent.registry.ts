@@ -20,7 +20,7 @@ export default class AgentRegistry {
 
   async agentExists(agentId: string) {
     const agent = await this.contract.methods.getAgent(agentId).call()
-    return !!agent
+    return !!agent.metadata
   }
   
   async createAgent(from: string, agentId: string, reference: string) {

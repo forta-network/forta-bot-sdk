@@ -157,13 +157,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return fortaConfig.agentRegistryContractAddress || "0x61447385B019187daa48e91c55c02AF1F1f3F863"
     }),
     agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
-      // if (!fortaConfig.agentRegistryJsonRpcUrl) {
-      //   throw new Error(`no agentRegistryJsonRpcUrl in config`)
-      // } else if (!fortaConfig.agentRegistryJsonRpcUrl.startsWith("http")) {
-      //   throw new Error(`agentRegistryJsonRpcUrl must begin with http or https`)
-      // }
-      // return fortaConfig.agentRegistryJsonRpcUrl
-      return "https://polygon-rpc.com/"
+      return fortaConfig.agentRegistryJsonRpcUrl || "https://polygon-rpc.com/"
     }),
 
     jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
