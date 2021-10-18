@@ -24,8 +24,8 @@ export default function provideEnable(
       throw new Error(`agent id ${agentId} does not exist`)
     }
 
-    const isAgentDisabled = await agentRegistry.isDisabled(agentId)
-    if (!isAgentDisabled) {
+    const isAgentEnabled = await agentRegistry.isEnabled(agentId)
+    if (isAgentEnabled) {
       console.log(`agent id ${agentId} is already enabled`)
       return
     }
