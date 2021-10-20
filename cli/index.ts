@@ -2,7 +2,7 @@
 import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
 
-export type CommandName = "init" | "run" | "publish" | "disable" | "enable"
+export type CommandName = "init" | "run" | "publish" | "disable" | "enable" | "keyfile"
 export type CommandHandler = (args: any) => Promise<void>
 
 async function executeCommand(commandName: CommandName, cliArgs: any) {
@@ -66,6 +66,10 @@ yargs
   .command('enable', 'Enables the Forta Agent',
     (yargs: Argv) => {},
     (cliArgs: any) => executeCommand("enable", cliArgs)
+  )
+  .command('keyfile', 'Prints out keyfile information',
+    (yargs: Argv) => {},
+    (cliArgs: any) => executeCommand("keyfile", cliArgs)
   )
   .strict()
   .argv
