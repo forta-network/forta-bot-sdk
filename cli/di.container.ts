@@ -95,6 +95,15 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     agentId: asFunction((agentName: string) => keccak256(agentName)).singleton(),
     version: asFunction((packageJson: any) => packageJson.version),
     documentation: asValue(join(process.cwd(), 'README.md')),
+    repository: asFunction((packageJson: any) => {
+      const repository = packageJson.repository
+      if (typeof repository === 'string') {
+        return repository
+      } else if (typeof repository === 'object') {
+        return repository.url
+      }
+      return undefined
+    }).singleton(),
     keyfileName: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.keyfile
     }),

@@ -15,12 +15,15 @@ describe("uploadManifest", () => {
   const mockAgentId = "0xagentId"
   const mockVersion = "0.1"
   const mockDocumentation = "README.md"
+  const mockRepository = "github.com/myrepository"
   const mockImageRef = "123abc"
   const mockPublicKey = "0x123"
   const mockPrivateKey = "0xabc"
 
   beforeAll(() => {
-    uploadManifest = provideUploadManifest(mockWeb3, mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentId, mockVersion, mockDocumentation)
+    uploadManifest = provideUploadManifest(
+      mockWeb3, mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentId, mockVersion, mockDocumentation, mockRepository
+    )
   })
 
   it("throws error if documentation not found", async () => {
@@ -53,7 +56,9 @@ describe("uploadManifest", () => {
       version: mockVersion,
       timestamp: systemTime.toUTCString(),
       imageReference: mockImageRef,
-      documentation: mockDocumentationRef
+      documentation: mockDocumentationRef,
+      repository: mockRepository,
+      chainIds: [1]
     }
     const mockSignature = "signature"
     mockWeb3.eth.accounts.sign.mockReturnValueOnce({ signature: mockSignature })

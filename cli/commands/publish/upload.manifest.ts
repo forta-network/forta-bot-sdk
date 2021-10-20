@@ -14,6 +14,7 @@ export default function provideUploadManifest(
   agentId: string,
   version: string,
   documentation: string,
+  repository: string
 ): UploadManifest {
   assertExists(web3AgentRegistry, 'web3AgentRegistry')
   assertExists(filesystem, 'filesystem')
@@ -41,7 +42,9 @@ export default function provideUploadManifest(
       version,
       timestamp: new Date().toUTCString(),
       imageReference,
-      documentation: documentationReference
+      documentation: documentationReference,
+      repository,
+      chainIds: [1]
     }
 
     // sign agent manifest
