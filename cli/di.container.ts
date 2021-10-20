@@ -12,6 +12,7 @@ import provideRun from "./commands/run"
 import providePublish from "./commands/publish"
 import provideDisable from './commands/disable'
 import provideEnable from './commands/enable'
+import provideKeyfile from './commands/keyfile'
 import AgentController from "./commands/run/server/agent.controller"
 import { provideRunTransaction } from "./commands/run/run.transaction"
 import { provideRunBlock } from "./commands/run/run.block"
@@ -70,6 +71,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     publish: asFunction(providePublish),
     disable: asFunction(provideDisable),
     enable: asFunction(provideEnable),
+    keyfile: asFunction(provideKeyfile),
 
     runProdServer: asFunction(provideRunServer),
     runTransaction: asFunction(provideRunTransaction),
