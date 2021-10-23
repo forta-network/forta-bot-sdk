@@ -1,7 +1,7 @@
 import sys
 import os
 from jsonc_parser.parser import JsoncParser
-import sha3
+from Crypto.Hash import keccak
 
 
 def get_forta_config():
@@ -69,6 +69,6 @@ def hex_to_int(strVal):
 
 
 def keccak256(val):
-    hash = sha3.keccak_256()
+    hash = keccak.new(digest_bits=256)
     hash.update(bytes(val, encoding='utf-8'))
     return f'0x{hash.hexdigest()}'
