@@ -10,6 +10,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 import provideInit from "./commands/init"
 import provideRun from "./commands/run"
 import providePublish from "./commands/publish"
+import providePush from './commands/push'
 import provideDisable from './commands/disable'
 import provideEnable from './commands/enable'
 import provideKeyfile from './commands/keyfile'
@@ -69,6 +70,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     init: asFunction(provideInit),
     run: asFunction(provideRun),
     publish: asFunction(providePublish),
+    push: asFunction(providePush),
     disable: asFunction(provideDisable),
     enable: asFunction(provideEnable),
     keyfile: asFunction(provideKeyfile),
