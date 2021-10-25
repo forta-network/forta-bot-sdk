@@ -2,7 +2,7 @@
 import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
 
-export type CommandName = "init" | "run" | "publish" | "disable" | "enable" | "keyfile"
+export type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile"
 export type CommandHandler = (args: any) => Promise<void>
 
 async function executeCommand(commandName: CommandName, cliArgs: any) {
@@ -58,6 +58,15 @@ yargs
       })
     },
     (cliArgs: any) => executeCommand("publish", cliArgs)
+  )
+  .command('push', 'Push the Forta Agent image to the repository',
+    (yargs: Argv) => {
+      yargs.option('config', {
+        description: 'Specify a config file (default: forta.config.json)',
+        type: 'string',
+      })
+    },
+    (cliArgs: any) => executeCommand("push", cliArgs)
   )
   .command('disable', 'Disables the Forta Agent',
     (yargs: Argv) => {},
