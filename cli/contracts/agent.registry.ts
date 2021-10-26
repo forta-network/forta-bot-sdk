@@ -1,6 +1,4 @@
-import Web3 from "web3"
-import { Contract } from "web3-eth-contract"
-import { AbiItem } from "web3-utils"
+import { ethers, Contract, providers, Wallet } from "ethers"
 import AgentRegistryAbi from "./agent.registry.abi.json"
 
 const GAS_MULTIPLIER = 1.15
@@ -9,57 +7,55 @@ export default class AgentRegistry {
   private contract: Contract;
 
   constructor(
-    web3AgentRegistry: Web3,
+    ethersAgentRegistryProvider: providers.JsonRpcProvider,
     agentRegistryContractAddress: string
   ) {
-    this.contract = new web3AgentRegistry.eth.Contract(
-      <AbiItem[]>AgentRegistryAbi, 
-      agentRegistryContractAddress
+    this.contract = new ethers.Contract(
+      agentRegistryContractAddress,
+      AgentRegistryAbi,
+      ethersAgentRegistryProvider
     )
   }
 
   async agentExists(agentId: string) {
-    const agent = await this.contract.methods.getAgent(agentId).call()
+    const agent = await this.contract.getAgent(agentId)
     return !!agent.metadata
   }
   
-  async createAgent(from: string, agentId: string, reference: string) {
-    const createAgentTx = this.contract.methods.createAgent(agentId, from, reference, [1])
-    const gas = await createAgentTx.estimateGas({ from })
-    await createAgentTx.send({
-      from,
-      gas: Math.round(gas * GAS_MULTIPLIER)
-    })
+  async createAgent(fromWallet: Wallet, agentId: string, reference: string) {
+    const from = fromWallet.getAddress()
+    const contractWithSigner = this.contract.connect(fromWallet)
+    const gas = await contractWithSigner.estimateGas.createAgent(agentId, from, reference, [1])
+    const tx = await contractWithSigner.createAgent(agentId, from, reference, [1], { gasLimit: gas.mul(GAS_MULTIPLIER) })
+    await tx.wait()
+    return tx.hash
   }
 
-  async updateAgent(from: string, agentId: string, reference: string) {
-    const updateAgentTx = this.contract.methods.updateAgent(agentId, reference, [1])
-    const gas = await updateAgentTx.estimateGas({ from })
-    await updateAgentTx.send({
-      from,
-      gas: Math.round(gas * GAS_MULTIPLIER)
-    })
+  async updateAgent(fromWallet: Wallet, agentId: string, reference: string) {
+    const contractWithSigner = this.contract.connect(fromWallet)
+    const gas = await contractWithSigner.estimateGas.updateAgent(agentId, reference, [1])
+    const tx = await contractWithSigner.updateAgent(agentId, reference, [1], { gasLimit: gas.mul(GAS_MULTIPLIER) })
+    await tx.wait()
+    return tx.hash
   }
 
   async isEnabled(agentId: string) {
-    return this.contract.methods.isEnabled(agentId).call()
+    return this.contract.isEnabled(agentId)
   }
 
-  async disableAgent(from: string, agentId: string) {
-    const disableAgentTx = this.contract.methods.disableAgent(agentId, 1)// Permission.OWNER = 1
-    const gas = await disableAgentTx.estimateGas({ from })
-    await disableAgentTx.send({
-      from,
-      gas: Math.round(gas * GAS_MULTIPLIER)
-    })
+  async disableAgent(fromWallet: Wallet, agentId: string) {
+    const contractWithSigner = this.contract.connect(fromWallet)
+    const gas = await contractWithSigner.estimateGas.disableAgent(agentId, 1)// Permission.OWNER = 1
+    const tx = await contractWithSigner.disableAgent(agentId, 1, { gasLimit: gas.mul(GAS_MULTIPLIER) })
+    await tx.wait()
+    return tx.hash
   }
 
-  async enableAgent(from: string, agentId: string) {
-    const enableAgentTx = this.contract.methods.enableAgent(agentId, 1)// Permission.OWNER = 1
-    const gas = await enableAgentTx.estimateGas({ from })
-    await enableAgentTx.send({
-      from,
-      gas: Math.round(gas * GAS_MULTIPLIER)
-    })
+  async enableAgent(fromWallet: Wallet, agentId: string) {
+    const contractWithSigner = this.contract.connect(fromWallet)
+    const gas = await contractWithSigner.estimateGas.enableAgent(agentId, 1)// Permission.OWNER = 1
+    const tx = await contractWithSigner.enableAgent(agentId, 1, { gasLimit: gas.mul(GAS_MULTIPLIER) })
+    await tx.wait()
+    return tx.hash
   }
 }

@@ -10,7 +10,5 @@ export default function providePush(
   return async function push(cliArgs: any) {
     const imageReference = await uploadImage()
     console.log(`successfully pushed image with reference ${imageReference}`)
-    // invoke process.exit() otherwise a web3 websocket connection can prevent the process from completing
-    process.exit()
   } 
 }

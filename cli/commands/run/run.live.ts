@@ -1,4 +1,4 @@
-import Web3 from "web3";
+import { providers } from "ethers"
 import { assertExists } from '../../utils';
 import { RunHandlersOnBlock } from '../../utils/run.handlers.on.block';
 
@@ -6,11 +6,11 @@ import { RunHandlersOnBlock } from '../../utils/run.handlers.on.block';
 export type RunLive = () => Promise<void>
 
 export function provideRunLive(
-  web3: Web3, 
+  ethersProvider: providers.JsonRpcProvider, 
   runHandlersOnBlock: RunHandlersOnBlock,
   setInterval: (callback: any, ms: number) => NodeJS.Timeout
 ): RunLive {
-  assertExists(web3, 'web3')
+  assertExists(ethersProvider, 'ethersProvider')
   assertExists(runHandlersOnBlock, 'runHandlersOnBlock')
   assertExists(setInterval, 'setInterval')
 
@@ -18,13 +18,13 @@ export function provideRunLive(
     console.log('listening for blockchain data...')
 
     // process the latest block
-    let latestBlockNumber = await web3.eth.getBlockNumber()
+    let latestBlockNumber = await ethersProvider.getBlockNumber()
     await runHandlersOnBlock(latestBlockNumber)
 
     // poll for the latest block every 15s and process each
     setInterval(async () => {
       let currBlockNumber = latestBlockNumber
-      latestBlockNumber = await web3.eth.getBlockNumber()
+      latestBlockNumber = await ethersProvider.getBlockNumber()
       const endBlockNumber = latestBlockNumber
       while (currBlockNumber < endBlockNumber) {
         currBlockNumber++

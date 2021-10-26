@@ -1,4 +1,4 @@
-import Web3 from "web3";
+import { providers } from "ethers"
 import { assertExists, CreateTransactionEvent } from ".";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetTraceData } from "./get.trace.data";
@@ -6,12 +6,12 @@ import { GetTraceData } from "./get.trace.data";
 export type RunHandlersOnTransaction = (txHash: string) => Promise<void>
 
 export function provideRunHandlersOnTransaction(
-  web3: Web3,
+  ethersProvider: providers.JsonRpcProvider,
   getAgentHandlers: GetAgentHandlers,
   getTraceData: GetTraceData,
   createTransactionEvent: CreateTransactionEvent
 ): RunHandlersOnTransaction {
-  assertExists(web3, 'web3')
+  assertExists(ethersProvider, 'ethersProvider')
   assertExists(getAgentHandlers, 'getAgentHandlers')
   assertExists(getTraceData, 'getTraceData')
   assertExists(createTransactionEvent, 'createTransactionEvent')
@@ -22,9 +22,9 @@ export function provideRunHandlersOnTransaction(
       throw new Error("no transaction handler found")
     }
       
-    const networkId = await web3.eth.net.getId()
-    const receipt = await web3.eth.getTransactionReceipt(txHash)
-    const block = await web3.eth.getBlock(receipt.blockHash, true)
+    const networkId = (await ethersProvider.getNetwork()).chainId
+    const receipt = await ethersProvider.getTransactionReceipt(txHash)
+    const block = await ethersProvider.getBlockWithTransactions(receipt.blockHash)
     const traces = await getTraceData(receipt.transactionHash)
     const txEvent = createTransactionEvent(receipt, block, networkId, traces)
 

@@ -2,7 +2,7 @@ import os from 'os'
 import fs from 'fs'
 import { join } from "path"
 import { asClass, asFunction, asValue, createContainer, InjectionMode } from "awilix"
-import Web3 from 'web3'
+import { ethers } from "ethers"
 import shell from 'shelljs'
 import prompts from 'prompts'
 import { jsonc } from 'jsonc'
@@ -170,7 +170,11 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return fortaConfig.agentRegistryContractAddress || "0x61447385B019187daa48e91c55c02AF1F1f3F863"
     }),
     agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.agentRegistryJsonRpcUrl || "https://polygon-rpc.com/"
+      const url = fortaConfig.agentRegistryJsonRpcUrl || "https://polygon-rpc.com/"
+      if (!url.startsWith("http")) {
+        throw new Error(`agentRegistryJsonRpcUrl must begin with http or https`)
+      }
+      return url
     }),
 
     jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
@@ -181,8 +185,8 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       }
       return fortaConfig.jsonRpcUrl
     }),
-    web3: asFunction((jsonRpcUrl: string) =>  new Web3(jsonRpcUrl)).singleton(),
-    web3AgentRegistry: asFunction((agentRegistryJsonRpcUrl: string) => new Web3(agentRegistryJsonRpcUrl)).singleton(),
+    ethersProvider: asFunction((jsonRpcUrl: string) =>  new ethers.providers.JsonRpcProvider(jsonRpcUrl)).singleton(),
+    ethersAgentRegistryProvider: asFunction((agentRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(agentRegistryJsonRpcUrl)).singleton(),
 
     ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig) => {
       if (!fortaConfig.ipfsGatewayUrl) {

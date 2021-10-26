@@ -1,4 +1,4 @@
-import Web3 from "web3";
+import { providers } from "ethers"
 import { Trace } from "../../sdk";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetTraceData } from "./get.trace.data";
@@ -7,13 +7,13 @@ import { assertExists, CreateBlockEvent, CreateTransactionEvent } from ".";
 export type RunHandlersOnBlock = (blockHashOrNumber: string | number) => Promise<void>
 
 export function provideRunHandlersOnBlock(
-  web3: Web3,
+  ethersProvider: providers.JsonRpcProvider,
   getAgentHandlers: GetAgentHandlers,
   getTraceData: GetTraceData,
   createBlockEvent: CreateBlockEvent,
   createTransactionEvent: CreateTransactionEvent
 ): RunHandlersOnBlock {
-  assertExists(web3, 'web3')
+  assertExists(ethersProvider, 'ethersProvider')
   assertExists(getAgentHandlers, 'getAgentHandlers')
   assertExists(getTraceData, 'getTraceData')
   assertExists(createBlockEvent, 'createBlockEvent')
@@ -26,8 +26,8 @@ export function provideRunHandlersOnBlock(
     }
 
     console.log(`fetching block ${blockHashOrNumber}...`)
-    const networkId = await web3.eth.net.getId()
-    const block = await web3.eth.getBlock(blockHashOrNumber, true)
+    const networkId = (await ethersProvider.getNetwork()).chainId
+    const block = await ethersProvider.getBlockWithTransactions(blockHashOrNumber)
 
     // run block handler
     if (handleBlock) {
@@ -50,11 +50,7 @@ export function provideRunHandlersOnBlock(
 
     // run transaction handler on all block transactions
     for (const transaction of block.transactions) {
-      let receipt = await web3.eth.getTransactionReceipt(transaction.hash)
-      // retry once if receipt fetching failed TODO figure out why this happens sometimes
-      if (!receipt) {
-        receipt = await web3.eth.getTransactionReceipt(transaction.hash)
-      }
+      let receipt = await ethersProvider.getTransactionReceipt(transaction.hash)
       if (!receipt) {
         console.log(`error fetching receipt for ${transaction.hash}`)
         continue;

@@ -1,4 +1,4 @@
-import Web3 from "web3"
+import { Wallet } from "ethers"
 import { CommandHandler } from "../.."
 import { assertExists, assertIsNonEmptyString } from "../../utils"
 import { AppendToFile } from "../../utils/append.to.file"
@@ -6,13 +6,11 @@ import { GetCredentials } from "../../utils/get.credentials"
 import AgentRegistry from "../../contracts/agent.registry"
 
 export default function provideDisable(
-  web3AgentRegistry: Web3,
   appendToFile: AppendToFile,
   getCredentials: GetCredentials,
   agentRegistry: AgentRegistry,
   agentId: string
 ): CommandHandler {
-  assertExists(web3AgentRegistry, 'web3AgentRegistry')
   assertExists(appendToFile, 'appendToFile')
   assertExists(getCredentials, 'getCredentials')
   assertExists(agentRegistry, 'agentRegistry')
@@ -30,12 +28,11 @@ export default function provideDisable(
       return
     }
 
-    const { publicKey, privateKey } = await getCredentials()
-    //make sure web3 knows about this wallet in order to sign the transaction
-    web3AgentRegistry.eth.accounts.wallet.add(privateKey);
+    const { privateKey } = await getCredentials()
 
     console.log('disabling agent...')
-    await agentRegistry.disableAgent(publicKey, agentId)
+    const fromWallet = new Wallet(privateKey)
+    await agentRegistry.disableAgent(fromWallet, agentId)
 
     const logMessage = `successfully disabled agent id ${agentId}`
     console.log(logMessage)
