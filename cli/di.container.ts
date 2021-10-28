@@ -40,6 +40,9 @@ import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transac
 import provideAppendToFile from './utils/append.to.file'
 import provideGetFortaConfig, { GetFortaConfig } from './utils/get.forta.config'
 import provideListKeyfiles from './utils/list.keyfiles'
+import provideGetNetworkId from './utils/get.network.id'
+import provideGetBlockWithTransactions from './utils/get.block.with.transactions'
+import provideGetTransactionReceipt from './utils/get.transaction.receipt'
 
 export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -140,6 +143,10 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     listKeyfiles: asFunction(provideListKeyfiles),
     addToIpfs: asFunction(provideAddToIpfs),
     appendToFile: asFunction(provideAppendToFile),
+
+    getNetworkId: asFunction(provideGetNetworkId),
+    getBlockWithTransactions: asFunction(provideGetBlockWithTransactions),
+    getTransactionReceipt: asFunction(provideGetTransactionReceipt),
 
     getTraceData: asFunction(provideGetTraceData),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {

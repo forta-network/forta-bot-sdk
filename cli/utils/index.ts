@@ -2,11 +2,12 @@ import fs from 'fs'
 import path from 'path'
 import _ from 'lodash'
 import { jsonc } from 'jsonc'
-import { BlockWithTransactions, TransactionReceipt } from "@ethersproject/abstract-provider"
 import { Keccak } from 'sha3'
 import { ShellString } from 'shelljs'
 import { BlockEvent, EventType, TransactionEvent } from "../../sdk"
 import { Trace } from '../../sdk/trace'
+import { JsonRpcBlock } from './get.block.with.transactions'
+import { JsonRpcTransactionReceipt } from './get.transaction.receipt'
 
 export type GetJsonFile = (filePath: string) => any
 export const getJsonFile: GetJsonFile = (filePath: string) => {
@@ -43,39 +44,39 @@ export const formatAddress = (address: string) => {
   return _.isString(address) ? address.toLowerCase() : address
 }
 
-// creates a Forta BlockEvent from a web3 BlockTransactionObject
-export type CreateBlockEvent = (block: BlockWithTransactions, networkId: number) => BlockEvent
-export const createBlockEvent: CreateBlockEvent = (block: BlockWithTransactions, networkId: number) => {
+// creates a Forta BlockEvent from a json-rpc block object
+export type CreateBlockEvent = (block: JsonRpcBlock, networkId: number) => BlockEvent
+export const createBlockEvent: CreateBlockEvent = (block: JsonRpcBlock, networkId: number) => {
   const blok = {
-    difficulty: block.difficulty.toString(),
+    difficulty: block.difficulty,
     extraData: block.extraData,
-    gasLimit: block.gasLimit.toString(),
-    gasUsed: block.gasUsed.toString(),
+    gasLimit: block.gasLimit,
+    gasUsed: block.gasUsed,
     hash: block.hash,
     logsBloom: block.logsBloom,
     miner: formatAddress(block.miner),
-    mixHash: (block as any).mixHash,
+    mixHash: block.mixHash,
     nonce: block.nonce,
-    number: block.number,
+    number: parseInt(block.number),
     parentHash: block.parentHash,
-    receiptsRoot: (block as any).receiptsRoot,
+    receiptsRoot: block.receiptsRoot,
     sha3Uncles: block.sha3Uncles,
-    size: block.size.toString(),
+    size: block.size,
     stateRoot: block.stateRoot,
-    timestamp: typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp,
-    totalDifficulty: block.totalDifficulty.toString(),
+    timestamp: parseInt(block.timestamp),
+    totalDifficulty: block.totalDifficulty,
     transactions: block.transactions.map(tx => tx.hash),
-    transactionsRoot: (block as any).transactionsRoot,
+    transactionsRoot: block.transactionsRoot,
     uncles: block.uncles
   }
   return new BlockEvent(EventType.BLOCK, networkId, blok)
 }
 
-// creates a Forta TransactionEvent from a web3 TransactionReceipt and BlockTransactionObject
-export type CreateTransactionEvent = (receipt: TransactionReceipt, block: BlockWithTransactions, networkId: number, traces: Trace[]) => TransactionEvent
+// creates a Forta TransactionEvent from a json-rpc transaction receipt and block object
+export type CreateTransactionEvent = (receipt: JsonRpcTransactionReceipt, block: JsonRpcBlock, networkId: number, traces: Trace[]) => TransactionEvent
 export const createTransactionEvent: CreateTransactionEvent = (
-  receipt: TransactionReceipt, 
-  block: BlockWithTransactions, 
+  receipt: JsonRpcTransactionReceipt, 
+  block: JsonRpcBlock, 
   networkId: number, 
   traces: Trace[] = []
 ) => {
@@ -84,14 +85,14 @@ export const createTransactionEvent: CreateTransactionEvent = (
     hash: transaction.hash,
     from: formatAddress(transaction.from),
     to: transaction.to ? formatAddress(transaction.to) : null,
-    nonce: transaction.nonce,
-    gas: transaction.gas.toString(),
+    nonce: parseInt(transaction.nonce),
+    gas: transaction.gas,
     gasPrice: transaction.gasPrice,
     value: transaction.value,
     data: transaction.input,
-    r: (transaction as any).r,
-    s: (transaction as any).s,
-    v: (transaction as any).v,
+    r: transaction.r,
+    s: transaction.s,
+    v: transaction.v,
   }
   const addresses = {
     [tx.from]: true
@@ -101,34 +102,34 @@ export const createTransactionEvent: CreateTransactionEvent = (
   }
 
   const rcpt = {
-    blockNumber: receipt.blockNumber,
+    blockNumber: parseInt(receipt.blockNumber),
     blockHash: receipt.blockHash,
-    transactionIndex: receipt.transactionIndex,
+    transactionIndex: parseInt(receipt.transactionIndex),
     transactionHash: receipt.transactionHash,
-    status: receipt.status,
+    status: receipt.status === "0x1",
     logsBloom: receipt.logsBloom,
     contractAddress: receipt.contractAddress ? formatAddress(receipt.contractAddress) : null,
-    gasUsed: receipt.gasUsed.toString(),
-    cumulativeGasUsed: receipt.cumulativeGasUsed.toString(),
+    gasUsed: receipt.gasUsed,
+    cumulativeGasUsed: receipt.cumulativeGasUsed,
     logs: receipt.logs.map(log => ({
       address: formatAddress(log.address),
       topics: log.topics,
       data: log.data,
-      logIndex: log.logIndex,
-      blockNumber: log.blockNumber,
+      logIndex: parseInt(log.logIndex),
+      blockNumber: parseInt(log.blockNumber),
       blockHash: log.blockHash,
-      transactionIndex: log.transactionIndex,
+      transactionIndex: parseInt(log.transactionIndex),
       transactionHash: log.transactionHash,
-      removed: false,
+      removed: log.removed,
     })),
-    root: (receipt as any).root ?? '',
-  }  
+    root: receipt.root ?? '',
+  }
   rcpt.logs.forEach(log => addresses[log.address] = true)
 
   const blok = {
     hash: block.hash,
-    number: block.number,
-    timestamp: typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
+    number: parseInt(block.number),
+    timestamp: parseInt(block.timestamp)
   }
 
   const trcs: Trace[] = []
