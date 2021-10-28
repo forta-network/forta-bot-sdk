@@ -2,23 +2,17 @@ import { provideRunHandlersOnTransaction, RunHandlersOnTransaction } from "./run
 
 describe("runHandlersOnTransaction", () => {
   let runHandlersOnTransaction: RunHandlersOnTransaction
-  const mockWeb3 = {
-    eth : {
-      getBlock: jest.fn(),
-      getTransactionReceipt: jest.fn(),
-      net: {
-        getId: jest.fn()
-      }
-    }
-  } as any
   const mockGetAgentHandlers = jest.fn()
+  const mockGetNetworkId = jest.fn()
+  const mockGetTransactionReceipt = jest.fn()
+  const mockGetBlockWithTransactions = jest.fn()
   const mockGetTraceData = jest.fn().mockReturnValue([])
   const mockCreateTransactionEvent = jest.fn()
   const mockTxHash = "0x123"
 
   beforeAll(() => {
     runHandlersOnTransaction = provideRunHandlersOnTransaction(
-      mockWeb3, mockGetAgentHandlers, mockGetTraceData, mockCreateTransactionEvent
+      mockGetAgentHandlers, mockGetNetworkId, mockGetTransactionReceipt, mockGetBlockWithTransactions, mockGetTraceData, mockCreateTransactionEvent
     )
   })
 
@@ -39,11 +33,11 @@ describe("runHandlersOnTransaction", () => {
     const mockHandleTransaction = jest.fn().mockReturnValue([])
     mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
     const mockNetworkId = 1
-    mockWeb3.eth.net.getId.mockReturnValueOnce(mockNetworkId)
-    const mockReceipt = { blockHash: '0xabc', transactionHash: mockTxHash }
-    mockWeb3.eth.getTransactionReceipt.mockReturnValueOnce(mockReceipt)
+    mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
+    const mockReceipt = { blockNumber: 123, transactionHash: mockTxHash }
+    mockGetTransactionReceipt.mockReturnValueOnce(mockReceipt)
     const mockBlock = { hash: '0xabc' }
-    mockWeb3.eth.getBlock.mockReturnValueOnce(mockBlock)
+    mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
     const mockTxEvent = {}
     mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
 
@@ -51,12 +45,12 @@ describe("runHandlersOnTransaction", () => {
 
     expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
     expect(mockGetAgentHandlers).toHaveBeenCalledWith()
-    expect(mockWeb3.eth.net.getId).toHaveBeenCalledTimes(1)
-    expect(mockWeb3.eth.net.getId).toHaveBeenCalledWith()
-    expect(mockWeb3.eth.getTransactionReceipt).toHaveBeenCalledTimes(1)
-    expect(mockWeb3.eth.getTransactionReceipt).toHaveBeenCalledWith(mockTxHash)
-    expect(mockWeb3.eth.getBlock).toHaveBeenCalledTimes(1)
-    expect(mockWeb3.eth.getBlock).toHaveBeenCalledWith(mockReceipt.blockHash, true)
+    expect(mockGetNetworkId).toHaveBeenCalledTimes(1)
+    expect(mockGetNetworkId).toHaveBeenCalledWith()
+    expect(mockGetTransactionReceipt).toHaveBeenCalledTimes(1)
+    expect(mockGetTransactionReceipt).toHaveBeenCalledWith(mockTxHash)
+    expect(mockGetBlockWithTransactions).toHaveBeenCalledTimes(1)
+    expect(mockGetBlockWithTransactions).toHaveBeenCalledWith(mockReceipt.blockNumber)
     expect(mockGetTraceData).toHaveBeenCalledTimes(1)
     expect(mockGetTraceData).toHaveBeenCalledWith(mockReceipt.transactionHash)
     expect(mockCreateTransactionEvent).toHaveBeenCalledTimes(1)

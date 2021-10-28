@@ -1,6 +1,6 @@
 import fs from "fs"
 import { ethers, Wallet } from "ethers"
-import { assertExists, assertIsNonEmptyString } from "../../utils"
+import { assertExists, assertIsNonEmptyString, keccak256 } from "../../utils"
 import { AddToIpfs } from "../../utils/add.to.ipfs"
 
 // uploads signed agent manifest to ipfs and returns ipfs reference
@@ -47,7 +47,7 @@ export default function provideUploadManifest(
 
     // sign agent manifest
     const signingKey = new ethers.utils.SigningKey(privateKey)
-    const signature = ethers.utils.joinSignature(signingKey.signDigest(JSON.stringify(manifest)))
+    const signature = ethers.utils.joinSignature(signingKey.signDigest(keccak256(JSON.stringify(manifest))))
 
     // upload signed manifest to ipfs
     console.log('pushing agent manifest to IPFS...')

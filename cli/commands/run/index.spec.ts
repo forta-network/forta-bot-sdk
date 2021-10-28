@@ -6,11 +6,9 @@ describe("run", () => {
   const mockContainer = {
     resolve: jest.fn()
   } as any
-  const mockExit = jest.spyOn(process, 'exit').mockImplementation();
 
   const resetMocks = () => {
     mockContainer.resolve.mockReset()
-    mockExit.mockReset()
   }
 
   beforeAll(() => {
@@ -30,7 +28,6 @@ describe("run", () => {
     expect(mockContainer.resolve).toHaveBeenCalledWith("runTransaction")
     expect(mockRunTransaction).toHaveBeenCalledTimes(1)
     expect(mockRunTransaction).toHaveBeenCalledWith(mockCliArgs.tx)
-    expect(mockExit).toHaveBeenCalledTimes(1)
   })
 
   it("invokes runBlock if block argument is provided", async () => {
@@ -44,7 +41,6 @@ describe("run", () => {
     expect(mockContainer.resolve).toHaveBeenCalledWith("runBlock")
     expect(mockRunBlock).toHaveBeenCalledTimes(1)
     expect(mockRunBlock).toHaveBeenCalledWith(mockCliArgs.block)
-    expect(mockExit).toHaveBeenCalledTimes(1)
   })
 
   it("invokes runBlockRange if range argument is provided", async () => {
@@ -58,7 +54,6 @@ describe("run", () => {
     expect(mockContainer.resolve).toHaveBeenCalledWith("runBlockRange")
     expect(mockRunBlockRange).toHaveBeenCalledTimes(1)
     expect(mockRunBlockRange).toHaveBeenCalledWith(mockCliArgs.range)
-    expect(mockExit).toHaveBeenCalledTimes(1)
   })
 
   it("invokes runFile if file argument is provided", async () => {
@@ -72,7 +67,6 @@ describe("run", () => {
     expect(mockContainer.resolve).toHaveBeenCalledWith("runFile")
     expect(mockRunFile).toHaveBeenCalledTimes(1)
     expect(mockRunFile).toHaveBeenCalledWith(mockCliArgs.file)
-    expect(mockExit).toHaveBeenCalledTimes(1)
   })
 
   it("invokes runProdServer if prod argument is provided", async () => {
@@ -86,7 +80,6 @@ describe("run", () => {
     expect(mockContainer.resolve).toHaveBeenCalledWith("runProdServer")
     expect(mockRunProdServer).toHaveBeenCalledTimes(1)
     expect(mockRunProdServer).toHaveBeenCalledWith()
-    expect(mockExit).toHaveBeenCalledTimes(0)
   })
 
   it("invokes runLive if no argument is provided", async () => {
@@ -100,6 +93,5 @@ describe("run", () => {
     expect(mockContainer.resolve).toHaveBeenCalledWith("runLive")
     expect(mockRunLive).toHaveBeenCalledTimes(1)
     expect(mockRunLive).toHaveBeenCalledWith()
-    expect(mockExit).toHaveBeenCalledTimes(0)
   })
 })
