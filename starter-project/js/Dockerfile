@@ -6,7 +6,7 @@
 # RUN javascript-obfuscator ./src --output ./dist --split-strings true --split-strings-chunk-length 3
 
 # Final stage: install production dependencies
-FROM node:14.15.5-alpine
+FROM node:12-alpine
 ENV NODE_ENV=production
 WORKDIR /app
 # if using obfuscated code from build stage:
