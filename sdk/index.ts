@@ -8,6 +8,7 @@ import { Trace, TraceAction, TraceResult } from "./trace"
 import { Transaction } from "./transaction"
 
 interface FortaConfig {
+  agentId?: string
   jsonRpcUrl?: string
   ipfsGatewayUrl?: string
   ipfsGatewayAuth?: string
