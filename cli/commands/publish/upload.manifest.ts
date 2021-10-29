@@ -1,13 +1,12 @@
 import fs from "fs"
-import Web3 from "web3"
+import { ethers, Wallet } from "ethers"
 import { assertExists, assertIsNonEmptyString, keccak256 } from "../../utils"
 import { AddToIpfs } from "../../utils/add.to.ipfs"
 
 // uploads signed agent manifest to ipfs and returns ipfs reference
-export type UploadManifest = (imageReference: string, publicKey: string, privateKey: string) => Promise<string>
+export type UploadManifest = (imageReference: string, privateKey: string) => Promise<string>
 
 export default function provideUploadManifest(
-  web3AgentRegistry: Web3,
   filesystem: typeof fs,
   addToIpfs: AddToIpfs,
   agentName: string,
@@ -16,7 +15,6 @@ export default function provideUploadManifest(
   documentation: string,
   repository: string
 ): UploadManifest {
-  assertExists(web3AgentRegistry, 'web3AgentRegistry')
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
   assertIsNonEmptyString(agentName, 'agentName')
@@ -24,7 +22,7 @@ export default function provideUploadManifest(
   assertIsNonEmptyString(version, 'version')
   assertIsNonEmptyString(documentation, 'documentation')
 
-  return async function uploadManifest(imageReference: string, publicKey: string, privateKey: string) {
+  return async function uploadManifest(imageReference: string, privateKey: string) {
     // upload documentation to ipfs
     if (!filesystem.existsSync(documentation)) {
       throw new Error(`documentation file ${documentation} not found`)
@@ -35,7 +33,7 @@ export default function provideUploadManifest(
 
     // create agent manifest
     const manifest = {
-      from: publicKey,
+      from: new Wallet(privateKey).getAddress(),
       name: agentName,
       agentId: agentName,
       agentIdHash: agentId,
@@ -48,7 +46,8 @@ export default function provideUploadManifest(
     }
 
     // sign agent manifest
-    const { signature } = web3AgentRegistry.eth.accounts.sign(JSON.stringify(manifest), privateKey);
+    const signingKey = new ethers.utils.SigningKey(privateKey)
+    const signature = ethers.utils.joinSignature(signingKey.signDigest(keccak256(JSON.stringify(manifest))))
 
     // upload signed manifest to ipfs
     console.log('pushing agent manifest to IPFS...')

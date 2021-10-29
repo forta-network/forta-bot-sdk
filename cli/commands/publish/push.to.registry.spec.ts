@@ -1,11 +1,8 @@
-import { keccak256 } from "../../utils"
+import { Wallet } from "ethers"
 import providePushToRegistry, { PushToRegistry } from "./push.to.registry"
 
 describe("pushToRegistry", () => {
   let pushToRegistry: PushToRegistry
-  const mockWeb3 = {
-    eth: { accounts: { wallet: { add: jest.fn() } } }
-  } as any
   const mockAppendToFile = jest.fn()
   const mockAgentRegistry = {
     agentExists: jest.fn(),
@@ -14,19 +11,17 @@ describe("pushToRegistry", () => {
   } as any
   const mockAgentId = "0xagentId"
   const mockManifestRef = "abc123"
-  const mockPublicKey = "0x123"
-  const mockPrivateKey = "0xabc"
+  const mockPrivateKey = "0xabcd"
 
   const resetMocks = () => {
     mockAppendToFile.mockReset()
-    mockWeb3.eth.accounts.wallet.add.mockReset()
     mockAgentRegistry.agentExists.mockReset()
     mockAgentRegistry.createAgent.mockReset()
     mockAgentRegistry.updateAgent.mockReset()
   }
 
   beforeAll(() => {
-    pushToRegistry = providePushToRegistry(mockWeb3, mockAppendToFile, mockAgentRegistry, mockAgentId)
+    pushToRegistry = providePushToRegistry(mockAppendToFile, mockAgentRegistry, mockAgentId)
   })
 
   beforeEach(() => resetMocks())
@@ -36,16 +31,17 @@ describe("pushToRegistry", () => {
     jest.useFakeTimers('modern').setSystemTime(systemTime)
     mockAgentRegistry.agentExists.mockReturnValueOnce(false)
 
-    await pushToRegistry(mockManifestRef, mockPublicKey, mockPrivateKey)
+    await pushToRegistry(mockManifestRef, mockPrivateKey)
 
-    expect(mockWeb3.eth.accounts.wallet.add).toHaveBeenCalledTimes(1)
-    expect(mockWeb3.eth.accounts.wallet.add).toHaveBeenCalledWith(mockPrivateKey)
-    expect(mockWeb3.eth.accounts.wallet.add).toHaveBeenCalledBefore(mockAgentRegistry.agentExists)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledBefore(mockAgentRegistry.createAgent)
     expect(mockAgentRegistry.createAgent).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.createAgent).toHaveBeenCalledWith(mockPublicKey, mockAgentId, mockManifestRef)
+    const [fromWallet, agentId, manifestReference] = mockAgentRegistry.createAgent.mock.calls[0]
+    expect(fromWallet).toBeInstanceOf(Wallet)
+    expect(fromWallet.getAddress()).toEqual(new Wallet(mockPrivateKey).getAddress())
+    expect(agentId).toEqual(mockAgentId)
+    expect(manifestReference).toEqual(mockManifestRef)
     expect(mockAgentRegistry.updateAgent).toHaveBeenCalledTimes(0)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
     expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully added agent id ${mockAgentId} with manifest ${mockManifestRef}`, 'publish.log')
@@ -57,16 +53,17 @@ describe("pushToRegistry", () => {
     jest.useFakeTimers('modern').setSystemTime(systemTime)
     mockAgentRegistry.agentExists.mockReturnValueOnce(true)
 
-    await pushToRegistry(mockManifestRef, mockPublicKey, mockPrivateKey)
+    await pushToRegistry(mockManifestRef, mockPrivateKey)
 
-    expect(mockWeb3.eth.accounts.wallet.add).toHaveBeenCalledTimes(1)
-    expect(mockWeb3.eth.accounts.wallet.add).toHaveBeenCalledWith(mockPrivateKey)
-    expect(mockWeb3.eth.accounts.wallet.add).toHaveBeenCalledBefore(mockAgentRegistry.agentExists)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledBefore(mockAgentRegistry.updateAgent)
     expect(mockAgentRegistry.updateAgent).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.updateAgent).toHaveBeenCalledWith(mockPublicKey, mockAgentId, mockManifestRef)
+    const [fromWallet, agentId, manifestReference] = mockAgentRegistry.updateAgent.mock.calls[0]
+    expect(fromWallet).toBeInstanceOf(Wallet)
+    expect(fromWallet.getAddress()).toEqual(new Wallet(mockPrivateKey).getAddress())
+    expect(agentId).toEqual(mockAgentId)
+    expect(manifestReference).toEqual(mockManifestRef)
     expect(mockAgentRegistry.createAgent).toHaveBeenCalledTimes(0)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
     expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully updated agent id ${mockAgentId} with manifest ${mockManifestRef}`, 'publish.log')

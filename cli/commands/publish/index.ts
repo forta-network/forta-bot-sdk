@@ -1,4 +1,3 @@
-
 import { CommandHandler } from '../..'
 import { assertExists } from '../../utils'
 import { GetCredentials } from '../../utils/get.credentials'
@@ -19,10 +18,8 @@ export default function providePublish(
 
   return async function publish(cliArgs: any) {
     const imageReference = await uploadImage()
-    const { publicKey, privateKey } = await getCredentials()
-    const manifestReference = await uploadManifest(imageReference, publicKey, privateKey)
-    await pushToRegistry(manifestReference, publicKey, privateKey)
-    // invoke process.exit() otherwise a web3 websocket connection can prevent the process from completing
-    process.exit()
+    const { privateKey } = await getCredentials()
+    const manifestReference = await uploadManifest(imageReference, privateKey)
+    await pushToRegistry(manifestReference, privateKey)
   } 
 }

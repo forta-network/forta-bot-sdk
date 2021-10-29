@@ -1,65 +1,75 @@
-import Web3 from "web3"
-import { Contract } from "web3-eth-contract"
-import { AbiItem } from "web3-utils"
+import { ethers, providers, Wallet } from "ethers"
 import AgentRegistryAbi from "./agent.registry.abi.json"
 
 const GAS_MULTIPLIER = 1.15
+const GAS_PRICE_MULTIPLIER = 1.3
 
 export default class AgentRegistry {
-  private contract: Contract;
 
   constructor(
-    web3AgentRegistry: Web3,
-    agentRegistryContractAddress: string
-  ) {
-    this.contract = new web3AgentRegistry.eth.Contract(
-      <AbiItem[]>AgentRegistryAbi, 
-      agentRegistryContractAddress
-    )
-  }
+    private ethersAgentRegistryProvider: providers.JsonRpcProvider,
+    private agentRegistryContractAddress: string
+  ) {}
 
   async agentExists(agentId: string) {
-    const agent = await this.contract.methods.getAgent(agentId).call()
+    const agent = await this.getContract().getAgent(agentId)
     return !!agent.metadata
   }
   
-  async createAgent(from: string, agentId: string, reference: string) {
-    const createAgentTx = this.contract.methods.createAgent(agentId, from, reference, [1])
-    const gas = await createAgentTx.estimateGas({ from })
-    await createAgentTx.send({
-      from,
-      gas: Math.round(gas * GAS_MULTIPLIER)
-    })
+  async createAgent(fromWallet: Wallet, agentId: string, reference: string) {
+    const from = fromWallet.getAddress()
+    const contract = this.getContract(fromWallet)
+    const gas = await contract.estimateGas.createAgent(agentId, from, reference, [1])
+    const txOptions = await this.getTxOptions(gas, fromWallet)
+    const tx = await contract.createAgent(agentId, from, reference, [1], txOptions)
+    await tx.wait()
+    return tx.hash
   }
 
-  async updateAgent(from: string, agentId: string, reference: string) {
-    const updateAgentTx = this.contract.methods.updateAgent(agentId, reference, [1])
-    const gas = await updateAgentTx.estimateGas({ from })
-    await updateAgentTx.send({
-      from,
-      gas: Math.round(gas * GAS_MULTIPLIER)
-    })
+  async updateAgent(fromWallet: Wallet, agentId: string, reference: string) {
+    const contract = this.getContract(fromWallet)
+    const gas = await contract.estimateGas.updateAgent(agentId, reference, [1])
+    const txOptions = await this.getTxOptions(gas, fromWallet)
+    const tx = await contract.updateAgent(agentId, reference, [1], txOptions)
+    await tx.wait()
+    return tx.hash
   }
 
   async isEnabled(agentId: string) {
-    return this.contract.methods.isEnabled(agentId).call()
+    return this.getContract().isEnabled(agentId)
   }
 
-  async disableAgent(from: string, agentId: string) {
-    const disableAgentTx = this.contract.methods.disableAgent(agentId, 1)// Permission.OWNER = 1
-    const gas = await disableAgentTx.estimateGas({ from })
-    await disableAgentTx.send({
-      from,
-      gas: Math.round(gas * GAS_MULTIPLIER)
-    })
+  async disableAgent(fromWallet: Wallet, agentId: string) {
+    const contract = this.getContract(fromWallet)
+    const gas = await contract.estimateGas.disableAgent(agentId, 1)// Permission.OWNER = 1
+    const txOptions = await this.getTxOptions(gas, fromWallet)
+    const tx = await contract.disableAgent(agentId, 1, txOptions)
+    await tx.wait()
+    return tx.hash
   }
 
-  async enableAgent(from: string, agentId: string) {
-    const enableAgentTx = this.contract.methods.enableAgent(agentId, 1)// Permission.OWNER = 1
-    const gas = await enableAgentTx.estimateGas({ from })
-    await enableAgentTx.send({
-      from,
-      gas: Math.round(gas * GAS_MULTIPLIER)
-    })
+  async enableAgent(fromWallet: Wallet, agentId: string) {
+    const contract = this.getContract(fromWallet)
+    const gas = await contract.estimateGas.enableAgent(agentId, 1)// Permission.OWNER = 1
+    const txOptions = await this.getTxOptions(gas, fromWallet)
+    const tx = await contract.enableAgent(agentId, 1, txOptions)
+    await tx.wait()
+    return tx.hash
+  }
+
+  private getContract(fromWallet?: Wallet) {
+    return new ethers.Contract(
+      this.agentRegistryContractAddress,
+      AgentRegistryAbi,
+      fromWallet ? fromWallet.connect(this.ethersAgentRegistryProvider) : this.ethersAgentRegistryProvider
+    )
+  }
+
+  private async getTxOptions(gasLimit: ethers.BigNumber, fromWallet: Wallet) {
+    const gasPrice = await fromWallet.connect(this.ethersAgentRegistryProvider).getGasPrice()
+    return {
+      gasLimit: Math.round(gasLimit.toNumber() * GAS_MULTIPLIER),
+      gasPrice: Math.round(gasPrice.toNumber() * GAS_PRICE_MULTIPLIER)
+    }
   }
 }

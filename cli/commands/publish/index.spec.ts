@@ -7,15 +7,14 @@ describe("publish", () => {
   const mockUploadImage = jest.fn()
   const mockUploadManifest = jest.fn()
   const mockPushToRegistry = jest.fn()
-  const mockExit = jest.spyOn(process, 'exit').mockImplementation();
 
   beforeAll(() => {
     publish = providePublish(mockGetCredentials, mockUploadImage, mockUploadManifest, mockPushToRegistry)
   })
 
   it("publishes the agent correctly", async () => {
-    const mockCredentials = { publicKey: "0x123", privateKey: "0x456"}
-    mockGetCredentials.mockReturnValueOnce(mockCredentials)
+    const mockPrivateKey = "0x456"
+    mockGetCredentials.mockReturnValueOnce({ privateKey: mockPrivateKey})
     const mockImageRef = "abc123"
     mockUploadImage.mockReturnValueOnce(mockImageRef)
     const mockManifestRef = "def456"
@@ -30,10 +29,9 @@ describe("publish", () => {
     expect(mockGetCredentials).toHaveBeenCalledWith()
     expect(mockGetCredentials).toHaveBeenCalledBefore(mockUploadManifest)
     expect(mockUploadManifest).toHaveBeenCalledTimes(1)
-    expect(mockUploadManifest).toHaveBeenCalledWith(mockImageRef, mockCredentials.publicKey, mockCredentials.privateKey)
+    expect(mockUploadManifest).toHaveBeenCalledWith(mockImageRef, mockPrivateKey)
     expect(mockUploadManifest).toHaveBeenCalledBefore(mockPushToRegistry)
     expect(mockPushToRegistry).toHaveBeenCalledTimes(1)
-    expect(mockPushToRegistry).toHaveBeenCalledWith(mockManifestRef, mockCredentials.publicKey, mockCredentials.privateKey)
-    expect(mockExit).toHaveBeenCalledTimes(1)
+    expect(mockPushToRegistry).toHaveBeenCalledWith(mockManifestRef, mockPrivateKey)
   })
 })

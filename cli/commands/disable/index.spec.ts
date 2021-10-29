@@ -1,17 +1,9 @@
+import { Wallet } from "ethers"
 import provideDisable from "."
 import { CommandHandler } from "../.."
 
 describe("disable", () => {
   let disable: CommandHandler
-  const mockWeb3AgentRegistry = {
-    eth: {
-      accounts: {
-        wallet: {
-          add: jest.fn()
-        }
-      }
-    }
-  } as any
   const mockAppendToFile = jest.fn()
   const mockGetCredentials = jest.fn()
   const mockAgentRegistry = {
@@ -29,7 +21,7 @@ describe("disable", () => {
 
   beforeAll(() => {
     disable = provideDisable(
-      mockWeb3AgentRegistry, mockAppendToFile, mockGetCredentials, mockAgentRegistry, mockAgentId
+      mockAppendToFile, mockGetCredentials, mockAgentRegistry, mockAgentId
     )
   })
 
@@ -68,9 +60,8 @@ describe("disable", () => {
     jest.useFakeTimers('modern').setSystemTime(systemTime)
     mockAgentRegistry.agentExists.mockReturnValueOnce(true)
     mockAgentRegistry.isEnabled.mockReturnValueOnce(true)
-    const mockPublicKey = "0x123"
-    const mockPrivateKey = "0x456"
-    mockGetCredentials.mockReturnValueOnce({ publicKey: mockPublicKey, privateKey: mockPrivateKey })
+    const mockPrivateKey = "0x4567"
+    mockGetCredentials.mockReturnValueOnce({ privateKey: mockPrivateKey })
 
     await disable({})
 
@@ -80,10 +71,11 @@ describe("disable", () => {
     expect(mockAgentRegistry.isEnabled).toHaveBeenCalledWith(mockAgentId)
     expect(mockGetCredentials).toHaveBeenCalledTimes(1)
     expect(mockGetCredentials).toHaveBeenCalledWith()
-    expect(mockWeb3AgentRegistry.eth.accounts.wallet.add).toHaveBeenCalledTimes(1)
-    expect(mockWeb3AgentRegistry.eth.accounts.wallet.add).toHaveBeenCalledWith(mockPrivateKey)
     expect(mockAgentRegistry.disableAgent).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.disableAgent).toHaveBeenCalledWith(mockPublicKey, mockAgentId)
+    const [fromWallet, agentId] = mockAgentRegistry.disableAgent.mock.calls[0]
+    expect(fromWallet).toBeInstanceOf(Wallet)
+    expect(fromWallet.getAddress()).toEqual(new Wallet(mockPrivateKey).getAddress())
+    expect(agentId).toEqual(mockAgentId)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
     expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully disabled agent id ${mockAgentId}`, 'publish.log')
     jest.useRealTimers()

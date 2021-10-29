@@ -1,11 +1,9 @@
+import { ethers, Wallet } from "ethers"
 import { keccak256 } from "../../utils"
 import provideUploadManifest, { UploadManifest } from "./upload.manifest"
 
 describe("uploadManifest", () => {
   let uploadManifest: UploadManifest
-  const mockWeb3 = {
-    eth : { accounts: { sign: jest.fn() } }
-  } as any
   const mockFilesystem = {
     existsSync: jest.fn(),
     readFileSync: jest.fn()
@@ -17,12 +15,11 @@ describe("uploadManifest", () => {
   const mockDocumentation = "README.md"
   const mockRepository = "github.com/myrepository"
   const mockImageRef = "123abc"
-  const mockPublicKey = "0x123"
-  const mockPrivateKey = "0xabc"
+  const mockPrivateKey = "0xabcd"
 
   beforeAll(() => {
     uploadManifest = provideUploadManifest(
-      mockWeb3, mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentId, mockVersion, mockDocumentation, mockRepository
+      mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentId, mockVersion, mockDocumentation, mockRepository
     )
   })
 
@@ -30,7 +27,7 @@ describe("uploadManifest", () => {
     mockFilesystem.existsSync.mockReturnValueOnce(false)
 
     try {
-      await uploadManifest(mockImageRef, mockPublicKey, mockPrivateKey)
+      await uploadManifest(mockImageRef, mockPrivateKey)
     } catch (e) {
       expect(e.message).toBe(`documentation file ${mockDocumentation} not found`)
     }
@@ -49,7 +46,7 @@ describe("uploadManifest", () => {
     const mockDocumentationRef = "docRef"
     mockAddToIpfs.mockReturnValueOnce(mockDocumentationRef)
     const mockManifest = {
-      from: mockPublicKey,
+      from: new Wallet(mockPrivateKey).getAddress(),
       name: mockAgentName,
       agentId: mockAgentName,
       agentIdHash: mockAgentId,
@@ -60,12 +57,10 @@ describe("uploadManifest", () => {
       repository: mockRepository,
       chainIds: [1]
     }
-    const mockSignature = "signature"
-    mockWeb3.eth.accounts.sign.mockReturnValueOnce({ signature: mockSignature })
     const mockManifestRef = "manifestRef"
     mockAddToIpfs.mockReturnValueOnce(mockManifestRef)
 
-    const manifestRef = await uploadManifest(mockImageRef, mockPublicKey, mockPrivateKey)
+    const manifestRef = await uploadManifest(mockImageRef, mockPrivateKey)
 
     expect(manifestRef).toBe(mockManifestRef)
     expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(1)
@@ -74,9 +69,9 @@ describe("uploadManifest", () => {
     expect(mockFilesystem.readFileSync).toHaveBeenCalledWith(mockDocumentation, 'utf8')
     expect(mockAddToIpfs).toHaveBeenCalledTimes(2)
     expect(mockAddToIpfs).toHaveBeenNthCalledWith(1, mockDocumentationFile)
-    expect(mockWeb3.eth.accounts.sign).toHaveBeenCalledTimes(1)
-    expect(mockWeb3.eth.accounts.sign).toHaveBeenCalledWith(JSON.stringify(mockManifest), mockPrivateKey)
-    expect(mockAddToIpfs).toHaveBeenNthCalledWith(2, JSON.stringify({ manifest: mockManifest, signature: mockSignature }))
+    const signingKey = new ethers.utils.SigningKey(mockPrivateKey)
+    const signature = ethers.utils.joinSignature(signingKey.signDigest(keccak256(JSON.stringify(mockManifest))))
+    expect(mockAddToIpfs).toHaveBeenNthCalledWith(2, JSON.stringify({ manifest: mockManifest, signature }))
     jest.useRealTimers()
   })
 })

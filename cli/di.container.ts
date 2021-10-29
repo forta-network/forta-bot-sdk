@@ -2,7 +2,7 @@ import os from 'os'
 import fs from 'fs'
 import { join } from "path"
 import { asClass, asFunction, asValue, createContainer, InjectionMode } from "awilix"
-import Web3 from 'web3'
+import { ethers } from "ethers"
 import shell from 'shelljs'
 import prompts from 'prompts'
 import { jsonc } from 'jsonc'
@@ -40,6 +40,9 @@ import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transac
 import provideAppendToFile from './utils/append.to.file'
 import provideGetFortaConfig, { GetFortaConfig } from './utils/get.forta.config'
 import provideListKeyfiles from './utils/list.keyfiles'
+import provideGetNetworkId from './utils/get.network.id'
+import provideGetBlockWithTransactions from './utils/get.block.with.transactions'
+import provideGetTransactionReceipt from './utils/get.transaction.receipt'
 
 export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -141,6 +144,10 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     addToIpfs: asFunction(provideAddToIpfs),
     appendToFile: asFunction(provideAppendToFile),
 
+    getNetworkId: asFunction(provideGetNetworkId),
+    getBlockWithTransactions: asFunction(provideGetBlockWithTransactions),
+    getTransactionReceipt: asFunction(provideGetTransactionReceipt),
+
     getTraceData: asFunction(provideGetTraceData),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.traceRpcUrl
@@ -170,7 +177,11 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return fortaConfig.agentRegistryContractAddress || "0x61447385B019187daa48e91c55c02AF1F1f3F863"
     }),
     agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.agentRegistryJsonRpcUrl || "https://polygon-rpc.com/"
+      const url = fortaConfig.agentRegistryJsonRpcUrl || "https://polygon-rpc.com/"
+      if (!url.startsWith("http")) {
+        throw new Error(`agentRegistryJsonRpcUrl must begin with http or https`)
+      }
+      return url
     }),
 
     jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
@@ -181,8 +192,8 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       }
       return fortaConfig.jsonRpcUrl
     }),
-    web3: asFunction((jsonRpcUrl: string) =>  new Web3(jsonRpcUrl)).singleton(),
-    web3AgentRegistry: asFunction((agentRegistryJsonRpcUrl: string) => new Web3(agentRegistryJsonRpcUrl)).singleton(),
+    ethersProvider: asFunction((jsonRpcUrl: string) =>  new ethers.providers.JsonRpcProvider(jsonRpcUrl)).singleton(),
+    ethersAgentRegistryProvider: asFunction((agentRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(agentRegistryJsonRpcUrl)).singleton(),
 
     ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig) => {
       if (!fortaConfig.ipfsGatewayUrl) {

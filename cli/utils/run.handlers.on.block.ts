@@ -1,20 +1,26 @@
-import Web3 from "web3";
 import { Trace } from "../../sdk";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetTraceData } from "./get.trace.data";
 import { assertExists, CreateBlockEvent, CreateTransactionEvent } from ".";
+import { GetNetworkId } from "./get.network.id";
+import { GetBlockWithTransactions } from "./get.block.with.transactions";
+import { GetTransactionReceipt } from "./get.transaction.receipt";
 
 export type RunHandlersOnBlock = (blockHashOrNumber: string | number) => Promise<void>
 
 export function provideRunHandlersOnBlock(
-  web3: Web3,
   getAgentHandlers: GetAgentHandlers,
+  getNetworkId: GetNetworkId,
+  getBlockWithTransactions: GetBlockWithTransactions,
+  getTransactionReceipt: GetTransactionReceipt,
   getTraceData: GetTraceData,
   createBlockEvent: CreateBlockEvent,
   createTransactionEvent: CreateTransactionEvent
 ): RunHandlersOnBlock {
-  assertExists(web3, 'web3')
   assertExists(getAgentHandlers, 'getAgentHandlers')
+  assertExists(getNetworkId, 'getNetworkId')
+  assertExists(getBlockWithTransactions, 'getBlockWithTransactions')
+  assertExists(getTransactionReceipt, 'getTransactionReceipt')
   assertExists(getTraceData, 'getTraceData')
   assertExists(createBlockEvent, 'createBlockEvent')
   assertExists(createTransactionEvent, 'createTransactionEvent')
@@ -26,8 +32,8 @@ export function provideRunHandlersOnBlock(
     }
 
     console.log(`fetching block ${blockHashOrNumber}...`)
-    const networkId = await web3.eth.net.getId()
-    const block = await web3.eth.getBlock(blockHashOrNumber, true)
+    const networkId = await getNetworkId()
+    const block = await getBlockWithTransactions(blockHashOrNumber)
 
     // run block handler
     if (handleBlock) {
@@ -39,7 +45,7 @@ export function provideRunHandlersOnBlock(
     if (!handleTransaction) return
     
     // get trace data for block and build map for each transaction
-    const traces = await getTraceData(block.number)
+    const traces = await getTraceData(parseInt(block.number))
     const traceMap: { [txHash: string]: Trace[]} = {}
     traces.forEach(trace => {
       if (!trace.transactionHash) return
@@ -50,11 +56,7 @@ export function provideRunHandlersOnBlock(
 
     // run transaction handler on all block transactions
     for (const transaction of block.transactions) {
-      let receipt = await web3.eth.getTransactionReceipt(transaction.hash)
-      // retry once if receipt fetching failed TODO figure out why this happens sometimes
-      if (!receipt) {
-        receipt = await web3.eth.getTransactionReceipt(transaction.hash)
-      }
+      let receipt = await getTransactionReceipt(transaction.hash)
       if (!receipt) {
         console.log(`error fetching receipt for ${transaction.hash}`)
         continue;
