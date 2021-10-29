@@ -10,7 +10,7 @@ describe("getCredentials", () => {
   const mockListKeyfiles = jest.fn()
   const mockGetKeyfile = jest.fn()
   const mockFortaKeystore = "some/key/store"
-  const mockKeyfileName = "keyfileName"
+  const mockKeyfileName = "keyfileName--0xaddress"
   const mockKeyfilePath = path.join(mockFortaKeystore, mockKeyfileName)
 
   const resetMocks = () => {
@@ -43,6 +43,7 @@ describe("getCredentials", () => {
   it("throws error if keyfile path does not exist", async () => {
     mockFilesystem.existsSync.mockReturnValueOnce(true)
     mockFilesystem.existsSync.mockReturnValueOnce(false)
+    mockListKeyfiles.mockReturnValueOnce([mockKeyfileName])
 
     try {
       await getCredentials()
@@ -51,6 +52,8 @@ describe("getCredentials", () => {
     }
 
     expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(2)
+    expect(mockListKeyfiles).toHaveBeenCalledTimes(1)
+    expect(mockListKeyfiles).toHaveBeenCalledWith()
     expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(1, mockFortaKeystore)
     expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(2, mockKeyfilePath)
   })
@@ -63,6 +66,7 @@ describe("getCredentials", () => {
     const mockPublicKey = "0x123"
     const mockPrivateKey = "0x456"
     mockGetKeyfile.mockReturnValueOnce({ publicKey: mockPublicKey, privateKey: mockPrivateKey })
+    mockListKeyfiles.mockReturnValueOnce([mockKeyfileName, "someOther--0xkeyfileaddress"])
 
     const { publicKey, privateKey } = await getCredentials()
 
@@ -71,7 +75,8 @@ describe("getCredentials", () => {
     expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(2)
     expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(1, mockFortaKeystore)
     expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(2, mockKeyfilePath)
-    expect(mockListKeyfiles).toHaveBeenCalledTimes(0)
+    expect(mockListKeyfiles).toHaveBeenCalledTimes(1)
+    expect(mockListKeyfiles).toHaveBeenCalledWith()
     expect(mockPrompt).toHaveBeenCalledTimes(1)
     expect(mockPrompt).toHaveBeenCalledWith({
       type: 'password',
@@ -82,7 +87,7 @@ describe("getCredentials", () => {
     expect(mockGetKeyfile).toHaveBeenCalledWith(mockKeyfilePath, mockPassword)
   })
 
-  it("returns credentials from default keyfile after prompting for password", async () => {
+  it("returns credentials from some unspecified keyfile after prompting for password", async () => {
     mockFilesystem.existsSync.mockReturnValueOnce(true)
     mockFilesystem.existsSync.mockReturnValueOnce(true)
     const mockKeyfileName2 = 'mockKeyfileName2'

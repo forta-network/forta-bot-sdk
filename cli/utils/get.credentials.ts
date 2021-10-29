@@ -27,10 +27,15 @@ export default function provideGetCredentials(
         throw new Error(`keystore folder ${fortaKeystore} not found`)
       }
 
+      const keyfiles = listKeyfiles()
       // if a keyfile name is not specified in config
       if (!keyfileName) {
-        // assuming only one keyfile in keystore
-        [ keyfileName ] = listKeyfiles()
+        // assume only one keyfile in keystore
+        keyfileName = keyfiles[0]
+      } else {
+        // find the keyfile using the address in the specified filename (can't use filename directly since it may contain path separators)
+        const keyfileAddress = keyfileName.substr(keyfileName.lastIndexOf('--')+2)
+        keyfileName = keyfiles.find(keyfile => keyfile.endsWith(keyfileAddress))!
       }
 
       const keyfilePath = path.join(fortaKeystore, keyfileName)
