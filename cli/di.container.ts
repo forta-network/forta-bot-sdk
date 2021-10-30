@@ -27,7 +27,7 @@ import providePushToRegistry from './commands/publish/push.to.registry'
 import { createBlockEvent, createTransactionEvent, getJsonFile, keccak256 } from "./utils"
 import AgentRegistry from "./contracts/agent.registry"
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
-import { provideGetKeyfile } from "./utils/get.keyfile"
+import { provideDecryptKeyfile } from "./utils/decrypt.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
 import provideGetCredentials from './utils/get.credentials'
 import { provideGetTraceData } from './utils/get.trace.data'
@@ -43,6 +43,7 @@ import provideListKeyfiles from './utils/list.keyfiles'
 import provideGetNetworkId from './utils/get.network.id'
 import provideGetBlockWithTransactions from './utils/get.block.with.transactions'
 import provideGetTransactionReceipt from './utils/get.transaction.receipt'
+import provideGetKeyfile from './utils/get.keyfile'
 
 export default function configureContainer(commandName: CommandName, cliArgs: any) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -141,6 +142,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     createBlockEvent: asValue(createBlockEvent),
     createTransactionEvent: asValue(createTransactionEvent),
     getKeyfile: asFunction(provideGetKeyfile),
+    decryptKeyfile: asFunction(provideDecryptKeyfile),
     createKeyfile: asFunction(provideCreateKeyfile),
     listKeyfiles: asFunction(provideListKeyfiles),
     addToIpfs: asFunction(provideAddToIpfs),
