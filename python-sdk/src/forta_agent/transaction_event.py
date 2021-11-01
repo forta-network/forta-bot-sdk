@@ -1,3 +1,5 @@
+import json
+from hexbytes import HexBytes
 from .event_type import EventType
 from .network import Network
 from .transaction import Transaction
@@ -19,6 +21,7 @@ class TransactionEvent:
         self.type = EventType[typeVal] if type(
             typeVal) == str else EventType(typeVal)
         networkVal = dict.get('network', "MAINNET")
+        networkVal = int(networkVal) if networkVal.isdigit() else networkVal
         self.network = Network[networkVal] if type(
             networkVal) == str else Network(networkVal)
         self.transaction = Transaction(dict.get('transaction', {}))
@@ -74,3 +77,57 @@ class TransactionEvent:
                         log.topics[0].lower() == event_topic and
                         (True if not contract_address else log.address.lower() == contract_address), self.receipt.logs)
         return list(events)
+
+    def filter_log(self, abi, contract_address=''):
+        abi = abi if isinstance(abi, list) else [abi]
+        abi = [json.loads(abi_item) for abi_item in abi]
+        logs = self.logs
+        # filter logs by contract address, if provided
+        if (contract_address):
+            contract_address = contract_address.lower()
+            logs = filter(lambda log: log.address.lower()
+                          == contract_address, logs)
+        # determine which event names to filter
+        event_names = []
+        for abi_item in abi:
+            if abi_item['type'] == "event":
+                event_names.append(abi_item['name'])
+        # parse logs
+        results = []
+        from . import web3Provider
+        contract = web3Provider.eth.contract(
+            "0x0000000000000000000000000000000000000000", abi=abi)
+        for log in logs:
+            log.topics = [HexBytes(topic) for topic in log.topics]
+            for event_name in event_names:
+                try:
+                    results.append(
+                        contract.events[event_name]().processLog(log))
+                except:
+                    continue  # TODO see if theres a better way to handle 'no matching event' error
+        return results
+
+    def filter_function(self, abi, contract_address=''):
+        abi = abi if isinstance(abi, list) else [abi]
+        abi = [json.loads(abi_object) for abi_object in abi]
+        # determine where to look for function calls (i.e. transaction object or traces)
+        sources = [{'data': self.transaction.data, 'to': self.transaction.to}]
+        if self.traces:
+            sources = [{'data': trace.action.input,
+                        'to': trace.action.to} for trace in self.traces]
+        # filter by contract address, if provided
+        if (contract_address):
+            contract_address = contract_address.lower()
+            sources = filter(
+                lambda source: source['to'] and source['to'].lower() == contract_address, sources)
+        # parse function inputs
+        results = []
+        from . import web3Provider
+        contract = web3Provider.eth.contract(
+            "0x0000000000000000000000000000000000000000", abi=abi)
+        for source in sources:
+            try:
+                results.append(contract.decode_function_input(source['data']))
+            except:
+                continue  # TODO see if theres a better way to handle 'no matching function' error
+        return results

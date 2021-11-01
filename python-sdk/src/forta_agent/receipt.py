@@ -35,3 +35,26 @@ class Log:
         self.transaction_hash = dict.get(
             'transactionHash', dict.get('transaction_hash'))
         self.removed = dict.get('removed')
+
+    @property
+    def logIndex(self):
+        return self.log_index
+
+    @property
+    def blockNumber(self):
+        return self.block_number
+
+    @property
+    def blockHash(self):
+        return self.block_hash
+
+    @property
+    def transactionIndex(self):
+        return self.transaction_index
+
+    @property
+    def transactionHash(self):
+        return self.transaction_hash
+
+    def __getitem__(self, key):
+        return getattr(self, key)
