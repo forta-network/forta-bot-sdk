@@ -1,8 +1,9 @@
+import { ethers } from "ethers"
 import { Finding, FindingSeverity, FindingType } from "./finding"
 import { BlockEvent } from "./block.event"
 import { Block } from "./block"
 import { TransactionEvent, TxEventBlock } from "./transaction.event"
-import { createBlockEvent, createTransactionEvent, getFortaConfig, getJsonRpcUrl } from "./utils"
+import { createBlockEvent, createTransactionEvent, getFortaConfig, getJsonRpcUrl, getEthersProvider } from "./utils"
 import { Log, Receipt } from "./receipt"
 import { Trace, TraceAction, TraceResult } from "./trace"
 import { Transaction } from "./transaction"
@@ -63,5 +64,7 @@ export {
   getFortaConfig,
   getJsonRpcUrl,
   createTransactionEvent,
-  createBlockEvent
+  createBlockEvent,
+  getEthersProvider,
+  ethers,
  }
