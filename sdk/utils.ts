@@ -15,7 +15,7 @@ export const getEthersProvider = () => {
   return new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
 }
 
-export const getFortaConfig: () => FortaConfig = () => {
+const getFortaConfig: () => FortaConfig = () => {
   let config = {}
   // try to read from global config
   const globalConfigPath = join(os.homedir(), '.forta', 'forta.config.json')
