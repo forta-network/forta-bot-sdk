@@ -35,6 +35,11 @@ export default function provideRun(
       const runLive = container.resolve<RunLive>("runLive")
       await runLive()
     }
+
+    // invoke process.exit() for short-lived functions, otherwise
+    // a child process (i.e. python agent process) can prevent commandline from returning
+    let isShortLived = cliArgs.tx || cliArgs.block || cliArgs.range || cliArgs.file
+    if (isShortLived) process.exit()
   }
 }
 

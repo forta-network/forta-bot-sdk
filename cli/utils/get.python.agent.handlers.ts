@@ -4,7 +4,6 @@ import os from 'os'
 import { PythonShell } from 'python-shell'
 import ReadLines from 'n-readlines'
 import { BlockEvent, Finding, HandleBlock, HandleTransaction, TransactionEvent } from "../../sdk"
-import { assertIsNonEmptyString } from "."
 
 // imports python agent handlers from file wrapped in javascript
 export type GetPythonAgentHandlers = (pythonAgentPath: string) => Promise<{ handleTransaction?: HandleTransaction, handleBlock? : HandleBlock }>
