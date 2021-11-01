@@ -9,6 +9,11 @@ import { Transaction } from './transaction'
 import { Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
+import { ethers } from '.'
+
+export const getEthersProvider = () => {
+  return new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
+}
 
 export const getFortaConfig: () => FortaConfig = () => {
   let config = {}
