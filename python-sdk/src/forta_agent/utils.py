@@ -4,6 +4,11 @@ from jsonc_parser.parser import JsoncParser
 import sha3
 
 
+def get_web3_provider():
+    from . import web3Provider
+    return web3Provider
+
+
 def get_forta_config():
     config = {}
     # try to read global config
