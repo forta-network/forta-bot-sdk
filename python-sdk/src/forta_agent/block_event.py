@@ -9,7 +9,8 @@ class BlockEvent:
         self.type = EventType[typeVal] if type(
             typeVal) == str else EventType(typeVal)
         networkVal = dict.get('network', "MAINNET")
-        networkVal = int(networkVal) if networkVal.isdigit() else networkVal
+        networkVal = int(networkVal) if type(
+            networkVal) == str and networkVal.isdigit() else networkVal
         self.network = Network[networkVal] if type(
             networkVal) == str else Network(networkVal)
         self.block = Block(dict.get('block', {}))
