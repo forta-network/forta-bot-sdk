@@ -2,7 +2,7 @@ import { ethers, providers, Wallet } from "ethers"
 import AgentRegistryAbi from "./agent.registry.abi.json"
 
 const GAS_MULTIPLIER = 1.15
-const GAS_PRICE_MULTIPLIER = 1.3
+const GAS_PRICE_MULTIPLIER = 1.5
 
 export default class AgentRegistry {
 
