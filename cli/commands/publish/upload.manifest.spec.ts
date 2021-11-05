@@ -46,7 +46,7 @@ describe("uploadManifest", () => {
     const mockDocumentationRef = "docRef"
     mockAddToIpfs.mockReturnValueOnce(mockDocumentationRef)
     const mockManifest = {
-      from: new Wallet(mockPrivateKey).getAddress(),
+      from: new Wallet(mockPrivateKey).address,
       name: mockAgentName,
       agentId: mockAgentName,
       agentIdHash: mockAgentId,
