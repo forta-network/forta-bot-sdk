@@ -6,6 +6,19 @@ import { AddToIpfs } from "../../utils/add.to.ipfs"
 // uploads signed agent manifest to ipfs and returns ipfs reference
 export type UploadManifest = (imageReference: string, privateKey: string) => Promise<string>
 
+type Manifest = {
+  from: string,
+  name: string,
+  agentId: string,
+  agentIdHash: string,
+  version: string,
+  timestamp: string,
+  imageReference: string,
+  documentation: string,
+  repository?: string,
+  chainIds: number[]
+}
+
 export default function provideUploadManifest(
   filesystem: typeof fs,
   addToIpfs: AddToIpfs,
@@ -32,8 +45,9 @@ export default function provideUploadManifest(
     const documentationReference = await addToIpfs(documentationFile)
 
     // create agent manifest
-    const manifest = {
-      from: new Wallet(privateKey).getAddress(),
+    const from = await new Wallet(privateKey).getAddress()
+    const manifest: Manifest = {
+      from,
       name: agentName,
       agentId: agentName,
       agentIdHash: agentId,
