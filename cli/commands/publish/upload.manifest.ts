@@ -40,6 +40,9 @@ export default function provideUploadManifest(
     if (!filesystem.existsSync(documentation)) {
       throw new Error(`documentation file ${documentation} not found`)
     }
+    if (!filesystem.statSync(documentation).size) {
+      throw new Error(`documentation file ${documentation} cannot be empty`)
+    }
     console.log('pushing agent documentation to IPFS...')
     const documentationFile = filesystem.readFileSync(documentation, 'utf8')
     const documentationReference = await addToIpfs(documentationFile)
