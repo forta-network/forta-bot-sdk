@@ -17,7 +17,7 @@ export default class AgentRegistry {
   }
   
   async createAgent(fromWallet: Wallet, agentId: string, reference: string) {
-    const from = await fromWallet.getAddress()
+    const from = fromWallet.address
     const contract = this.getContract(fromWallet)
     const gas = await contract.estimateGas.createAgent(agentId, from, reference, [1])
     const txOptions = await this.getTxOptions(gas, fromWallet)

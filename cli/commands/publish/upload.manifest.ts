@@ -45,9 +45,8 @@ export default function provideUploadManifest(
     const documentationReference = await addToIpfs(documentationFile)
 
     // create agent manifest
-    const from = await new Wallet(privateKey).getAddress()
     const manifest: Manifest = {
-      from,
+      from: new Wallet(privateKey).address,
       name: agentName,
       agentId: agentName,
       agentIdHash: agentId,
