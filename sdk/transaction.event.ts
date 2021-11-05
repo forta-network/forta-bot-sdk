@@ -12,6 +12,11 @@ export interface TxEventBlock {
   timestamp: number;
 }
 
+// used for decoded logs, simply including the originating address of the log
+export type LogDescription = ethers.utils.LogDescription & {
+    address: string
+}
+
 export class TransactionEvent {
   constructor(
     readonly type: EventType,
@@ -74,7 +79,7 @@ export class TransactionEvent {
     return events
   }
 
-  filterLog(eventAbi: string | string[], contractAddress: string = ''): ethers.utils.LogDescription[] {
+  filterLog(eventAbi: string | string[], contractAddress: string = ''): LogDescription[] {
     eventAbi = _.isArray(eventAbi) ? eventAbi : [eventAbi]
     let logs = this.receipt.logs
     // filter logs by contract address, if provided
@@ -83,11 +88,12 @@ export class TransactionEvent {
       logs = logs.filter(log => log.address.toLowerCase() === contractAddress)
     }
     // parse logs
-    const results = []
+    const results: LogDescription[] = []
     const iface = new ethers.utils.Interface(eventAbi);
     for (const log of logs) {
       try {
-        results.push(iface.parseLog(log))
+        const parsedLog = iface.parseLog(log)
+        results.push(Object.assign(parsedLog, { address: log.address }))
       } catch (e) {}// TODO see if theres a better way to handle 'no matching event' error
     }
     return results
@@ -106,7 +112,7 @@ export class TransactionEvent {
       sources = sources.filter(source => source.to?.toLowerCase() === contractAddress)
     }
     // parse function inputs
-    const results = []
+    const results: ethers.utils.TransactionDescription[] = []
     const iface = new ethers.utils.Interface(functionAbi)
     for (const source of sources) {
       try {
