@@ -1,3 +1,4 @@
+import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import _ from 'lodash'
@@ -32,6 +33,10 @@ export const assertShellResult = (result: ShellString, errMsg: string) => {
   if (result.code !== 0) {
     throw new Error(`${errMsg}: ${result.stderr}`)
   }
+}
+
+export const isAppleM1 = () => {
+  return os.cpus().some(cpu => cpu.model.includes("Apple M1"))
 }
 
 export const keccak256 = (str: string) => {
