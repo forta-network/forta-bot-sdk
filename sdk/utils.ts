@@ -40,7 +40,7 @@ export const getJsonRpcUrl = () => {
   
   // else, use the rpc url from forta.config.json
   const { jsonRpcUrl } = getFortaConfig()
-  if (!jsonRpcUrl) throw new Error('no jspnRpcUrl found')
+  if (!jsonRpcUrl) throw new Error('no jsonRpcUrl found')
   if (!jsonRpcUrl.startsWith("http")) throw new Error('jsonRpcUrl must begin with http(s)')
   return jsonRpcUrl
 }

@@ -1,6 +1,6 @@
 import shelljs from "shelljs"
 import prompts from "prompts"
-import { assertExists, assertIsNonEmptyString, assertShellResult } from "../../utils"
+import { assertExists, assertIsNonEmptyString, assertShellResult, isAppleM1 } from "../../utils"
 
 // uploads agent image to repository and returns image reference
 export type UploadImage = () => Promise<string>
