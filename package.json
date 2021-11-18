@@ -1,6 +1,6 @@
 {
   "name": "forta-agent",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "license": "MIT",
   "description": "Forta Agent SDK and CLI tool",
   "homepage": "https://forta.org/",
@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "tsc --p ./tsconfig.build.json && cp -r ./starter-project ./dist && cp ./cli/commands/init/forta.config.json ./dist/cli/commands/init/forta.config.json && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto",
-    "publish": "npm run build && npm publish",
+    "publish:forta": "npm run build && npm publish",
     "publish:local": "npm link",
     "test": "jest",
     "python:publish": "npm run python:build && python3 -m twine upload ./python-sdk/dist/*",
