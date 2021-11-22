@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/forta-agent.svg)](https://badge.fury.io/js/forta-agent)
 
-Visit forta.org to learn more about Forta. See the developer documentation at [docs.forta.network](https://docs.forta.network)
+Visit [forta.org](https://forta.org/) to learn more about Forta. See the developer documentation at [docs.forta.network](https://docs.forta.network)
 
 ## Changelog
 
