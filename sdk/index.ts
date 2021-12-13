@@ -3,7 +3,7 @@ import { Finding, FindingSeverity, FindingType } from "./finding"
 import { BlockEvent } from "./block.event"
 import { Block } from "./block"
 import { TransactionEvent, TxEventBlock, LogDescription } from "./transaction.event"
-import { createBlockEvent, createTransactionEvent, getJsonRpcUrl, getEthersProvider } from "./utils"
+import { createBlockEvent, createTransactionEvent, getJsonRpcUrl, getEthersProvider, getEthersBatchProvider } from "./utils"
 import { Log, Receipt } from "./receipt"
 import { Trace, TraceAction, TraceResult } from "./trace"
 import { Transaction } from "./transaction"
@@ -66,5 +66,6 @@ export {
   createTransactionEvent,
   createBlockEvent,
   getEthersProvider,
+  getEthersBatchProvider,
   ethers,
  }

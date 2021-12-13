@@ -15,6 +15,10 @@ export const getEthersProvider = () => {
   return new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
 }
 
+export const getEthersBatchProvider = () => {
+  return new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl())
+}
+
 const getFortaConfig: () => FortaConfig = () => {
   let config = {}
   // try to read from global config
