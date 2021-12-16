@@ -62,6 +62,16 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     filesystem: asValue(fs),
     dynamicImport: asValue((path: string) => import(path)),
     commandName: asValue(commandName),
+    cliVersion: asFunction(() => {
+      try {
+        // in the distributed npm package, the package.json will be 2 levels above this file
+        const packageJsonPath = join(__dirname, "..", "..", "package.json")
+        const packageJson =  getJsonFile(packageJsonPath)
+        return packageJson.version
+      } catch (e) {
+        throw new Error(`unable to parse cli package.json: ${e.message}`)
+      }
+    }).singleton(),
 
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     getFortaConfig: asFunction(provideGetFortaConfig),

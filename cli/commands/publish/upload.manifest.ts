@@ -16,7 +16,8 @@ type Manifest = {
   imageReference: string,
   documentation: string,
   repository?: string,
-  chainIds: number[]
+  chainIds: number[],
+  publishedFrom: string
 }
 
 export default function provideUploadManifest(
@@ -26,7 +27,8 @@ export default function provideUploadManifest(
   agentId: string,
   version: string,
   documentation: string,
-  repository: string
+  repository: string,
+  cliVersion: string,
 ): UploadManifest {
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
@@ -34,6 +36,7 @@ export default function provideUploadManifest(
   assertIsNonEmptyString(agentId, 'agentId')
   assertIsNonEmptyString(version, 'version')
   assertIsNonEmptyString(documentation, 'documentation')
+  assertIsNonEmptyString(cliVersion, 'cliVersion')
 
   return async function uploadManifest(imageReference: string, privateKey: string) {
     // upload documentation to ipfs
@@ -58,7 +61,8 @@ export default function provideUploadManifest(
       imageReference,
       documentation: documentationReference,
       repository,
-      chainIds: [1]
+      chainIds: [1],
+      publishedFrom: `Forta CLI ${cliVersion}`
     }
 
     // sign agent manifest
