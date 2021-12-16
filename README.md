@@ -6,6 +6,13 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
+### [0.0.33](https://github.com/forta-protocol/forta-agent-sdk/commit/30eae8fbba53a85f377efce2cb934e712fd819bc)
+
+- Add support for specifying multiple transactions/blocks for the `forta-agent run` command
+- Include CLI version in published manifest
+- Add `getEthersBatchProvider` utility function to Javascript SDK
+- Export the `keccak256` utility function from Javascript and Python SDK
+
 ### [0.0.32](https://github.com/forta-protocol/forta-agent-sdk/commit/77622f12f7961c8af6534b509540efdae4f6f3fa)
 
 - Actually fix published npm artifact
