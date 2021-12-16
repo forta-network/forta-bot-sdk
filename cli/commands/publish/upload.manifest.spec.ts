@@ -17,6 +17,7 @@ describe("uploadManifest", () => {
   const mockRepository = "github.com/myrepository"
   const mockImageRef = "123abc"
   const mockPrivateKey = "0xabcd"
+  const mockCliVersion = "0.2"
 
   const resetMocks = () => {
     mockFilesystem.existsSync.mockReset()
@@ -25,7 +26,7 @@ describe("uploadManifest", () => {
 
   beforeAll(() => {
     uploadManifest = provideUploadManifest(
-      mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentId, mockVersion, mockDocumentation, mockRepository
+      mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentId, mockVersion, mockDocumentation, mockRepository, mockCliVersion
     )
   })
 
@@ -79,7 +80,8 @@ describe("uploadManifest", () => {
       imageReference: mockImageRef,
       documentation: mockDocumentationRef,
       repository: mockRepository,
-      chainIds: [1]
+      chainIds: [1],
+      publishedFrom: `Forta CLI ${mockCliVersion}`
     }
     const mockManifestRef = "manifestRef"
     mockAddToIpfs.mockReturnValueOnce(mockManifestRef)
