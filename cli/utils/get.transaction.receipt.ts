@@ -26,7 +26,7 @@ export default function provideGetTransactionReceipt(
   assertExists(ethersProvider, 'ethersProvider')
   assertExists(cache, 'cache')
 
-  return async function provideGetTransactionReceipt(txHash: string) {
+  return async function getTransactionReceipt(txHash: string) {
     // check cache first
     const cachedReceipt = cache.getKey(txHash.toLowerCase())
     if (cachedReceipt) return cachedReceipt

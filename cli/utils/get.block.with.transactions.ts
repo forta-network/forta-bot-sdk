@@ -24,7 +24,7 @@ export default function provideGetBlockWithTransactions(
   assertExists(ethersProvider, 'ethersProvider')
   assertExists(cache, 'cache')
 
-  return async function provideGetBlockWithTransactions(blockHashOrNumber: string | number) {
+  return async function getBlockWithTransactions(blockHashOrNumber: string | number) {
     // check the cache first
     const cachedBlock = cache.getKey(blockHashOrNumber.toString().toLowerCase())
     if (cachedBlock) return cachedBlock
