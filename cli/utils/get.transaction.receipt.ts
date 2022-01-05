@@ -1,4 +1,5 @@
 import { providers } from "ethers";
+import { Cache } from "flat-cache";
 import { assertExists } from ".";
 import { Log, Receipt } from "../../sdk";
 
@@ -19,14 +20,23 @@ export type JsonRpcTransactionReceipt = Omit<Receipt, 'status' | 'blockNumber' |
 export type GetTransactionReceipt = (txHash: string) => Promise<JsonRpcTransactionReceipt>
 
 export default function provideGetTransactionReceipt(
-  ethersProvider: providers.JsonRpcProvider
+  ethersProvider: providers.JsonRpcProvider,
+  cache: Cache
 ) {
   assertExists(ethersProvider, 'ethersProvider')
+  assertExists(cache, 'cache')
 
   return async function provideGetTransactionReceipt(txHash: string) {
-    return ethersProvider.send(
+    // check cache first
+    const cachedReceipt = cache.getKey(txHash.toLowerCase())
+    if (cachedReceipt) return cachedReceipt
+
+    // fetch the receipt
+    const receipt = await ethersProvider.send(
       'eth_getTransactionReceipt',
       [txHash]
     )
+    cache.setKey(txHash.toLowerCase(), receipt)
+    return receipt
   }
 }
