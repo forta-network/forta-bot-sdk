@@ -6,6 +6,10 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
+### [0.0.34](https://github.com/forta-protocol/forta-agent-sdk/commit/088ede26b544b770858c2e720084c95cc3a76e13)
+
+- Add disk caching for the `forta-agent run` command
+
 ### [0.0.33](https://github.com/forta-protocol/forta-agent-sdk/commit/30eae8fbba53a85f377efce2cb934e712fd819bc)
 
 - Add support for specifying multiple transactions/blocks for the `forta-agent run` command
