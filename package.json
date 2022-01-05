@@ -31,6 +31,7 @@
     "awilix": "^4.3.4",
     "axios": "^0.21.1",
     "ethers": "^5.5.1",
+    "flat-cache": "^3.0.4",
     "form-data": "^4.0.0",
     "jsonc": "^2.0.0",
     "keythereum": "^1.2.0",
@@ -43,6 +44,7 @@
     "yargs": "^17.0.1"
   },
   "devDependencies": {
+    "@types/flat-cache": "^2.0.0",
     "@types/jest": "^26.0.22",
     "@types/lodash": "^4.14.170",
     "@types/n-readlines": "^1.0.2",

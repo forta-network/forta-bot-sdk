@@ -1,4 +1,5 @@
 import { AwilixContainer } from 'awilix';
+import { Cache } from 'flat-cache';
 import { CommandHandler } from '../..';
 import { assertExists } from '../../utils';
 import { RunBlock } from './run.block';
@@ -9,9 +10,11 @@ import { RunTransaction } from './run.transaction';
 import { RunProdServer } from './server';
 
 export default function provideRun(
-  container: AwilixContainer
+  container: AwilixContainer,
+  cache: Cache
 ): CommandHandler {
   assertExists(container, 'container')
+  assertExists(cache, 'cache')
 
   return async function run(cliArgs: any) {
     // we manually inject the run functions here (instead of through the provide function above) so that
@@ -35,6 +38,9 @@ export default function provideRun(
       const runLive = container.resolve<RunLive>("runLive")
       await runLive()
     }
+
+    // persist any cached blocks/txs/traces to disk
+    cache.save(true) // true = dont prune keys not used in this run
 
     // invoke process.exit() for short-lived functions, otherwise
     // a child process (i.e. python agent process) can prevent commandline from returning

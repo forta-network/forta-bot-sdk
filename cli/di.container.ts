@@ -7,6 +7,7 @@ import shell from 'shelljs'
 import prompts from 'prompts'
 import { jsonc } from 'jsonc'
 import axios, { AxiosRequestConfig } from 'axios'
+import flatCache from 'flat-cache'
 import provideInit from "./commands/init"
 import provideRun from "./commands/run"
 import providePublish from "./commands/publish"
@@ -72,6 +73,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
         throw new Error(`unable to parse cli package.json: ${e.message}`)
       }
     }).singleton(),
+    cache: asFunction((fortaKeystore: string) => flatCache.load('cli-cache', fortaKeystore)).singleton(),
 
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     getFortaConfig: asFunction(provideGetFortaConfig),
