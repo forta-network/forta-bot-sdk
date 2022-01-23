@@ -33,10 +33,8 @@ class Finding:
         self.protocol = dict.get('protocol', 'ethereum')
         self.severity = dict['severity']
         self.type = dict['type']
-        self.everest_id = dict.get('everest_id')
         self.metadata = dict.get('metadata')
 
     def toJson(self):
-        d = dict(self.__dict__, **
-                 {'alertId': self.alert_id, 'everestId': self.everest_id})
+        d = dict(self.__dict__, **{'alertId': self.alert_id})
         return json.dumps({k: v for k, v in d.items() if v or k == 'type' or k == 'severity'})

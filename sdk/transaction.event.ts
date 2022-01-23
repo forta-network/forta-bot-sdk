@@ -68,17 +68,6 @@ export class TransactionEvent {
     return this.block.hash
   }
 
-  filterEvent(eventSignature: string, contractAddress: string = ''): Log[] {
-    const eventTopic = keccak256(eventSignature).toLowerCase()
-    contractAddress = contractAddress.toLowerCase()
-    const events = this.receipt.logs.filter(
-      log => log.topics.length
-        && log.topics[0].toLowerCase() === eventTopic
-        && (contractAddress.length ? log.address.toLowerCase() === contractAddress : true)
-    )
-    return events
-  }
-
   filterLog(eventAbi: string | string[], contractAddress: string = ''): LogDescription[] {
     eventAbi = _.isArray(eventAbi) ? eventAbi : [eventAbi]
     let logs = this.receipt.logs
