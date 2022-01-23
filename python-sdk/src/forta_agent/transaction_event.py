@@ -71,14 +71,6 @@ class TransactionEvent:
     def block_hash(self):
         return self.block.hash
 
-    def filter_event(self, event_signature, contract_address=''):
-        event_topic = keccak256(event_signature).lower()
-        contract_address = contract_address.lower()
-        events = filter(lambda log: len(log.topics) > 0 and
-                        log.topics[0].lower() == event_topic and
-                        (True if not contract_address else log.address.lower() == contract_address), self.receipt.logs)
-        return list(events)
-
     def filter_log(self, abi, contract_address=''):
         abi = abi if isinstance(abi, list) else [abi]
         abi = [json.loads(abi_item) for abi_item in abi]
