@@ -192,6 +192,7 @@ describe("AgentController", () => {
         metadata: {
           timestamp: systemTime.toISOString(),
         },
+        private: false
       })
     })
 
@@ -208,6 +209,7 @@ describe("AgentController", () => {
         metadata: {
           timestamp: systemTime.toISOString(),
         },
+        private: false
       })
     })
 
@@ -227,6 +229,7 @@ describe("AgentController", () => {
         metadata: {
           timestamp: systemTime.toISOString(),
         },
+        private: false
       })
       expect(mockHandleBlock).toHaveBeenCalledTimes(1)
       const blockEvent: BlockEvent = mockHandleBlock.mock.calls[0][0]
@@ -287,6 +290,7 @@ describe("AgentController", () => {
         metadata: {
           timestamp: systemTime.toISOString(),
         },
+        private: false
       })
     })
 
@@ -303,6 +307,7 @@ describe("AgentController", () => {
         metadata: {
           timestamp: systemTime.toISOString(),
         },
+        private: false
       })
     })
 
@@ -321,6 +326,7 @@ describe("AgentController", () => {
         metadata: {
           timestamp: systemTime.toISOString(),
         },
+        private: false
       })
       expect(mockHandleTransaction).toHaveBeenCalledTimes(1)
       const txEvent: TransactionEvent = mockHandleTransaction.mock.calls[0][0]
