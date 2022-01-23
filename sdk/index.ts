@@ -3,10 +3,19 @@ import { Finding, FindingSeverity, FindingType } from "./finding"
 import { BlockEvent } from "./block.event"
 import { Block } from "./block"
 import { TransactionEvent, TxEventBlock, LogDescription } from "./transaction.event"
-import { createBlockEvent, createTransactionEvent, getJsonRpcUrl, getEthersProvider, getEthersBatchProvider, keccak256 } from "./utils"
 import { Log, Receipt } from "./receipt"
 import { Trace, TraceAction, TraceResult } from "./trace"
 import { Transaction } from "./transaction"
+import { 
+  createBlockEvent, 
+  createTransactionEvent, 
+  getJsonRpcUrl, 
+  getEthersProvider, 
+  getEthersBatchProvider, 
+  keccak256,
+  setPrivateFindings,
+  isPrivateFindings
+} from "./utils"
 
 interface FortaConfig {
   agentId?: string
@@ -68,5 +77,7 @@ export {
   getEthersProvider,
   getEthersBatchProvider,
   ethers,
-  keccak256
+  keccak256,
+  setPrivateFindings,
+  isPrivateFindings
  }

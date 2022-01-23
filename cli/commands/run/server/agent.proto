@@ -67,6 +67,7 @@ message Finding {
   string name = 6;
   string description = 7;
   string everestId = 8;
+  bool private = 9;
 }
 
 message EvaluateTxResponse {
@@ -76,6 +77,7 @@ message EvaluateTxResponse {
   map<string, string> metadata = 4;
   string timestamp = 5;
   uint32 latencyMs = 6;
+  bool private = 7;
 }
 
 message EvaluateBlockResponse {
@@ -85,12 +87,13 @@ message EvaluateBlockResponse {
   map<string, string> metadata = 4;
   string timestamp = 5;
   uint32 latencyMs = 6;
+  bool private = 7;
 }
 
 message BlockEvent {
   enum EventType {
     BLOCK = 0;
-    REORG = 1;
+    REORG = 1 [deprecated=true];
   }
   message Network {
     string chainId = 1;

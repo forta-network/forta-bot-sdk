@@ -100,3 +100,12 @@ export const keccak256 = (str: string) => {
   hash.update(str)
   return `0x${hash.digest('hex')}`
 }
+
+let IS_PRIVATE_FINDINGS = false
+export const setPrivateFindings = (isPrivate: boolean) => {
+  IS_PRIVATE_FINDINGS = isPrivate
+}
+
+export const isPrivateFindings = () => {
+  return IS_PRIVATE_FINDINGS
+}

@@ -1,4 +1,8 @@
-const { BlockEvent, TransactionEvent } = require("../../../../sdk");
+const {
+  BlockEvent,
+  TransactionEvent,
+  isPrivateFindings,
+} = require("../../../../sdk");
 const { assertExists, formatAddress } = require("../../../utils");
 
 module.exports = class AgentController {
@@ -38,6 +42,7 @@ module.exports = class AgentController {
       metadata: {
         timestamp: new Date().toISOString(),
       },
+      private: isPrivateFindings(),
     });
   }
 
@@ -68,6 +73,7 @@ module.exports = class AgentController {
       metadata: {
         timestamp: new Date().toISOString(),
       },
+      private: isPrivateFindings(),
     });
   }
 
@@ -108,11 +114,7 @@ module.exports = class AgentController {
       uncles: block.uncles,
     };
 
-    return new BlockEvent(
-      type,
-      parseInt(network.chainId),
-      blok
-    );
+    return new BlockEvent(type, parseInt(network.chainId), blok);
   }
 
   createTransactionEventFromGrpcRequest(request) {
