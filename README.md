@@ -6,6 +6,12 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
+### [0.0.35](https://github.com/forta-protocol/forta-agent-sdk/commit/385545c5bb30b815dcd749233851d4e748f20119)
+
+- Add support for private agents with the `setPrivateFindings` method
+- Deprecate `everestId` attribute of Finding
+- Deprecate `filterEvent` method of TransactionEvent
+
 ### [0.0.34](https://github.com/forta-protocol/forta-agent-sdk/commit/088ede26b544b770858c2e720084c95cc3a76e13)
 
 - Add disk caching for the `forta-agent run` command
