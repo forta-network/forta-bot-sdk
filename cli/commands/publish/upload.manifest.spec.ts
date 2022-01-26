@@ -18,6 +18,7 @@ describe("uploadManifest", () => {
   const mockImageRef = "123abc"
   const mockPrivateKey = "0xabcd"
   const mockCliVersion = "0.2"
+  const mockChainIds = [1];
 
   const resetMocks = () => {
     mockFilesystem.existsSync.mockReset()
@@ -26,7 +27,7 @@ describe("uploadManifest", () => {
 
   beforeAll(() => {
     uploadManifest = provideUploadManifest(
-      mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentId, mockVersion, mockDocumentation, mockRepository, mockCliVersion
+      mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentId, mockVersion, mockDocumentation, mockRepository, mockCliVersion, mockChainIds
     )
   })
 

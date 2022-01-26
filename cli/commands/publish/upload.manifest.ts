@@ -29,9 +29,11 @@ export default function provideUploadManifest(
   documentation: string,
   repository: string,
   cliVersion: string,
+  chainIds: number[],
 ): UploadManifest {
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
+  assertExists(chainIds, 'chainIds')
   assertIsNonEmptyString(agentName, 'agentName')
   assertIsNonEmptyString(agentId, 'agentId')
   assertIsNonEmptyString(version, 'version')
@@ -61,7 +63,7 @@ export default function provideUploadManifest(
       imageReference,
       documentation: documentationReference,
       repository,
-      chainIds: [1],
+      chainIds,
       publishedFrom: `Forta CLI ${cliVersion}`
     }
 
