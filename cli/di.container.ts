@@ -159,6 +159,8 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     listKeyfiles: asFunction(provideListKeyfiles),
     addToIpfs: asFunction(provideAddToIpfs),
     appendToFile: asFunction(provideAppendToFile),
+    shouldContinue: asFunction(() =>  true).singleton(),
+
 
     getNetworkId: asFunction(provideGetNetworkId),
     getBlockWithTransactions: asFunction(provideGetBlockWithTransactions),

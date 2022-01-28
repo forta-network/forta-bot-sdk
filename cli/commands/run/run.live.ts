@@ -8,28 +8,32 @@ export type RunLive = () => Promise<void>
 export function provideRunLive(
   ethersProvider: providers.JsonRpcProvider, 
   runHandlersOnBlock: RunHandlersOnBlock,
-  setInterval: (callback: any, ms: number) => NodeJS.Timeout
+  shouldContinue: () => boolean
 ): RunLive {
   assertExists(ethersProvider, 'ethersProvider')
   assertExists(runHandlersOnBlock, 'runHandlersOnBlock')
-  assertExists(setInterval, 'setInterval')
+  assertExists(shouldContinue, 'shouldContinue')
 
   return async function runLive() {
+
     console.log('listening for blockchain data...')
 
-    // process the latest block
+    // generate block queue
     let latestBlockNumber = await ethersProvider.getBlockNumber()
-    await runHandlersOnBlock(latestBlockNumber)
+    let blockQueue = Array(25).fill(latestBlockNumber).map((e, i) => e + i)
+    blockQueue.shift()
+    blockQueue.push(blockQueue[blockQueue.length - 1] + 1)
 
-    // poll for the latest block every 15s and process each
-    setInterval(async () => {
-      let currBlockNumber = latestBlockNumber
-      latestBlockNumber = await ethersProvider.getBlockNumber()
-      const endBlockNumber = latestBlockNumber
+    await runHandlersOnBlock(latestBlockNumber)
+    let currBlockNumber = blockQueue.shift()
+
+    while(shouldContinue()) {
+      let endBlockNumber = await ethersProvider.getBlockNumber()
       while (currBlockNumber < endBlockNumber) {
-        currBlockNumber++
         await runHandlersOnBlock(currBlockNumber)
+        currBlockNumber = blockQueue.shift()
+        blockQueue.push(blockQueue[blockQueue.length - 1] + 1)
       }
-    }, 15000)
+    }
   }
 }

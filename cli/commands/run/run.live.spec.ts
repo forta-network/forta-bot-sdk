@@ -6,23 +6,24 @@ describe("runLive", () => {
     getBlockNumber: jest.fn()
   } as any
   const mockRunHandlersOnBlock = jest.fn()
-  const mockSetInterval = jest.fn()
+  const mockShouldContinue = jest.fn()
   const latestBlockNumber = 1000
-  let callback: () => Promise<void>
 
   const resetMocks = () => {
     mockRunHandlersOnBlock.mockReset()
+    mockShouldContinue.mockReset()
     mockEthersProvider.getBlockNumber.mockReset()
   }
 
   beforeAll(() => {
-    runLive = provideRunLive(mockEthersProvider, mockRunHandlersOnBlock, mockSetInterval)
+    runLive = provideRunLive(mockEthersProvider, mockRunHandlersOnBlock, mockShouldContinue)
   })
 
   beforeEach(() => resetMocks())
 
-  it("runs handlers on latest block and then schedules callback every 15s", async () => {
+  it("runs handlers on latest block and terminates", async () => {
     mockEthersProvider.getBlockNumber.mockReturnValueOnce(latestBlockNumber)
+    mockShouldContinue.mockReturnValueOnce(false)
 
     await runLive()
 
@@ -30,34 +31,43 @@ describe("runLive", () => {
     expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledWith()
     expect(mockRunHandlersOnBlock).toHaveBeenCalledTimes(1)
     expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(latestBlockNumber)
-    expect(mockSetInterval).toHaveBeenCalledTimes(1)
-    callback = mockSetInterval.mock.calls[0][0]
-    const interval = mockSetInterval.mock.calls[0][1]
-    expect(interval).toBe(15000)
+    expect(mockShouldContinue).toHaveBeenCalledTimes(1)
   })
 
-  describe("callback", () => {
+  describe("shouldContinue", async () => {
     it("does nothing if latest block number has not changed", async () => {
-      mockEthersProvider.getBlockNumber.mockReturnValueOnce(latestBlockNumber)
+      mockEthersProvider.getBlockNumber
+        .mockReturnValueOnce(latestBlockNumber)
+        .mockReturnValueOnce(latestBlockNumber)
+    
+      mockShouldContinue
+        .mockReturnValueOnce(true)
+        .mockReturnValueOnce(false)
 
-      await callback()
+      await runLive()
 
-      expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledTimes(1)
+      expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledTimes(2)
       expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledWith()
-      expect(mockRunHandlersOnBlock).toHaveBeenCalledTimes(0)
+      expect(mockRunHandlersOnBlock).toHaveBeenCalledTimes(1)
     })
 
     it("runs handlers against each block since last processed block", async () => {
-      mockEthersProvider.getBlockNumber.mockReturnValueOnce(latestBlockNumber+3)
+      mockEthersProvider.getBlockNumber
+        .mockReturnValueOnce(latestBlockNumber)
+        .mockReturnValueOnce(latestBlockNumber+3)
+      
+      mockShouldContinue
+        .mockReturnValueOnce(true)
+        .mockReturnValueOnce(false)
 
-      await callback()
+      await runLive()
 
-      expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledTimes(1)
+      expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledTimes(2)
       expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledWith()
       expect(mockRunHandlersOnBlock).toHaveBeenCalledTimes(3)
-      expect(mockRunHandlersOnBlock).toHaveBeenNthCalledWith(1, latestBlockNumber+1)
-      expect(mockRunHandlersOnBlock).toHaveBeenNthCalledWith(2, latestBlockNumber+2)
-      expect(mockRunHandlersOnBlock).toHaveBeenNthCalledWith(3, latestBlockNumber+3)
+      expect(mockRunHandlersOnBlock).toHaveBeenNthCalledWith(1, latestBlockNumber)
+      expect(mockRunHandlersOnBlock).toHaveBeenNthCalledWith(2, latestBlockNumber+1)
+      expect(mockRunHandlersOnBlock).toHaveBeenNthCalledWith(3, latestBlockNumber+2)
     })
   })
 })
