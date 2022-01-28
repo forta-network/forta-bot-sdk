@@ -16,21 +16,21 @@ export default class AgentRegistry {
     return !!agent.metadata
   }
   
-  async createAgent(fromWallet: Wallet, agentId: string, reference: string) {
+  async createAgent(fromWallet: Wallet, agentId: string, reference: string, chainIds: number[]) {
     const from = fromWallet.address
     const contract = this.getContract(fromWallet)
-    const gas = await contract.estimateGas.createAgent(agentId, from, reference, [1])
+    const gas = await contract.estimateGas.createAgent(agentId, from, reference, chainIds)
     const txOptions = await this.getTxOptions(gas, fromWallet)
-    const tx = await contract.createAgent(agentId, from, reference, [1], txOptions)
+    const tx = await contract.createAgent(agentId, from, reference, chainIds, txOptions)
     await tx.wait()
     return tx.hash
   }
 
-  async updateAgent(fromWallet: Wallet, agentId: string, reference: string) {
+  async updateAgent(fromWallet: Wallet, agentId: string, reference: string, chainIds: number[]) {
     const contract = this.getContract(fromWallet)
-    const gas = await contract.estimateGas.updateAgent(agentId, reference, [1])
+    const gas = await contract.estimateGas.updateAgent(agentId, reference, chainIds)
     const txOptions = await this.getTxOptions(gas, fromWallet)
-    const tx = await contract.updateAgent(agentId, reference, [1], txOptions)
+    const tx = await contract.updateAgent(agentId, reference, chainIds, txOptions)
     await tx.wait()
     return tx.hash
   }

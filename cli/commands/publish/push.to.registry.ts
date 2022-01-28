@@ -9,11 +9,13 @@ export type PushToRegistry = (manifestReference: string, privateKey: string) => 
 export default function providePushToRegistry(
   appendToFile: AppendToFile,
   agentRegistry: AgentRegistry,
-  agentId: string
+  agentId: string,
+  chainIds: number[]
 ): PushToRegistry {
   assertExists(appendToFile, 'appendToFile')
   assertExists(agentRegistry, 'agentRegistry')
   assertIsNonEmptyString(agentId, 'agentId')
+  assertExists(chainIds, 'chainIds')
   
   return async function pushToRegistry(manifestReference: string, privateKey: string) {
     const fromWallet = new Wallet(privateKey)
@@ -21,10 +23,10 @@ export default function providePushToRegistry(
 
     if (!agentExists) {
       console.log('adding agent to registry...')
-      await agentRegistry.createAgent(fromWallet, agentId, manifestReference)
+      await agentRegistry.createAgent(fromWallet, agentId, manifestReference, chainIds)
     } else {
       console.log('updating agent in registry...')
-      await agentRegistry.updateAgent(fromWallet, agentId, manifestReference)
+      await agentRegistry.updateAgent(fromWallet, agentId, manifestReference, chainIds)
     }
 
     const logMessage = `successfully ${agentExists ? 'updated' : 'added'} agent id ${agentId} with manifest ${manifestReference}`
