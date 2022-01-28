@@ -32,7 +32,6 @@ interface FortaConfig {
   traceBlockMethod?: string
   traceTransactionMethod?: string
   keyfile?: string
-  chainIds?: number[]
 }
 
 type Initialize = () => Promise<void>

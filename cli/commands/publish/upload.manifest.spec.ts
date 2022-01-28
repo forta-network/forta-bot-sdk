@@ -18,7 +18,7 @@ describe("uploadManifest", () => {
   const mockImageRef = "123abc"
   const mockPrivateKey = "0xabcd"
   const mockCliVersion = "0.2"
-  const mockChainIds = [1];
+  const mockChainIds = [1, 1337];
 
   const resetMocks = () => {
     mockFilesystem.existsSync.mockReset()
@@ -81,7 +81,7 @@ describe("uploadManifest", () => {
       imageReference: mockImageRef,
       documentation: mockDocumentationRef,
       repository: mockRepository,
-      chainIds: [1],
+      chainIds: mockChainIds,
       publishedFrom: `Forta CLI ${mockCliVersion}`
     }
     const mockManifestRef = "manifestRef"

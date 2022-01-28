@@ -33,12 +33,12 @@ export default function provideUploadManifest(
 ): UploadManifest {
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
-  assertExists(chainIds, 'chainIds')
   assertIsNonEmptyString(agentName, 'agentName')
   assertIsNonEmptyString(agentId, 'agentId')
   assertIsNonEmptyString(version, 'version')
   assertIsNonEmptyString(documentation, 'documentation')
   assertIsNonEmptyString(cliVersion, 'cliVersion')
+  assertExists(chainIds, 'chainIds')
 
   return async function uploadManifest(imageReference: string, privateKey: string) {
     // upload documentation to ipfs

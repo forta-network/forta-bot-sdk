@@ -12,6 +12,7 @@ describe("pushToRegistry", () => {
   const mockAgentId = "0xagentId"
   const mockManifestRef = "abc123"
   const mockPrivateKey = "0xabcd"
+  const mockChainIds = [1]
 
   const resetMocks = () => {
     mockAppendToFile.mockReset()
@@ -21,7 +22,7 @@ describe("pushToRegistry", () => {
   }
 
   beforeAll(() => {
-    pushToRegistry = providePushToRegistry(mockAppendToFile, mockAgentRegistry, mockAgentId)
+    pushToRegistry = providePushToRegistry(mockAppendToFile, mockAgentRegistry, mockAgentId, mockChainIds)
   })
 
   beforeEach(() => resetMocks())
@@ -37,11 +38,12 @@ describe("pushToRegistry", () => {
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledBefore(mockAgentRegistry.createAgent)
     expect(mockAgentRegistry.createAgent).toHaveBeenCalledTimes(1)
-    const [fromWallet, agentId, manifestReference] = mockAgentRegistry.createAgent.mock.calls[0]
+    const [fromWallet, agentId, manifestReference, chainIds] = mockAgentRegistry.createAgent.mock.calls[0]
     expect(fromWallet).toBeInstanceOf(Wallet)
     expect(fromWallet.getAddress()).toEqual(new Wallet(mockPrivateKey).getAddress())
     expect(agentId).toEqual(mockAgentId)
     expect(manifestReference).toEqual(mockManifestRef)
+    expect(chainIds).toEqual(mockChainIds)
     expect(mockAgentRegistry.updateAgent).toHaveBeenCalledTimes(0)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
     expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully added agent id ${mockAgentId} with manifest ${mockManifestRef}`, 'publish.log')
@@ -59,11 +61,12 @@ describe("pushToRegistry", () => {
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledBefore(mockAgentRegistry.updateAgent)
     expect(mockAgentRegistry.updateAgent).toHaveBeenCalledTimes(1)
-    const [fromWallet, agentId, manifestReference] = mockAgentRegistry.updateAgent.mock.calls[0]
+    const [fromWallet, agentId, manifestReference, chainIds] = mockAgentRegistry.updateAgent.mock.calls[0]
     expect(fromWallet).toBeInstanceOf(Wallet)
     expect(fromWallet.getAddress()).toEqual(new Wallet(mockPrivateKey).getAddress())
     expect(agentId).toEqual(mockAgentId)
     expect(manifestReference).toEqual(mockManifestRef)
+    expect(chainIds).toEqual(mockChainIds)
     expect(mockAgentRegistry.createAgent).toHaveBeenCalledTimes(0)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
     expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully updated agent id ${mockAgentId} with manifest ${mockManifestRef}`, 'publish.log')

@@ -116,12 +116,11 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return fortaConfig.agentId || keccak256(agentName)
     }).singleton(),
     chainIds: asFunction((packageJson: any) => {
-      if(!packageJson.chainIds) {
-        throw new Error("please specify chainIds in package.json for where this agent should deploy ([1] = mainnet)")
+      const { chainIds } = packageJson
+      if (!chainIds || !chainIds.length) {
+        throw new Error("please specify chainIds array in package.json for where this agent should deploy e.g. [1] = Ethereum mainnet")
       }
-      const cIds = packageJson.chainIds;
-      cIds.sort();
-      return cIds;
+      return chainIds.sort()
     }).singleton(),
     version: asFunction((packageJson: any) => packageJson.version),
     documentation: asValue(join(process.cwd(), 'README.md')),

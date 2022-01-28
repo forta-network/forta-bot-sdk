@@ -14,8 +14,8 @@ export default function providePushToRegistry(
 ): PushToRegistry {
   assertExists(appendToFile, 'appendToFile')
   assertExists(agentRegistry, 'agentRegistry')
-  assertExists(chainIds, 'chainIds')
   assertIsNonEmptyString(agentId, 'agentId')
+  assertExists(chainIds, 'chainIds')
   
   return async function pushToRegistry(manifestReference: string, privateKey: string) {
     const fromWallet = new Wallet(privateKey)
