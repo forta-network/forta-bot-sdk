@@ -6,6 +6,10 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
+### [0.0.36](https://github.com/forta-protocol/forta-agent-sdk/commit/fd7e401de3a2de1cbd3e7784a849cdfb2ddbd9da)
+
+- Add support for specifying `chainIds` in package.json
+
 ### [0.0.35](https://github.com/forta-protocol/forta-agent-sdk/commit/385545c5bb30b815dcd749233851d4e748f20119)
 
 - Add support for private agents with the `setPrivateFindings` method
