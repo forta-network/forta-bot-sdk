@@ -112,6 +112,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       }
     }).singleton(),
     agentName: asFunction((packageJson: any) => packageJson.name).singleton(),
+    description: asFunction((packageJson: any) => packageJson.description).singleton(),
     agentId: asFunction((fortaConfig: FortaConfig, agentName: string) => {
       return fortaConfig.agentId || keccak256(agentName)
     }).singleton(),

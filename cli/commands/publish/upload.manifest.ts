@@ -9,6 +9,7 @@ export type UploadManifest = (imageReference: string, privateKey: string) => Pro
 type Manifest = {
   from: string,
   name: string,
+  description: string,
   agentId: string,
   agentIdHash: string,
   version: string,
@@ -24,6 +25,7 @@ export default function provideUploadManifest(
   filesystem: typeof fs,
   addToIpfs: AddToIpfs,
   agentName: string,
+  description: string,
   agentId: string,
   version: string,
   documentation: string,
@@ -34,6 +36,7 @@ export default function provideUploadManifest(
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
   assertIsNonEmptyString(agentName, 'agentName')
+  assertIsNonEmptyString(description, 'description')
   assertIsNonEmptyString(agentId, 'agentId')
   assertIsNonEmptyString(version, 'version')
   assertIsNonEmptyString(documentation, 'documentation')
@@ -56,6 +59,7 @@ export default function provideUploadManifest(
     const manifest: Manifest = {
       from: new Wallet(privateKey).address,
       name: agentName,
+      description,
       agentId: agentName,
       agentIdHash: agentId,
       version,
