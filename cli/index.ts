@@ -46,6 +46,9 @@ yargs
       }).option('config', {
         description: 'Specify a config file (default: forta.config.json)',
         type: 'string',
+      }).option('nocache', {
+        description: 'Disables writing to the cache (but reads are still enabled)',
+        type: 'string'
       })
     },
     (cliArgs: any) => executeCommand("run", cliArgs)

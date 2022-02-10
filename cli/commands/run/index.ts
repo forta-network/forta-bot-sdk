@@ -39,8 +39,10 @@ export default function provideRun(
       await runLive()
     }
 
-    // persist any cached blocks/txs/traces to disk
-    cache.save(true) // true = dont prune keys not used in this run
+    if (!("nocache" in cliArgs)) {
+      // persist any cached blocks/txs/traces to disk
+      cache.save(true) // true = dont prune keys not used in this run
+    }
 
     // invoke process.exit() for short-lived functions, otherwise
     // a child process (i.e. python agent process) can prevent commandline from returning
