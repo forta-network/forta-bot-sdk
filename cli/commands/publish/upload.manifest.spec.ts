@@ -11,6 +11,7 @@ describe("uploadManifest", () => {
   } as any
   const mockAddToIpfs = jest.fn()
   const mockAgentName = "agentName"
+  const mockDescription = "some description"
   const mockAgentId = "0xagentId"
   const mockVersion = "0.1"
   const mockDocumentation = "README.md"
@@ -27,7 +28,7 @@ describe("uploadManifest", () => {
 
   beforeAll(() => {
     uploadManifest = provideUploadManifest(
-      mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentId, mockVersion, mockDocumentation, mockRepository, mockCliVersion, mockChainIds
+      mockFilesystem, mockAddToIpfs, mockAgentName, mockDescription, mockAgentId, mockVersion, mockDocumentation, mockRepository, mockCliVersion, mockChainIds
     )
   })
 
@@ -74,6 +75,7 @@ describe("uploadManifest", () => {
     const mockManifest = {
       from: new Wallet(mockPrivateKey).address,
       name: mockAgentName,
+      description: mockDescription,
       agentId: mockAgentName,
       agentIdHash: mockAgentId,
       version: mockVersion,
