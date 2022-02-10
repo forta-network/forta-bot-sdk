@@ -6,6 +6,16 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
+### [0.0.38](https://github.com/forta-protocol/forta-agent-sdk/commit/dfac04e1efce7da90986e2f943c08da572d52c67)
+
+- Added `description` field to agent manifest from package.json
+
+### [0.0.37](https://github.com/forta-protocol/forta-agent-sdk/commit/72ff4ef56583b0980fa4fcd02bdfd2ff9247772c)
+
+- Added support for specifying multiple addresses in `filterLog` and `filterFunction` commands
+- Added `--nocache` option to `forta-agent run` command to disable writing to cache
+- Fixed `forta-agent run` command to process blocks sequentially when listening for realtime data
+
 ### [0.0.36](https://github.com/forta-protocol/forta-agent-sdk/commit/fd7e401de3a2de1cbd3e7784a849cdfb2ddbd9da)
 
 - Add support for specifying `chainIds` in package.json
