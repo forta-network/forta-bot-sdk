@@ -104,7 +104,7 @@ describe("run", () => {
   })
 
   it("invokes runLive if no argument is provided", async () => {
-    const mockCliArgs = {}
+    const mockCliArgs = {nocache: ""}
     const mockRunLive = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunLive)
 
@@ -114,8 +114,7 @@ describe("run", () => {
     expect(mockContainer.resolve).toHaveBeenCalledWith("runLive")
     expect(mockRunLive).toHaveBeenCalledTimes(1)
     expect(mockRunLive).toHaveBeenCalledWith()
-    expect(mockCache.save).toHaveBeenCalledTimes(1)
-    expect(mockCache.save).toHaveBeenCalledWith(true)
+    expect(mockCache.save).toHaveBeenCalledTimes(0)
     expect(mockExit).toHaveBeenCalledTimes(0)
   })
 })
