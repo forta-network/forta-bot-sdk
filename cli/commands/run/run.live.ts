@@ -21,15 +21,24 @@ export function provideRunLive(
     let latestBlockNumber = await ethersProvider.getBlockNumber()
     await runHandlersOnBlock(latestBlockNumber)
 
+    let isProcessing = false
+
     // poll for the latest block every 15s and process each
     setInterval(async () => {
+      // if a previous iteration is running, just update the latestBlockNumber so it will get processed
+      if (isProcessing) {
+        latestBlockNumber = await ethersProvider.getBlockNumber()
+        return
+      }
+
+      isProcessing = true
       let currBlockNumber = latestBlockNumber
       latestBlockNumber = await ethersProvider.getBlockNumber()
-      const endBlockNumber = latestBlockNumber
-      while (currBlockNumber < endBlockNumber) {
+      while (currBlockNumber < latestBlockNumber) {
         currBlockNumber++
         await runHandlersOnBlock(currBlockNumber)
       }
+      isProcessing = false
     }, 15000)
   }
 }
