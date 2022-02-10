@@ -5,7 +5,6 @@ from .network import Network
 from .transaction import Transaction
 from .receipt import Receipt
 from .trace import Trace
-from .utils import keccak256
 
 
 class TxEventBlock:
@@ -77,9 +76,12 @@ class TransactionEvent:
         logs = self.logs
         # filter logs by contract address, if provided
         if (contract_address):
-            contract_address = contract_address.lower()
+            contract_address = contract_address if isinstance(
+                contract_address, list) else [contract_address]
+            contract_address_map = {
+                address.lower(): True for address in contract_address}
             logs = filter(lambda log: log.address.lower()
-                          == contract_address, logs)
+                          in contract_address_map, logs)
         # determine which event names to filter
         event_names = []
         for abi_item in abi:
@@ -110,9 +112,12 @@ class TransactionEvent:
                         'to': trace.action.to} for trace in self.traces]
         # filter by contract address, if provided
         if (contract_address):
-            contract_address = contract_address.lower()
+            contract_address = contract_address if isinstance(
+                contract_address, list) else [contract_address]
+            contract_address_map = {
+                address.lower(): True for address in contract_address}
             sources = filter(
-                lambda source: source['to'] and source['to'].lower() == contract_address, sources)
+                lambda source: source['to'] and source['to'].lower() in contract_address_map, sources)
         # parse function inputs
         results = []
         from . import web3Provider
