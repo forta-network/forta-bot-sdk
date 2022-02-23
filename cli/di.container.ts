@@ -223,10 +223,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     ethersAgentRegistryProvider: asFunction((agentRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(agentRegistryJsonRpcUrl)).singleton(),
 
     ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig) => {
-      if (!fortaConfig.ipfsGatewayUrl) {
-        throw new Error(`no ipfsGatewayUrl provided in config`)
-      }
-      return fortaConfig.ipfsGatewayUrl
+      return fortaConfig.ipfsGatewayUrl || "https://ipfs.forta.network"
     }),
     ipfsGatewayAuth: asFunction((ipfsGatewayUrl: string, fortaConfig: FortaConfig) => {
       if (ipfsGatewayUrl.includes('ipfs.infura.io') && !fortaConfig.ipfsGatewayAuth) {
