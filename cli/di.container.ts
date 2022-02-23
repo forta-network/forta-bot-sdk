@@ -137,6 +137,9 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     keyfileName: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.keyfile
     }),
+    keyfilePassword: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.keyfilePassword
+    }).singleton(),
     agentPath: asFunction(() => {
       const projectDir = process.cwd()
       // default js agent
