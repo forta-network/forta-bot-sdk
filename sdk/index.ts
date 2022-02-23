@@ -32,6 +32,7 @@ interface FortaConfig {
   traceBlockMethod?: string
   traceTransactionMethod?: string
   keyfile?: string
+  keyfilePassword?: string
 }
 
 type Initialize = () => Promise<void>

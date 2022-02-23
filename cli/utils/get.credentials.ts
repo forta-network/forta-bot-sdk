@@ -10,6 +10,7 @@ export default function provideGetCredentials(
   prompt: typeof prompts,
   getKeyfile: GetKeyfile,
   decryptKeyfile: DecryptKeyfile,
+  keyfilePassword?: string
 ): GetCredentials {
   assertExists(prompt, 'prompt')
   assertExists(getKeyfile, 'getKeyfile')
@@ -18,12 +19,16 @@ export default function provideGetCredentials(
   return async function getCredentials() {
     const { path, name } = getKeyfile()
 
+    // if user specified keyfile password in forta config (useful for ci/cd)
+    if (keyfilePassword) {
+      return decryptKeyfile(path, keyfilePassword)
+    }
+
     const { password } = await prompt({
       type: 'password',
       name: 'password',
       message: `Enter password to decrypt keyfile ${name}`
     })
-
     return decryptKeyfile(path, password)
   }
 }
