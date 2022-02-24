@@ -6,6 +6,13 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
+### [0.0.39](https://github.com/forta-protocol/forta-agent-sdk/commit/3da4e24f7e22a2adb6a66643a2c226ac070849b3)
+
+- Added `keyfilePassword` config field for CI/CD pipelines
+- Set default `ipfsGatewayUrl` to https://ipfs.forta.network
+- Updated `getJsonRpcUrl` to not throw error when running unit tests
+- Updated agent image build process to always target amd64 architecture
+
 ### [0.0.38](https://github.com/forta-protocol/forta-agent-sdk/commit/dfac04e1efce7da90986e2f943c08da572d52c67)
 
 - Added `description` field to agent manifest from package.json
