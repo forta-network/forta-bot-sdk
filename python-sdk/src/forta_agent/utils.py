@@ -35,11 +35,13 @@ def get_json_rpc_url():
         return f'http://{os.environ["JSON_RPC_HOST"]}{":"+os.environ["JSON_RPC_PORT"] if "JSON_RPC_PORT" in os.environ else ""}'
 
     config = get_forta_config()
+    if os.environ.get('PYTHON_ENV') == "test":  # dont throw errors when running tests
+        return config.get("jsonRpcUrl")
     if "jsonRpcUrl" not in config:
         raise Exception("no jsonRpcUrl found")
     if not str(config.get("jsonRpcUrl")).startswith("http"):
         raise Exception("jsonRpcUrl must begin with http(s)")
-    return config["jsonRpcUrl"]
+    return config.get("jsonRpcUrl")
 
 
 def create_block_event(dict):
