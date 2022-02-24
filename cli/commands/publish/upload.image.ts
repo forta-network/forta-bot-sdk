@@ -1,6 +1,6 @@
 import shelljs from "shelljs"
 import prompts from "prompts"
-import { assertExists, assertIsNonEmptyString, assertShellResult, isAppleM1 } from "../../utils"
+import { assertExists, assertIsNonEmptyString, assertShellResult } from "../../utils"
 
 // uploads agent image to repository and returns image reference
 export type UploadImage = () => Promise<string>
@@ -28,11 +28,7 @@ export default function provideUploadImage(
     // build the agent image
     console.log('building agent image...')
     const containerTag = `${agentName}-intermediate`
-    let buildCommand = `docker build --tag ${containerTag} .`
-    if (isAppleM1()) {
-      // TODO should this just be the default build command?
-      buildCommand = `docker buildx build --platform linux/amd64 --tag ${containerTag} .`
-    }
+    let buildCommand = `docker buildx build --platform linux/amd64 --tag ${containerTag} .`
     const buildResult = shell.exec(buildCommand)
     assertShellResult(buildResult, 'error building agent image')
 
