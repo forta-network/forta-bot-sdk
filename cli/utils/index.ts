@@ -35,10 +35,6 @@ export const assertShellResult = (result: ShellString, errMsg: string) => {
   }
 }
 
-export const isAppleM1 = () => {
-  return os.cpus().some(cpu => cpu.model.includes("Apple M1"))
-}
-
 export const keccak256 = (str: string) => {
   const hash = new Keccak(256)
   hash.update(str)

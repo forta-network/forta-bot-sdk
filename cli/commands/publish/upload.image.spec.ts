@@ -1,4 +1,3 @@
-import { isAppleM1 } from "../../utils"
 import provideUploadImage, { UploadImage } from "./upload.image"
 
 describe("uploadImage", () => {
@@ -55,11 +54,7 @@ describe("uploadImage", () => {
     }
 
     expect(mockShell.exec).toHaveBeenCalledTimes(2)
-    if (isAppleM1()) {
-      expect(mockShell.exec).toHaveBeenNthCalledWith(2, `docker buildx build --platform linux/amd64 --tag ${mockContainerTag} .`)
-    } else {
-      expect(mockShell.exec).toHaveBeenNthCalledWith(2, `docker build --tag ${mockContainerTag} .`)
-    }
+    expect(mockShell.exec).toHaveBeenNthCalledWith(2, `docker buildx build --platform linux/amd64 --tag ${mockContainerTag} .`)
   })
 
   it("throws error if unable to tag image", async () => {
