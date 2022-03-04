@@ -34,7 +34,6 @@ import provideGetCredentials from './utils/get.credentials'
 import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
 import { provideGetPythonAgentHandlers } from './utils/get.python.agent.handlers'
-import { CommandName } from '.'
 import provideAddToIpfs from './utils/add.to.ipfs'
 import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
 import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transaction'
@@ -46,7 +45,7 @@ import provideGetBlockWithTransactions from './utils/get.block.with.transactions
 import provideGetTransactionReceipt from './utils/get.transaction.receipt'
 import provideGetKeyfile from './utils/get.keyfile'
 
-export default function configureContainer(commandName: CommandName, cliArgs: any) {
+export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
   const bindings = {
@@ -62,12 +61,12 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     setInterval: asValue(setInterval),
     filesystem: asValue(fs),
     dynamicImport: asValue((path: string) => import(path)),
-    commandName: asValue(commandName),
+    cliCommandName: asValue<string>(args.cliCommandName),
     cliVersion: asFunction(() => {
       try {
         // in the distributed npm package, the package.json will be 2 levels above this file
         const packageJsonPath = join(__dirname, "..", "..", "package.json")
-        const packageJson =  getJsonFile(packageJsonPath)
+        const packageJson = getJsonFile(packageJsonPath)
         return packageJson.version
       } catch (e) {
         throw new Error(`unable to parse cli package.json: ${e.message}`)
@@ -75,12 +74,14 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     }).singleton(),
     cache: asFunction((fortaKeystore: string) => flatCache.load('cli-cache', fortaKeystore)).singleton(),
 
+    args: asValue(args),
+    contextPath: asValue(args.contextPath || process.cwd()),// the directory containing the agent's package.json
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     getFortaConfig: asFunction(provideGetFortaConfig),
     fortaConfig: asFunction((getFortaConfig: GetFortaConfig) => getFortaConfig()).singleton(),
     configFilename: asValue("forta.config.json"),
     localConfigFilename: asFunction((configFilename: string) => {
-      return cliArgs.config || configFilename
+      return args.config || configFilename
     }).singleton(),
 
     init: asFunction(provideInit),
@@ -103,9 +104,9 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     uploadManifest: asFunction(provideUploadManifest),
     pushToRegistry: asFunction(providePushToRegistry),
 
-    packageJson: asFunction(() => {
+    packageJson: asFunction((contextPath: string) => {
       try {
-        const packageJsonPath = join(process.cwd(), "package.json")
+        const packageJsonPath = join(contextPath, "package.json")
         return getJsonFile(packageJsonPath)
       } catch (e) {
         throw new Error(`unable to parse package.json: ${e.message}`)
@@ -124,7 +125,7 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
       return chainIds.sort()
     }).singleton(),
     version: asFunction((packageJson: any) => packageJson.version),
-    documentation: asValue(join(process.cwd(), 'README.md')),
+    documentation: asFunction((contextPath: string) => { return join(contextPath, 'README.md') }).singleton(),
     repository: asFunction((packageJson: any) => {
       const repository = packageJson.repository
       if (typeof repository === 'string') {
@@ -140,20 +141,19 @@ export default function configureContainer(commandName: CommandName, cliArgs: an
     keyfilePassword: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.keyfilePassword
     }).singleton(),
-    agentPath: asFunction(() => {
-      const projectDir = process.cwd()
+    agentPath: asFunction((contextPath: string) => {
       // default js agent
-      let agentPath = join(projectDir, "src", "agent")
+      let agentPath = join(contextPath, "src", "agent")
       // check if typescript agent
-      if (fs.existsSync(join(projectDir, "src", "agent.ts"))) {
+      if (fs.existsSync(join(contextPath, "src", "agent.ts"))) {
         // point to compiled javascript agent in output folder
-        const tsConfigPath = join(projectDir, "tsconfig.json")
+        const tsConfigPath = join(contextPath, "tsconfig.json")
         const { compilerOptions } = jsonc.parse(fs.readFileSync(tsConfigPath, 'utf8'))
-        agentPath = join(projectDir, compilerOptions.outDir, "agent")
+        agentPath = join(contextPath, compilerOptions.outDir, "agent")
       }
       // check if python agent
-      else if (fs.existsSync(join(projectDir, "src", "agent.py"))) {
-        agentPath = join(projectDir, "src", "agent.py")
+      else if (fs.existsSync(join(contextPath, "src", "agent.py"))) {
+        agentPath = join(contextPath, "src", "agent.py")
       }
       return agentPath
     }),

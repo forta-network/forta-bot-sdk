@@ -19,7 +19,8 @@ describe("init", () => {
   const mockConfigFilename = "forta.config.json"
   const mockListKeyfiles = jest.fn()
   const mockCreateKeyfile = jest.fn()
-  const mockCliArgs = {}
+  const mockContextPath = "/path/to/agent"
+  const mockArgs = {}
   const starterProjectPath = `${join(__dirname, '..', '..', '..', 'starter-project')}`
 
   const resetMocks = () => {
@@ -36,7 +37,7 @@ describe("init", () => {
 
   beforeAll(() => {
     init = provideInit(
-      mockShell, mockPrompt, mockFilesystem, mockFortaKeystore, mockConfigFilename, mockListKeyfiles, mockCreateKeyfile)
+      mockShell, mockPrompt, mockFilesystem, mockFortaKeystore, mockConfigFilename, mockListKeyfiles, mockCreateKeyfile, mockContextPath, mockArgs)
   })
 
   beforeEach(() => resetMocks())
@@ -45,7 +46,7 @@ describe("init", () => {
     mockShell.ls.mockReturnValueOnce(['file1', 'file2'])
     mockPrompt.mockReturnValueOnce({ proceed: 'no' })
 
-    await init(mockCliArgs)
+    await init()
 
     expect(mockShell.ls).toHaveBeenCalledTimes(1)
     expect(mockPrompt).toHaveBeenCalledTimes(1)
@@ -66,7 +67,7 @@ describe("init", () => {
     mockShell.cp.mockReturnValueOnce(copyProjectResult)
 
     try {
-      await init(mockCliArgs)
+      await init()
     } catch (e) {
       expect(e.message).toEqual(`error copying starter-project folder: ${copyProjectResult.stderr}`)
     }
@@ -86,12 +87,14 @@ describe("init", () => {
       .mockReturnValueOnce(copyJsTsResult)
 
     try {
-      await init(mockCliArgs)
+      await init()
     } catch (e) {
       expect(e.message).toEqual(`error unpacking js folder: ${copyJsTsResult.stderr}`)
     }
     try {
-      await init({ ...mockCliArgs, typescript: true })
+      init = provideInit(
+        mockShell, mockPrompt, mockFilesystem, mockFortaKeystore, mockConfigFilename, mockListKeyfiles, mockCreateKeyfile, mockContextPath, { ...mockArgs, typescript: true })
+      await init()
     } catch (e) {
       expect(e.message).toEqual(`error unpacking ts folder: ${copyJsTsResult.stderr}`)
     }
@@ -113,7 +116,7 @@ describe("init", () => {
     mockShell.mv.mockReturnValueOnce(renameGitignoreResult)
 
     try {
-      await init(mockCliArgs)
+      await init()
     } catch (e) {
       expect(e.message).toEqual(`error renaming gitignore file: ${renameGitignoreResult.stderr}`)
     }
@@ -135,7 +138,7 @@ describe("init", () => {
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
 
     try {
-      await init(mockCliArgs)
+      await init()
     } catch (e) {
       expect(e.message).toEqual(`error cleaning up files: ${removeUnusedResult.stderr}`)
     }
@@ -161,7 +164,7 @@ describe("init", () => {
     mockShell.mkdir.mockReturnValueOnce(createKeystoreResult)
 
     try {
-      await init(mockCliArgs)
+      await init()
     } catch (e) {
       expect(e.message).toEqual(`error creating keystore folder ${mockFortaKeystore}: ${createKeystoreResult.stderr}`)
     }
@@ -192,7 +195,7 @@ describe("init", () => {
     mockShell.cp.mockReturnValueOnce(copyConfigResult)
 
     try {
-      await init(mockCliArgs)
+      await init()
     } catch (e) {
       expect(e.message).toEqual(`error creating ${mockConfigFilename}: ${copyConfigResult.stderr}`)
     }
@@ -222,7 +225,7 @@ describe("init", () => {
     mockPrompt.mockReturnValueOnce({ password })
     mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(true)
 
-    await init(mockCliArgs)
+    await init()
 
     expect(mockShell.ls).toHaveBeenCalledTimes(1)
     expect(mockShell.cp).toHaveBeenCalledTimes(2)
@@ -254,7 +257,7 @@ describe("init", () => {
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
     mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(true)
 
-    await init(mockCliArgs)
+    await init()
 
     expect(mockShell.ls).toHaveBeenCalledTimes(1)
     expect(mockShell.cp).toHaveBeenCalledTimes(2)

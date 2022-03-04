@@ -10,7 +10,7 @@ export default function providePush(
   assertExists(uploadImage, 'uploadImage')
   assertExists(appendToFile, 'appendToFile')
 
-  return async function push(cliArgs: any) {
+  return async function push() {
     const imageReference = await uploadImage()
 
     const logMessage = `successfully pushed image with reference ${imageReference}`

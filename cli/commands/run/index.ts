@@ -11,27 +11,31 @@ import { RunProdServer } from './server';
 
 export default function provideRun(
   container: AwilixContainer,
-  cache: Cache
+  cache: Cache,
+  args: any
 ): CommandHandler {
   assertExists(container, 'container')
   assertExists(cache, 'cache')
+  assertExists(args, 'args')
 
-  return async function run(cliArgs: any) {
+  return async function run(runtimeArgs: any = {}) {
+    args = { ...args, ...runtimeArgs }
+
     // we manually inject the run functions here (instead of through the provide function above) so that
     // we get RUNTIME errors if certain configuration is missing for that run function e.g. jsonRpcUrl
-    if (cliArgs.tx) {
+    if (args.tx) {
       const runTransaction = container.resolve<RunTransaction>("runTransaction")
-      await runTransaction(cliArgs.tx)
-    } else if (cliArgs.block) {
+      await runTransaction(args.tx)
+    } else if (args.block) {
       const runBlock = container.resolve<RunBlock>("runBlock")
-      await runBlock(cliArgs.block)
-    } else if (cliArgs.range) {
+      await runBlock(args.block)
+    } else if (args.range) {
       const runBlockRange = container.resolve<RunBlockRange>("runBlockRange")
-      await runBlockRange(cliArgs.range)
-    } else if (cliArgs.file) {
+      await runBlockRange(args.range)
+    } else if (args.file) {
       const runFile = container.resolve<RunFile>("runFile")
-      await runFile(cliArgs.file)
-    } else if (cliArgs.prod) {
+      await runFile(args.file)
+    } else if (args.prod) {
       const runProdServer = container.resolve<RunProdServer>("runProdServer")
       await runProdServer()
     } else {
@@ -39,14 +43,14 @@ export default function provideRun(
       await runLive()
     }
 
-    if (!("nocache" in cliArgs)) {
+    if (!("nocache" in args)) {
       // persist any cached blocks/txs/traces to disk
       cache.save(true) // true = dont prune keys not used in this run
     }
 
     // invoke process.exit() for short-lived functions, otherwise
     // a child process (i.e. python agent process) can prevent commandline from returning
-    let isShortLived = cliArgs.tx || cliArgs.block || cliArgs.range || cliArgs.file
+    let isShortLived = args.tx || args.block || args.range || args.file
     if (isShortLived) process.exit()
   }
 }

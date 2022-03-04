@@ -2,14 +2,14 @@
 import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
 
-export type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile"
-export type CommandHandler = (args: any) => Promise<void>
+type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile"
+export type CommandHandler = (args?: any) => Promise<void>
 
-async function executeCommand(commandName: CommandName, cliArgs: any) {
+async function executeCommand(cliCommandName: CommandName, cliArgs: any) {
   try {
-    const diContainer = configureContainer(commandName, cliArgs);
-    const command = diContainer.resolve<CommandHandler>(commandName)
-    await command(cliArgs)
+    const diContainer = configureContainer({ ...cliArgs, cliCommandName });
+    const command = diContainer.resolve<CommandHandler>(cliCommandName)
+    await command()
   } catch (e) {
     console.error(`ERROR: ${e}`)
     process.exit()

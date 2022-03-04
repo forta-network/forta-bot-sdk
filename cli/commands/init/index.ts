@@ -14,7 +14,9 @@ export default function provideInit(
   fortaKeystore: string,
   configFilename: string,
   listKeyfiles: ListKeyfiles,
-  createKeyfile: CreateKeyfile
+  createKeyfile: CreateKeyfile,
+  contextPath: string,
+  args: any
 ): CommandHandler {
   assertExists(shell, 'shell')
   assertExists(prompt, 'prompt')
@@ -23,9 +25,20 @@ export default function provideInit(
   assertIsNonEmptyString(configFilename, 'configFilename')
   assertExists(listKeyfiles, 'listKeyfiles')
   assertExists(createKeyfile, 'createKeyfile')
+  assertIsNonEmptyString(contextPath, 'contextPath')
+  assertExists(args, 'args')
 
-  return async function init(cliArgs: any) {
-    // check if current directory is empty
+  return async function init(runtimeArgs: any = {}) {
+    args = { ...args, ...runtimeArgs }
+
+    // make sure contextPath folder exists
+    if (!filesystem.existsSync(contextPath)) {
+      const createContextPathResult = shell.mkdir(contextPath)
+      assertShellResult(createContextPathResult, `error creating project folder ${contextPath}`)
+    }
+    shell.cd(contextPath)
+
+    // check if directory is empty
     const files = shell.ls()
     if (files.length > 0) {
       const { proceed } = await prompt({
@@ -39,8 +52,8 @@ export default function provideInit(
       }
     }
 
-    const isTypescript = !!cliArgs.typescript
-    const isPython = !!cliArgs.python
+    const isTypescript = !!args.typescript
+    const isPython = !!args.python
     console.log(`initializing ${isPython ? "Python" : isTypescript ? "Typescript" : "Javascript"} Forta Agent...`)
     const starterProjectPath = `${join(__dirname, '..', '..', '..', 'starter-project')}`
     // copy files from starter-project to current directory
@@ -84,6 +97,17 @@ export default function provideInit(
       await createKeyfile(password)
     } else {
       console.log(`found existing keyfile ${keyfiles[0]} in ${fortaKeystore}`)
+    }
+
+    // run npm install in the project folder to initialize dependencies
+    console.log('running npm install...')
+    const npmInstallResult = shell.exec(`npm install`)
+    assertShellResult(npmInstallResult, `error installing npm dependencies`)
+
+    if (isTypescript) {
+      console.log(`compiling Typescript...`)
+      const compileTsResult = shell.exec(`npm run build`)
+      assertShellResult(compileTsResult, `error compiling Typescript`)
     }
   } 
 }

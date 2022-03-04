@@ -16,7 +16,7 @@ export default function provideEnable(
   assertExists(agentRegistry, 'agentRegistry')
   assertIsNonEmptyString(agentId, 'agentId')
 
-  return async function enable(cliArgs: any) {
+  return async function enable() {
     const agentExists = await agentRegistry.agentExists(agentId)
     if (!agentExists) {
       throw new Error(`agent id ${agentId} does not exist`)

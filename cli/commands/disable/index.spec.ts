@@ -33,7 +33,7 @@ describe("disable", () => {
     mockAgentRegistry.agentExists.mockReturnValueOnce(false)
 
     try {
-      await disable({})
+      await disable()
     } catch (e) {
       expect(e.message).toBe(`agent id ${mockAgentId} does not exist`)
     }
@@ -46,7 +46,7 @@ describe("disable", () => {
     mockAgentRegistry.agentExists.mockReturnValueOnce(true)
     mockAgentRegistry.isEnabled.mockReturnValueOnce(false)
 
-    await disable({})
+    await disable()
 
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
@@ -63,7 +63,7 @@ describe("disable", () => {
     const mockPrivateKey = "0x4567"
     mockGetCredentials.mockReturnValueOnce({ privateKey: mockPrivateKey })
 
-    await disable({})
+    await disable()
 
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)

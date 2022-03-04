@@ -17,6 +17,7 @@
     "forta-agent": "./dist/cli/index.js"
   },
   "scripts": {
+    "build": "npm run js:build",
     "js:build": "tsc --p ./tsconfig.build.json && cp -r ./starter-project ./dist && cp ./cli/commands/init/forta.config.json ./dist/cli/commands/init/forta.config.json && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto",
     "js:publish": "npm run js:build && npm publish",
     "js:publish:local": "npm link",

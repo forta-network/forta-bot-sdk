@@ -4,6 +4,7 @@ import os from 'os'
 import { PythonShell } from 'python-shell'
 import ReadLines from 'n-readlines'
 import { BlockEvent, Finding, HandleBlock, HandleTransaction, TransactionEvent } from "../../sdk"
+import { assertIsNonEmptyString } from '.'
 
 // imports python agent handlers from file wrapped in javascript
 export type GetPythonAgentHandlers = (pythonAgentPath: string) => Promise<{ handleTransaction?: HandleTransaction, handleBlock? : HandleBlock }>
@@ -14,13 +15,17 @@ const INITIALIZE_METHOD_NAME = "initialize"
 const HANDLE_TRANSACTION_METHOD_NAME = 'handle_transaction'
 const HANDLE_BLOCK_METHOD_NAME = 'handle_block'
 
-export function provideGetPythonAgentHandlers(): GetPythonAgentHandlers {
+export function provideGetPythonAgentHandlers(
+  contextPath: string
+): GetPythonAgentHandlers {
+  assertIsNonEmptyString(contextPath, 'contextPath')
+
   return async function getPythonAgentHandlers(pythonAgentPath: string) {
     // determine whether this agent has block/transaction handlers
     const { hasInitializeHandler, hasBlockHandler, hasTransactionHandler } = hasHandlers(pythonAgentPath)
     if (!hasBlockHandler && !hasTransactionHandler) throw new Error(`no handlers found in ${pythonAgentPath}`)
 
-    const pythonHandler = getPythonHandler(pythonAgentPath)
+    const pythonHandler = getPythonHandler(pythonAgentPath, contextPath)
     return {
       initialize: hasInitializeHandler ? pythonHandler : undefined,
       handleBlock: hasBlockHandler ? pythonHandler : undefined,
@@ -48,15 +53,15 @@ function hasHandlers(agentPath: string) {
   return { hasTransactionHandler, hasBlockHandler, hasInitializeHandler }
 }
 
-function getPythonHandler(agentPath: string) {
+function getPythonHandler(agentPath: string, contextPath: string) {
   // determine what the python module to import will be
-  const agentModule = agentPath.replace(`${process.cwd()}${path.sep}`, '').replace('.py', '').replace(path.sep, '.')
+  const agentModule = agentPath.replace(`${contextPath}${path.sep}`, '').replace('.py', '').replace(path.sep, '.')
   
   // write a wrapper script to invoke the agent handlers
   // WARNING! BE CAREFUL OF INDENTATION HERE
   const pythonWrapperScript = `
 import sys
-sys.path.append('${process.cwd()}')
+sys.path.append('${contextPath}')
 import json
 from forta_agent import BlockEvent, TransactionEvent
 import ${agentModule}

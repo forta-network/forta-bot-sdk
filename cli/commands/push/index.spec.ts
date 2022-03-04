@@ -16,7 +16,7 @@ describe("push", () => {
     const mockImageRef = "someImageRef"
     mockUploadImage.mockReturnValueOnce(mockImageRef)
 
-    await push({})
+    await push()
 
     expect(mockUploadImage).toHaveBeenCalledTimes(1)
     expect(mockUploadImage).toHaveBeenCalledWith()

@@ -16,6 +16,7 @@ import {
   setPrivateFindings,
   isPrivateFindings
 } from "./utils"
+import configureContainer from '../cli/di.container';
 
 interface FortaConfig {
   agentId?: string
@@ -80,5 +81,6 @@ export {
   ethers,
   keccak256,
   setPrivateFindings,
-  isPrivateFindings
+  isPrivateFindings,
+  configureContainer
  }
