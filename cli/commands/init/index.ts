@@ -103,11 +103,5 @@ export default function provideInit(
     console.log('running npm install...')
     const npmInstallResult = shell.exec(`npm install`)
     assertShellResult(npmInstallResult, `error installing npm dependencies`)
-
-    if (isTypescript) {
-      console.log(`compiling Typescript...`)
-      const compileTsResult = shell.exec(`npm run build`)
-      assertShellResult(compileTsResult, `error compiling Typescript`)
-    }
   } 
 }
