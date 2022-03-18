@@ -85,5 +85,7 @@ export default function provideInit(
     } else {
       console.log(`found existing keyfile ${keyfiles[0]} in ${fortaKeystore}`)
     }
+
+    console.log(`You agree that your use is subject to the terms and conditions found at https://forta.org/terms-of-use/`)
   } 
 }
