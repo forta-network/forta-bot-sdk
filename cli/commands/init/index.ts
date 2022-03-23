@@ -44,7 +44,7 @@ export default function provideInit(
       const { proceed } = await prompt({
         type: 'text',
         name: 'proceed',
-        message: `The current directory is not empty and files could be overwritten. Are you sure you want to initialize? (type 'yes' to proceed)`
+        message: `The directory ${contextPath} is not empty and files could be overwritten. Are you sure you want to initialize? (type 'yes' to proceed)`
       })
       if (proceed !== 'yes') {
         console.log('aborting initialization')
@@ -54,7 +54,7 @@ export default function provideInit(
 
     const isTypescript = !!args.typescript
     const isPython = !!args.python
-    console.log(`initializing ${isPython ? "Python" : isTypescript ? "Typescript" : "Javascript"} Forta Agent...`)
+    console.log(`Initializing ${isPython ? "Python" : isTypescript ? "Typescript" : "Javascript"} Forta Agent...`)
     const starterProjectPath = `${join(__dirname, '..', '..', '..', 'starter-project')}`
     // copy files from starter-project to current directory
     const copyProjectResult = shell.cp('-r', [`${starterProjectPath}/*`, `${starterProjectPath}/.*`], '.')
@@ -78,11 +78,11 @@ export default function provideInit(
     
     // create global forta.config.json if doesnt already exist
     if (!filesystem.existsSync(join(fortaKeystore, configFilename))) {
-      console.log(`creating ${configFilename}...`)
+      console.log(`Creating ${configFilename}...`)
       const copyConfigResult = shell.cp(join(__dirname, configFilename), fortaKeystore)
       assertShellResult(copyConfigResult, `error creating ${configFilename}`)
     } else {
-      console.log(`found existing ${configFilename} in ${fortaKeystore}`)
+      console.log(`Found existing ${configFilename} in ${fortaKeystore}`)
     }
 
     // create keyfile if one doesnt already exist
@@ -96,11 +96,11 @@ export default function provideInit(
       })
       await createKeyfile(password)
     } else {
-      console.log(`found existing keyfile ${keyfiles[0]} in ${fortaKeystore}`)
+      console.log(`Found existing keyfile ${keyfiles[0]} in ${fortaKeystore}`)
     }
 
     // run npm install in the project folder to initialize dependencies
-    console.log('running npm install...')
+    console.log('Running npm install...')
     const npmInstallResult = shell.exec(`npm install`)
     assertShellResult(npmInstallResult, `error installing npm dependencies`)
     
