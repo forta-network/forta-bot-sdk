@@ -17,10 +17,6 @@ describe("run", () => {
     mockExit.mockReset()
   }
 
-  beforeAll(() => {
-    run = provideRun(mockContainer, mockCache)
-  })
-
   beforeEach(() => resetMocks())
 
   it("invokes runTransaction if --tx argument is provided", async () => {
@@ -28,7 +24,8 @@ describe("run", () => {
     const mockRunTransaction = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunTransaction)
 
-    await run(mockCliArgs)
+    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
     expect(mockContainer.resolve).toHaveBeenCalledWith("runTransaction")
@@ -44,7 +41,8 @@ describe("run", () => {
     const mockRunBlock = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunBlock)
 
-    await run(mockCliArgs)
+    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
     expect(mockContainer.resolve).toHaveBeenCalledWith("runBlock")
@@ -60,7 +58,8 @@ describe("run", () => {
     const mockRunBlockRange = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunBlockRange)
 
-    await run(mockCliArgs)
+    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
     expect(mockContainer.resolve).toHaveBeenCalledWith("runBlockRange")
@@ -76,7 +75,8 @@ describe("run", () => {
     const mockRunFile = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunFile)
 
-    await run(mockCliArgs)
+    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
     expect(mockContainer.resolve).toHaveBeenCalledWith("runFile")
@@ -92,7 +92,8 @@ describe("run", () => {
     const mockRunProdServer = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunProdServer)
 
-    await run(mockCliArgs)
+    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
     expect(mockContainer.resolve).toHaveBeenCalledWith("runProdServer")
@@ -108,7 +109,8 @@ describe("run", () => {
     const mockRunLive = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunLive)
 
-    await run(mockCliArgs)
+    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
     expect(mockContainer.resolve).toHaveBeenCalledWith("runLive")

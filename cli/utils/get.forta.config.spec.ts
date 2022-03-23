@@ -3,7 +3,6 @@ import provideGetFortaConfig, { GetFortaConfig } from "./get.forta.config"
 
 describe("getFortaConfig", () => {
   let getFortaConfig: GetFortaConfig
-  const mockCommandName = "run"
   const mockFilesystem = {
     existsSync: jest.fn()
   } as any
@@ -12,6 +11,7 @@ describe("getFortaConfig", () => {
   const mockLocalConfigFilename = "local.forta.config.json"
   const mockFortaKeystore = "/path/to/keystore"
   const mockGetJsonFile = jest.fn()
+  const mockContextPath = "/path/to/agent"
 
   const resetMocks = () => {
     mockFilesystem.existsSync.mockReset()
@@ -20,7 +20,7 @@ describe("getFortaConfig", () => {
 
   beforeAll(() => {
     getFortaConfig = provideGetFortaConfig(
-      mockCommandName, mockFilesystem, mockIsProduction, mockConfigFilename, mockLocalConfigFilename, mockFortaKeystore, mockGetJsonFile
+      mockFilesystem, mockIsProduction, mockConfigFilename, mockLocalConfigFilename, mockFortaKeystore, mockGetJsonFile, mockContextPath
     )
   })
 
@@ -51,8 +51,9 @@ describe("getFortaConfig", () => {
   })
 
   it("returns empty config if commandName is init", () => {
+    mockFilesystem.existsSync.mockReturnValue(false)
     const getFortaConfig = provideGetFortaConfig(
-      "init", mockFilesystem, mockIsProduction, mockConfigFilename, mockLocalConfigFilename, mockFortaKeystore, mockGetJsonFile
+      mockFilesystem, mockIsProduction, mockConfigFilename, mockLocalConfigFilename, mockFortaKeystore, mockGetJsonFile, mockContextPath
     )
 
     const config = getFortaConfig()
@@ -62,7 +63,7 @@ describe("getFortaConfig", () => {
 
   it("returns empty config if isProduction is true", () => {
     const getFortaConfig = provideGetFortaConfig(
-      mockCommandName, mockFilesystem, true, mockConfigFilename, mockLocalConfigFilename, mockFortaKeystore, mockGetJsonFile
+      mockFilesystem, true, mockConfigFilename, mockLocalConfigFilename, mockFortaKeystore, mockGetJsonFile, mockContextPath
     )
 
     const config = getFortaConfig()
@@ -78,7 +79,7 @@ describe("getFortaConfig", () => {
     expect(config).toStrictEqual({})
     expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(2)
     expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(1, join(mockFortaKeystore, mockConfigFilename))
-    expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(2, join(process.cwd(), mockLocalConfigFilename))
+    expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(2, join(mockContextPath, mockLocalConfigFilename))
   })
 
   it("returns combined global and local config", () => {

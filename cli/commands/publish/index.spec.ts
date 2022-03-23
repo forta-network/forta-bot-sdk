@@ -20,7 +20,7 @@ describe("publish", () => {
     const mockManifestRef = "def456"
     mockUploadManifest.mockReturnValueOnce(mockManifestRef)
 
-    await publish({})
+    await publish()
 
     expect(mockUploadImage).toHaveBeenCalledTimes(1)
     expect(mockUploadImage).toHaveBeenCalledWith()

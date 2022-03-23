@@ -9,14 +9,14 @@ export default function provideDisable(
   appendToFile: AppendToFile,
   getCredentials: GetCredentials,
   agentRegistry: AgentRegistry,
-  agentId: string
+  agentId: string,
 ): CommandHandler {
   assertExists(appendToFile, 'appendToFile')
   assertExists(getCredentials, 'getCredentials')
   assertExists(agentRegistry, 'agentRegistry')
   assertIsNonEmptyString(agentId, 'agentId')
 
-  return async function disable(cliArgs: any) {
+  return async function disable() {
     const agentExists = await agentRegistry.agentExists(agentId)
     if (!agentExists) {
       throw new Error(`agent id ${agentId} does not exist`)

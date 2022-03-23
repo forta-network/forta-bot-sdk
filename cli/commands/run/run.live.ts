@@ -1,44 +1,40 @@
-import { providers } from "ethers"
-import { assertExists } from '../../utils';
-import { RunHandlersOnBlock } from '../../utils/run.handlers.on.block';
+import { providers } from "ethers";
+import { assertExists } from "../../utils";
+import { RunHandlersOnBlock } from "../../utils/run.handlers.on.block";
 
 // runs agent handlers against live blockchain data
-export type RunLive = () => Promise<void>
+export type RunLive = () => Promise<void>;
 
 export function provideRunLive(
-  ethersProvider: providers.JsonRpcProvider, 
-  runHandlersOnBlock: RunHandlersOnBlock,
-  setInterval: (callback: any, ms: number) => NodeJS.Timeout
+  ethersProvider: providers.JsonRpcProvider,
+  runHandlersOnBlock: RunHandlersOnBlock
 ): RunLive {
-  assertExists(ethersProvider, 'ethersProvider')
-  assertExists(runHandlersOnBlock, 'runHandlersOnBlock')
-  assertExists(setInterval, 'setInterval')
+  assertExists(ethersProvider, "ethersProvider");
+  assertExists(runHandlersOnBlock, "runHandlersOnBlock");
 
   return async function runLive() {
-    console.log('listening for blockchain data...')
+    console.log("listening for blockchain data...");
+    let currBlockNumber;
 
-    // process the latest block
-    let latestBlockNumber = await ethersProvider.getBlockNumber()
-    await runHandlersOnBlock(latestBlockNumber)
+    // poll for latest blocks
+    while (true) {
+      const latestBlockNumber = await ethersProvider.getBlockNumber();
 
-    let isProcessing = false
+      // if no new blocks
+      if (latestBlockNumber == currBlockNumber) {
+        // wait for a bit
+        await new Promise((resolve) => setTimeout(resolve, 15000));
+      } else {
+        if (currBlockNumber == undefined) {
+          currBlockNumber = latestBlockNumber;
+        }
 
-    // poll for the latest block every 15s and process each
-    setInterval(async () => {
-      // if a previous iteration is running, just update the latestBlockNumber so it will get processed
-      if (isProcessing) {
-        latestBlockNumber = await ethersProvider.getBlockNumber()
-        return
+        // process the new blocks
+        while (currBlockNumber <= latestBlockNumber) {
+          await runHandlersOnBlock(currBlockNumber);
+          currBlockNumber++;
+        }
       }
-
-      isProcessing = true
-      let currBlockNumber = latestBlockNumber
-      latestBlockNumber = await ethersProvider.getBlockNumber()
-      while (currBlockNumber < latestBlockNumber) {
-        currBlockNumber++
-        await runHandlersOnBlock(currBlockNumber)
-      }
-      isProcessing = false
-    }, 15000)
-  }
+    }
+  };
 }

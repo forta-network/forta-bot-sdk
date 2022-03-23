@@ -16,7 +16,7 @@ describe("keyfile", () => {
     mockGetKeyfile.mockReturnValueOnce({ path: mockPath })
     mockGetJsonFile.mockReturnValueOnce({ address: mockAddress })
 
-    await keyfile({})
+    await keyfile()
 
     expect(mockGetKeyfile).toHaveBeenCalledTimes(1)
     expect(mockGetKeyfile).toHaveBeenCalledWith()

@@ -16,6 +16,15 @@ import {
   setPrivateFindings,
   isPrivateFindings
 } from "./utils"
+import awilixConfigureContainer from '../cli/di.container';
+
+interface DiContainer {
+  resolve<T>(key: string): T
+}
+type ConfigureContainer = (args: object) => DiContainer
+const configureContainer: ConfigureContainer = (args: object = {}) => {
+  return awilixConfigureContainer(args)
+}
 
 interface FortaConfig {
   agentId?: string
@@ -86,5 +95,6 @@ export {
   ethers,
   keccak256,
   setPrivateFindings,
-  isPrivateFindings
+  isPrivateFindings,
+  configureContainer
  }

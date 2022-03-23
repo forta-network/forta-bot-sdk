@@ -6,29 +6,34 @@ import { assertExists, assertIsNonEmptyString, GetJsonFile } from "."
 export type GetFortaConfig = () => FortaConfig
 
 export default function provideGetFortaConfig(
-  commandName: string,
   filesystem: typeof fs,
   isProduction: boolean,
   configFilename: string,
   localConfigFilename: string,
   fortaKeystore: string,
-  getJsonFile: GetJsonFile
+  getJsonFile: GetJsonFile,
+  contextPath: string
 ): GetFortaConfig {
-  assertIsNonEmptyString(commandName, 'commandName')
   assertExists(filesystem, 'filesystem')
   assertIsNonEmptyString(configFilename, 'configFilename')
   assertIsNonEmptyString(localConfigFilename, 'localConfigFilename')
   assertIsNonEmptyString(fortaKeystore, 'fortaKeystore')
   assertExists(getJsonFile, 'getJsonFile')
+  assertIsNonEmptyString(contextPath, 'contextPath')
 
   return function getFortaConfig() {
     let config = {}
+    const globalConfigPath = join(fortaKeystore, configFilename)
+    const globalConfigExists = filesystem.existsSync(globalConfigPath)
+    const localConfigPath = join(contextPath, localConfigFilename)
+    const localConfigExists = filesystem.existsSync(localConfigPath)
+    const noConfigExists = !globalConfigExists && !localConfigExists
+
     // config file will not exist when running "init" or when running in production
-    if (commandName === "init" || isProduction) return config
+    if (noConfigExists || isProduction) return config
     
     // try to read from global config file
-    const globalConfigPath = join(fortaKeystore, configFilename)
-    if (filesystem.existsSync(globalConfigPath)) {
+    if (globalConfigExists) {
       try {
         config = Object.assign(config, getJsonFile(globalConfigPath))
       } catch (e) {
@@ -37,8 +42,7 @@ export default function provideGetFortaConfig(
     }
   
     // try to read from local (project-specific) config file
-    const localConfigPath = join(process.cwd(), localConfigFilename)
-    if (filesystem.existsSync(localConfigPath)) {
+    if (localConfigExists) {
       try {
         config = Object.assign(config, getJsonFile(localConfigPath))
       } catch (e) {

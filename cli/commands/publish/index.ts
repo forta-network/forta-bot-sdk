@@ -16,7 +16,7 @@ export default function providePublish(
   assertExists(uploadManifest, 'uploadManifest')
   assertExists(pushToRegistry, 'pushToRegistry')
 
-  return async function publish(cliArgs: any) {
+  return async function publish() {
     const imageReference = await uploadImage()
     const { privateKey } = await getCredentials()
     const manifestReference = await uploadManifest(imageReference, privateKey)
