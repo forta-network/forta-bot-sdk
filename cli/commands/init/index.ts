@@ -103,5 +103,7 @@ export default function provideInit(
     console.log('running npm install...')
     const npmInstallResult = shell.exec(`npm install`)
     assertShellResult(npmInstallResult, `error installing npm dependencies`)
+    
+    console.log(`You agree that your use is subject to the terms and conditions found at https://forta.org/terms-of-use/`)
   } 
 }

@@ -6,22 +6,27 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
+### 0.0.40
+
+- Fix Python SDK support for new chains
+- Add terms of use prompt to CLI `init` command
+- Update starter project Dockerfile to include line to enable logging
 ### [0.0.39](https://github.com/forta-protocol/forta-agent-sdk/commit/3da4e24f7e22a2adb6a66643a2c226ac070849b3)
 
-- Added `keyfilePassword` config field for CI/CD pipelines
+- Add `keyfilePassword` config field for CI/CD pipelines
 - Set default `ipfsGatewayUrl` to https://ipfs.forta.network
-- Updated `getJsonRpcUrl` to not throw error when running unit tests
-- Updated agent image build process to always target amd64 architecture
+- Update `getJsonRpcUrl` to not throw error when running unit tests
+- Update agent image build process to always target amd64 architecture
 
 ### [0.0.38](https://github.com/forta-protocol/forta-agent-sdk/commit/dfac04e1efce7da90986e2f943c08da572d52c67)
 
-- Added `description` field to agent manifest from package.json
+- Add `description` field to agent manifest from package.json
 
 ### [0.0.37](https://github.com/forta-protocol/forta-agent-sdk/commit/72ff4ef56583b0980fa4fcd02bdfd2ff9247772c)
 
-- Added support for specifying multiple addresses in `filterLog` and `filterFunction` commands
-- Added `--nocache` option to `forta-agent run` command to disable writing to cache
-- Fixed `forta-agent run` command to process blocks sequentially when listening for realtime data
+- Add support for specifying multiple addresses in `filterLog` and `filterFunction` commands
+- Add `--nocache` option to `forta-agent run` command to disable writing to cache
+- Fix `forta-agent run` command to process blocks sequentially when listening for realtime data
 
 ### [0.0.36](https://github.com/forta-protocol/forta-agent-sdk/commit/fd7e401de3a2de1cbd3e7784a849cdfb2ddbd9da)
 
