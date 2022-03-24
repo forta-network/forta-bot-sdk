@@ -6,11 +6,18 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
-### 0.0.40
+### 0.0.41
+
+- Set default `jsonRpcUrl` to https://cloudflare-eth.com
+- Expose CLI functionality using `configureContainer` method
+- Update CLI `init` command to also run `npm install`
+
+### [0.0.40](https://github.com/forta-protocol/forta-agent-sdk/commit/a1b5e9562706c9034f887b1d8594ec374abf74f9)
 
 - Fix Python SDK support for new chains
 - Add terms of use prompt to CLI `init` command
 - Update starter project Dockerfile to include line to enable logging
+
 ### [0.0.39](https://github.com/forta-protocol/forta-agent-sdk/commit/3da4e24f7e22a2adb6a66643a2c226ac070849b3)
 
 - Add `keyfilePassword` config field for CI/CD pipelines
