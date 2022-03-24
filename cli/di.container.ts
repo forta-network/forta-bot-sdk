@@ -44,6 +44,9 @@ import provideGetNetworkId from './utils/get.network.id'
 import provideGetBlockWithTransactions from './utils/get.block.with.transactions'
 import provideGetTransactionReceipt from './utils/get.transaction.receipt'
 import provideGetKeyfile from './utils/get.keyfile'
+import provideInitKeystore from './utils/init.keystore'
+import provideInitKeyfile from './utils/init.keyfile'
+import provideInitConfig from './utils/init.config'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -171,6 +174,9 @@ export default function configureContainer(args: any = {}) {
     listKeyfiles: asFunction(provideListKeyfiles),
     addToIpfs: asFunction(provideAddToIpfs),
     appendToFile: asFunction(provideAppendToFile),
+    initKeystore: asFunction(provideInitKeystore),
+    initKeyfile: asFunction(provideInitKeyfile),
+    initConfig: asFunction(provideInitConfig),
 
     getNetworkId: asFunction(provideGetNetworkId),
     getBlockWithTransactions: asFunction(provideGetBlockWithTransactions),
