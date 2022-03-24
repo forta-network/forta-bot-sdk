@@ -20,7 +20,7 @@ export default function provideInitKeystore(
       const createKeystoreResult = shell.mkdir(fortaKeystore);
       assertShellResult(
         createKeystoreResult,
-        `error creating keystore folder ${fortaKeystore}`
+        `Error creating keystore folder ${fortaKeystore}`
       );
     }
   };

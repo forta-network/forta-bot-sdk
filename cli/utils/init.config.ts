@@ -21,10 +21,10 @@ export default function provideInitConfig(
     if (!filesystem.existsSync(join(fortaKeystore, configFilename))) {
       console.log(`Creating ${configFilename}...`);
       const copyConfigResult = shell.cp(
-        join(__dirname, configFilename),
+        join(__dirname, "..", "commands", "init", configFilename),
         fortaKeystore
       );
-      assertShellResult(copyConfigResult, `error creating ${configFilename}`);
+      assertShellResult(copyConfigResult, `Error creating ${configFilename}`);
     } else {
       console.log(`Found existing ${configFilename} in ${fortaKeystore}`);
     }
