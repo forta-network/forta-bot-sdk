@@ -213,18 +213,17 @@ export default function configureContainer(args: any = {}) {
     agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       const url = fortaConfig.agentRegistryJsonRpcUrl || "https://polygon-rpc.com/"
       if (!url.startsWith("http")) {
-        throw new Error(`agentRegistryJsonRpcUrl must begin with http or https`)
+        throw new Error(`agentRegistryJsonRpcUrl must begin with http(s)`)
       }
       return url
     }),
 
     jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
-      if (!fortaConfig.jsonRpcUrl) {
-        throw new Error(`no jsonRpcUrl provided in config`)
-      } else if (!fortaConfig.jsonRpcUrl.startsWith("http")) {
-        throw new Error(`jsonRpcUrl must begin with http or https`)
+      const jsonRpcUrl = fortaConfig.jsonRpcUrl || "https://cloudflare-eth.com/"
+      if (!jsonRpcUrl.startsWith("http")) {
+        throw new Error(`jsonRpcUrl must begin with http(s)`)
       }
-      return fortaConfig.jsonRpcUrl
+      return jsonRpcUrl
     }),
     ethersProvider: asFunction((jsonRpcUrl: string) =>  new ethers.providers.JsonRpcProvider(jsonRpcUrl)).singleton(),
     ethersAgentRegistryProvider: asFunction((agentRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(agentRegistryJsonRpcUrl)).singleton(),

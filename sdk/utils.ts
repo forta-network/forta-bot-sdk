@@ -43,9 +43,8 @@ export const getJsonRpcUrl = () => {
   }
   
   // else, use the rpc url from forta.config.json
-  const { jsonRpcUrl } = getFortaConfig()
-  if (process.env.NODE_ENV === "test") return jsonRpcUrl // dont throw errors when running tests
-  if (!jsonRpcUrl) throw new Error('no jsonRpcUrl found')
+  let { jsonRpcUrl } = getFortaConfig()
+  if (!jsonRpcUrl) return "https://cloudflare-eth.com/"
   if (!jsonRpcUrl.startsWith("http")) throw new Error('jsonRpcUrl must begin with http(s)')
   return jsonRpcUrl
 }
