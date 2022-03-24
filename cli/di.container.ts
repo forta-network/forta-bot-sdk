@@ -73,6 +73,7 @@ export default function configureContainer(args: any = {}) {
       }
     }).singleton(),
     cache: asFunction((fortaKeystore: string) => flatCache.load('cli-cache', fortaKeystore)).singleton(),
+    sleep: asValue((durationMs: number) => new Promise((resolve) => setTimeout(resolve, durationMs))),
 
     args: asValue(args),
     contextPath: asValue(args.contextPath || process.cwd()),// the directory containing the agent's package.json
