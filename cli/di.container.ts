@@ -213,7 +213,7 @@ export default function configureContainer(args: any = {}) {
     agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       const url = fortaConfig.agentRegistryJsonRpcUrl || "https://polygon-rpc.com/"
       if (!url.startsWith("http")) {
-        throw new Error(`agentRegistryJsonRpcUrl must begin with http or https`)
+        throw new Error(`agentRegistryJsonRpcUrl must begin with http(s)`)
       }
       return url
     }),
@@ -221,7 +221,7 @@ export default function configureContainer(args: any = {}) {
     jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       const jsonRpcUrl = fortaConfig.jsonRpcUrl || "https://cloudflare-eth.com/"
       if (!jsonRpcUrl.startsWith("http")) {
-        throw new Error(`jsonRpcUrl must begin with http or https`)
+        throw new Error(`jsonRpcUrl must begin with http(s)`)
       }
       return jsonRpcUrl
     }),
