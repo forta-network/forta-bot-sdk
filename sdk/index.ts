@@ -21,7 +21,7 @@ import awilixConfigureContainer from '../cli/di.container';
 interface DiContainer {
   resolve<T>(key: string): T
 }
-type ConfigureContainer = (args: object) => DiContainer
+type ConfigureContainer = (args?: object) => DiContainer
 const configureContainer: ConfigureContainer = (args: object = {}) => {
   return awilixConfigureContainer(args)
 }
