@@ -3,33 +3,34 @@ import { assertExists } from "../../utils";
 import { RunHandlersOnBlock } from "../../utils/run.handlers.on.block";
 
 // runs agent handlers against live blockchain data
-export type RunLive = () => Promise<void>;
+export type RunLive = (shouldContinuePolling?: Function) => Promise<void>;
 
 export function provideRunLive(
   ethersProvider: providers.JsonRpcProvider,
-  runHandlersOnBlock: RunHandlersOnBlock
+  runHandlersOnBlock: RunHandlersOnBlock,
+  sleep: (durationMs: number) => Promise<void>
 ): RunLive {
   assertExists(ethersProvider, "ethersProvider");
   assertExists(runHandlersOnBlock, "runHandlersOnBlock");
+  assertExists(sleep, "sleep");
 
-  return async function runLive() {
+  return async function runLive(shouldContinuePolling: Function = () => true) {
     console.log("listening for blockchain data...");
     let currBlockNumber;
 
     // poll for latest blocks
-    while (true) {
+    while (shouldContinuePolling()) {
       const latestBlockNumber = await ethersProvider.getBlockNumber();
+      if (currBlockNumber == undefined) {
+        currBlockNumber = latestBlockNumber;
+      }
 
       // if no new blocks
-      if (latestBlockNumber == currBlockNumber) {
+      if (currBlockNumber > latestBlockNumber) {
         // wait for a bit
-        await new Promise((resolve) => setTimeout(resolve, 15000));
+        await sleep(15000);
       } else {
-        if (currBlockNumber == undefined) {
-          currBlockNumber = latestBlockNumber;
-        }
-
-        // process the new blocks
+        // process new blocks
         while (currBlockNumber <= latestBlockNumber) {
           await runHandlersOnBlock(currBlockNumber);
           currBlockNumber++;

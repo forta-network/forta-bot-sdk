@@ -7,9 +7,11 @@ describe("init", () => {
   const mockShell = {
     ls: jest.fn(),
     cp: jest.fn(),
+    cd: jest.fn(),
     mv: jest.fn(),
     rm: jest.fn(),
-    mkdir: jest.fn()
+    mkdir: jest.fn(),
+    exec: jest.fn()
   } as any
   const mockPrompt = jest.fn() as any
   const mockFilesystem = {
@@ -42,7 +44,25 @@ describe("init", () => {
 
   beforeEach(() => resetMocks())
 
+  it("throws error if unable to create contextPath folder", async () => {
+    mockFilesystem.existsSync.mockReturnValueOnce(false)
+    const mkdirResult = { code: -1, stderr: 'some shell error' }
+    mockShell.mkdir.mockReturnValueOnce(mkdirResult)
+
+    try {
+      await init()
+    } catch (e) {
+      expect(e.message).toEqual(`error creating project folder ${mockContextPath}: ${mkdirResult.stderr}`)
+    }
+
+    expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(1)
+    expect(mockFilesystem.existsSync).toHaveBeenCalledWith(mockContextPath)
+    expect(mockShell.mkdir).toHaveBeenCalledTimes(1)
+    expect(mockShell.mkdir).toHaveBeenCalledWith(mockContextPath)
+  })
+
   it("prompts user if current directory is empty and aborts if user says so", async () => {
+    mockFilesystem.existsSync.mockReturnValueOnce(true)
     mockShell.ls.mockReturnValueOnce(['file1', 'file2'])
     mockPrompt.mockReturnValueOnce({ proceed: 'no' })
 
@@ -53,7 +73,7 @@ describe("init", () => {
     expect(mockPrompt).toHaveBeenCalledWith({
       type: 'text',
       name: 'proceed',
-      message: `The current directory is not empty and files could be overwritten. Are you sure you want to initialize? (type 'yes' to proceed)`
+      message: `The directory ${mockContextPath} is not empty and files could be overwritten. Are you sure you want to initialize? (type 'yes' to proceed)`
     })
     expect(mockShell.cp).toHaveBeenCalledTimes(0)
     expect(mockShell.mv).toHaveBeenCalledTimes(0)
@@ -62,6 +82,7 @@ describe("init", () => {
   })
 
   it("throws error if unable to copy starter project directory", async () => {
+    mockFilesystem.existsSync.mockReturnValueOnce(true)
     mockShell.ls.mockReturnValue([])
     const copyProjectResult = { code: -1, stderr: 'some shell error' }
     mockShell.cp.mockReturnValueOnce(copyProjectResult)
@@ -78,6 +99,7 @@ describe("init", () => {
   })
 
   it("throws error if unable to copy files out of js/ts directory", async () => {
+    mockFilesystem.existsSync.mockReturnValueOnce(true)
     mockShell.ls.mockReturnValue([])
     const copyProjectResult = { code: 0 }
     const copyJsTsResult = { code: -1, stderr: 'some shell error' }
@@ -92,6 +114,7 @@ describe("init", () => {
       expect(e.message).toEqual(`error unpacking js folder: ${copyJsTsResult.stderr}`)
     }
     try {
+      mockFilesystem.existsSync.mockReturnValueOnce(true)
       init = provideInit(
         mockShell, mockPrompt, mockFilesystem, mockFortaKeystore, mockConfigFilename, mockListKeyfiles, mockCreateKeyfile, mockContextPath, { ...mockArgs, typescript: true })
       await init()
@@ -108,6 +131,7 @@ describe("init", () => {
   })
 
   it("throws error if unable to rename gitignore file", async () => {
+    mockFilesystem.existsSync.mockReturnValueOnce(true)
     mockShell.ls.mockReturnValue([])
     const copyProjectResult = { code: 0 }
     const copyJsTsResult = { code: 0 }
@@ -128,6 +152,7 @@ describe("init", () => {
   })
 
   it("throws error if unable to remove unused files/folders", async () => {
+    mockFilesystem.existsSync.mockReturnValueOnce(true)
     mockShell.ls.mockReturnValue([])
     const copyProjectResult = { code: 0 }
     const copyJsTsResult = { code: 0 }
@@ -159,7 +184,7 @@ describe("init", () => {
     mockShell.mv.mockReturnValueOnce(renameGitignoreResult)
     const removeUnusedResult = { code: 0 }
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
-    mockFilesystem.existsSync.mockReturnValueOnce(false)
+    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(false)
     const createKeystoreResult = { code: -1, stderr: 'some shell error'}
     mockShell.mkdir.mockReturnValueOnce(createKeystoreResult)
 
@@ -173,8 +198,8 @@ describe("init", () => {
     expect(mockShell.cp).toHaveBeenCalledTimes(2)
     expect(mockShell.mv).toHaveBeenCalledTimes(1)
     expect(mockShell.rm).toHaveBeenCalledTimes(1)
-    expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(1)
-    expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(1, mockFortaKeystore)
+    expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(2)
+    expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(2, mockFortaKeystore)
     expect(mockShell.mkdir).toHaveBeenCalledTimes(1)
     expect(mockShell.mkdir).toHaveBeenNthCalledWith(1, mockFortaKeystore)
   })
@@ -190,7 +215,7 @@ describe("init", () => {
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
     const createKeystoreResult = { code: 0 }
     mockShell.mkdir.mockReturnValueOnce(createKeystoreResult)
-    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(false)
+    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(true).mockReturnValueOnce(false)
     const copyConfigResult = { code: -1, stderr: 'some shell error'}
     mockShell.cp.mockReturnValueOnce(copyConfigResult)
 
@@ -204,10 +229,38 @@ describe("init", () => {
     expect(mockShell.cp).toHaveBeenCalledTimes(3)
     expect(mockShell.mv).toHaveBeenCalledTimes(1)
     expect(mockShell.rm).toHaveBeenCalledTimes(1)
-    expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(2)
-    expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(2, join(mockFortaKeystore, mockConfigFilename))
+    expect(mockFilesystem.existsSync).toHaveBeenCalledTimes(3)
+    expect(mockFilesystem.existsSync).toHaveBeenNthCalledWith(3, join(mockFortaKeystore, mockConfigFilename))
     expect(mockShell.mkdir).toHaveBeenCalledTimes(0)
     expect(mockShell.cp).toHaveBeenNthCalledWith(3, join(__dirname, mockConfigFilename), mockFortaKeystore)
+  })
+
+  it("throws error if unable to run npm install", async () => {
+    mockShell.ls.mockReturnValue([])
+    mockListKeyfiles.mockReturnValueOnce([])
+    const copyProjectResult = { code: 0 }
+    const copyJsTsResult = { code: 0 }
+    const copyConfigResult = { code: 0 }
+    mockShell.cp.mockReturnValueOnce(copyProjectResult).mockReturnValueOnce(copyJsTsResult).mockReturnValueOnce(copyConfigResult)
+    const renameGitignoreResult = { code: 0 }
+    mockShell.mv.mockReturnValueOnce(renameGitignoreResult)
+    const removeUnusedResult = { code: 0 }
+    mockShell.rm.mockReturnValueOnce(removeUnusedResult)
+    const password = 'some password'
+    mockPrompt.mockReturnValueOnce({ password })
+    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(true).mockReturnValueOnce(true)
+    const npmInstallResult = { code: -1, stderr: "some shell error" }
+    mockShell.exec.mockReturnValueOnce(npmInstallResult)
+
+    try {
+      await init()
+    } catch (e) {
+      expect(e.message).toEqual(`error installing npm dependencies: ${npmInstallResult.stderr}`)
+    }
+    
+
+    expect(mockShell.exec).toHaveBeenCalledTimes(1)
+    expect(mockShell.exec).toHaveBeenCalledWith(`npm install`)
   })
 
   it("prompts user for password to encrypt new keyfile if one does not exist", async () => {
@@ -223,7 +276,9 @@ describe("init", () => {
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
     const password = 'some password'
     mockPrompt.mockReturnValueOnce({ password })
-    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(true)
+    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(true).mockReturnValueOnce(true)
+    const npmInstallResult = { code: 0 }
+    mockShell.exec.mockReturnValueOnce(npmInstallResult)
 
     await init()
 
@@ -255,7 +310,9 @@ describe("init", () => {
     mockShell.mv.mockReturnValueOnce(renameGitignoreResult)
     const removeUnusedResult = { code: 0 }
     mockShell.rm.mockReturnValueOnce(removeUnusedResult)
-    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(true)
+    mockFilesystem.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(true).mockReturnValueOnce(true)
+    const npmInstallResult = { code: 0 }
+    mockShell.exec.mockReturnValueOnce(npmInstallResult)
 
     await init()
 
