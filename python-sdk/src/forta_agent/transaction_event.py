@@ -3,7 +3,7 @@ from hexbytes import HexBytes
 from .event_type import EventType
 from .network import Network
 from .transaction import Transaction
-from .receipt import Receipt
+from .receipt import Log
 from .trace import Trace
 
 
@@ -25,10 +25,12 @@ class TransactionEvent:
         self.network = Network[networkVal] if type(
             networkVal) == str else Network(networkVal)
         self.transaction = Transaction(dict.get('transaction', {}))
-        self.receipt = Receipt(dict.get('receipt', {}))
         self.traces = list(map(lambda t: Trace(t), dict.get('traces', [])))
         self.addresses = dict.get('addresses', {})
         self.block = TxEventBlock(dict.get('block', {}))
+        self.logs = list(map(lambda l: Log(l), dict.get('logs', [])))
+        self.contract_address = dict.get(
+            'contractAddress', dict.get('contract_address'))
 
     @property
     def hash(self):
@@ -43,20 +45,8 @@ class TransactionEvent:
         return self.transaction.from_
 
     @property
-    def status(self):
-        return self.receipt.status
-
-    @property
-    def gas_used(self):
-        return self.receipt.gas_used
-
-    @property
     def gas_price(self):
         return self.transaction.gas_price
-
-    @property
-    def logs(self):
-        return self.receipt.logs
 
     @property
     def timestamp(self):

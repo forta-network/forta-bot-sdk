@@ -4,7 +4,8 @@ import { GetTraceData } from "./get.trace.data";
 import { assertExists, CreateBlockEvent, CreateTransactionEvent } from ".";
 import { GetNetworkId } from "./get.network.id";
 import { GetBlockWithTransactions } from "./get.block.with.transactions";
-import { GetTransactionReceipt } from "./get.transaction.receipt";
+import { GetTransactionReceipt, JsonRpcLog } from "./get.transaction.receipt";
+import { GetLogsForBlock } from "./get.logs.for.block";
 
 export type RunHandlersOnBlock = (blockHashOrNumber: string | number) => Promise<void>
 
@@ -14,6 +15,7 @@ export function provideRunHandlersOnBlock(
   getBlockWithTransactions: GetBlockWithTransactions,
   getTransactionReceipt: GetTransactionReceipt,
   getTraceData: GetTraceData,
+  getLogsForBlock: GetLogsForBlock,
   createBlockEvent: CreateBlockEvent,
   createTransactionEvent: CreateTransactionEvent
 ): RunHandlersOnBlock {
@@ -22,6 +24,7 @@ export function provideRunHandlersOnBlock(
   assertExists(getBlockWithTransactions, 'getBlockWithTransactions')
   assertExists(getTransactionReceipt, 'getTransactionReceipt')
   assertExists(getTraceData, 'getTraceData')
+  assertExists(getLogsForBlock, 'getLogsForBlock')
   assertExists(createBlockEvent, 'createBlockEvent')
   assertExists(createTransactionEvent, 'createTransactionEvent')
 
@@ -44,6 +47,17 @@ export function provideRunHandlersOnBlock(
 
     if (!handleTransaction) return
     
+    // get logs for block and build map for each transaction
+    const logs = await getLogsForBlock(parseInt(block.number))
+    console.log(`block ${block.number} has ${logs.length} logs`)
+    const logMap: { [txHash: string]: JsonRpcLog[] } = {}
+    logs.forEach(log => {
+      if (!log.transactionHash) return
+      const txHash = log.transactionHash.toLowerCase()
+      if (!logMap[txHash]) logMap[txHash] = []
+      logMap[txHash].push(log)
+    })
+
     // get trace data for block and build map for each transaction
     const traces = await getTraceData(parseInt(block.number))
     const traceMap: { [txHash: string]: Trace[]} = {}
@@ -56,13 +70,8 @@ export function provideRunHandlersOnBlock(
 
     // run transaction handler on all block transactions
     for (const transaction of block.transactions) {
-      let receipt = await getTransactionReceipt(transaction.hash)
-      if (!receipt) {
-        console.log(`error fetching receipt for ${transaction.hash}`)
-        continue;
-      }
-      const txEvent = createTransactionEvent(receipt, block, networkId, traceMap[transaction.hash.toLowerCase()])
-
+      const txHash = transaction.hash.toLowerCase()
+      const txEvent = createTransactionEvent(transaction, block, networkId, traceMap[txHash], logMap[txHash])
       const findings = await handleTransaction(txEvent)
       console.log(`${findings.length} findings for transaction ${transaction.hash} ${findings}`)
     }

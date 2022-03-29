@@ -14,7 +14,8 @@ import {
   getEthersBatchProvider, 
   keccak256,
   setPrivateFindings,
-  isPrivateFindings
+  isPrivateFindings,
+  getTransactionReceipt
 } from "./utils"
 import awilixConfigureContainer from '../cli/di.container';
 
@@ -96,5 +97,6 @@ export {
   keccak256,
   setPrivateFindings,
   isPrivateFindings,
-  configureContainer
+  configureContainer,
+  getTransactionReceipt
  }

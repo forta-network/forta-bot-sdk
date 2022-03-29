@@ -6,7 +6,7 @@ import _ from 'lodash'
 import { Keccak } from 'sha3'
 import { BlockEvent, EventType, FortaConfig, Network, Trace, TransactionEvent } from '.'
 import { Transaction } from './transaction'
-import { Receipt } from './receipt'
+import { Log, Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
 import { ethers } from '.'
@@ -49,25 +49,59 @@ export const getJsonRpcUrl = () => {
   return jsonRpcUrl
 }
 
+export const getTransactionReceipt: (txHash: string) => Promise<Receipt> = async (txHash: string) => {
+  const ethersProvider = getEthersProvider()
+  const jsonReceipt = await ethersProvider.send(
+    'eth_getTransactionReceipt',
+    [txHash]
+  )
+  const receipt = {
+    blockNumber: parseInt(jsonReceipt.blockNumber),
+    blockHash: jsonReceipt.blockHash,
+    transactionIndex: parseInt(jsonReceipt.transactionIndex),
+    transactionHash: jsonReceipt.transactionHash,
+    status: jsonReceipt.status === "0x1",
+    logsBloom: jsonReceipt.logsBloom,
+    contractAddress: jsonReceipt.contractAddress ? jsonReceipt.contractAddress.toLowerCase() : null,
+    gasUsed: jsonReceipt.gasUsed,
+    cumulativeGasUsed: jsonReceipt.cumulativeGasUsed,
+    logs: jsonReceipt.logs.map((log: any) => ({
+      address: log.address.toLowerCase(),
+      topics: log.topics,
+      data: log.data,
+      logIndex: parseInt(log.logIndex),
+      blockNumber: parseInt(log.blockNumber),
+      blockHash: log.blockHash,
+      transactionIndex: parseInt(log.transactionIndex),
+      transactionHash: log.transactionHash,
+      removed: log.removed,
+    })),
+    root: jsonReceipt.root ?? '',
+  }
+  return receipt
+}
+
 // utility function for writing TransactionEvent tests
 export const createTransactionEvent = ({
   type = EventType.BLOCK,
   network = Network.MAINNET,
   transaction,
-  receipt,
   traces = [],
   addresses = {},
-  block
+  block,
+  logs = [],
+  contractAddress
 }: {
   type?: EventType,
   network?: Network,
   transaction: Transaction,
-  receipt: Receipt,
   traces?: Trace[],
   addresses?: { [key: string]: boolean },
-  block: TxEventBlock
+  block: TxEventBlock,
+  logs: Log[],
+  contractAddress: string | null
 }) => {
-  return new TransactionEvent(type, network, transaction, receipt, traces, addresses, block)
+  return new TransactionEvent(type, network, transaction, traces, addresses, block, logs, contractAddress)
 }
 
 // utility function for writing BlockEvent tests

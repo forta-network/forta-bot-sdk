@@ -1,5 +1,5 @@
 import { EventType, Network } from "./index";
-import { Receipt } from "./receipt";
+import { Log } from "./receipt";
 import { Trace } from "./trace";
 import { Transaction } from "./transaction";
 import { ethers } from ".";
@@ -21,10 +21,11 @@ export class TransactionEvent {
     readonly type: EventType,
     readonly network: Network,
     readonly transaction: Transaction,
-    readonly receipt: Receipt,
     readonly traces: Trace[] = [],
     readonly addresses: { [key: string]: boolean },
-    readonly block: TxEventBlock
+    readonly block: TxEventBlock,
+    readonly logs: Log[] = [],
+    readonly contractAddress: string | null
   ) {}
 
   get hash() {
@@ -39,20 +40,8 @@ export class TransactionEvent {
     return this.transaction.to;
   }
 
-  get status() {
-    return this.receipt.status;
-  }
-
-  get gasUsed() {
-    return this.receipt.gasUsed;
-  }
-
   get gasPrice() {
     return this.transaction.gasPrice;
-  }
-
-  get logs() {
-    return this.receipt.logs;
   }
 
   get timestamp() {
@@ -72,7 +61,7 @@ export class TransactionEvent {
     contractAddress?: string | string[]
   ): LogDescription[] {
     eventAbi = _.isArray(eventAbi) ? eventAbi : [eventAbi];
-    let logs = this.receipt.logs;
+    let logs = this.logs;
     // filter logs by contract address, if provided
     if (contractAddress) {
       contractAddress = _.isArray(contractAddress)

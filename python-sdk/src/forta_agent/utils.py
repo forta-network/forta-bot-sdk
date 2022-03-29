@@ -42,6 +42,35 @@ def get_json_rpc_url():
     return config.get("jsonRpcUrl")
 
 
+def get_transaction_receipt(tx_hash):
+    from .receipt import Receipt  # avoid circular import
+    web3_provider = get_web3_provider()
+    receipt = web3_provider.eth.get_transaction_receipt(tx_hash)
+    return Receipt({
+        "status": receipt.get("status") == 1,
+        "root": receipt.get("root"),
+        "gas_used": receipt.get("gasUsed"),
+        "cumulative_gas_used": receipt.get("cumulativeGasUsed"),
+        "logs_bloom": receipt.get("logsBloom").hex(),
+        "contract_address": None if receipt.get("contractAddress") == None else receipt.get("contractAddress").lower(),
+        "block_number": receipt.get("blockNumber"),
+        "block_hash": receipt.get("blockHash").hex(),
+        "transaction_index": receipt.get("transactionIndex"),
+        "transaction_hash": receipt.get("transactionHash").hex(),
+        "logs": list(map(lambda log: {
+            "address": log.get("address").lower(),
+            "topics": list(map(lambda topic: topic.hex(), log.get("topics", []))),
+            "data": log.get("data"),
+            "log_index": log.get("logIndex"),
+            "block_number": log.get("blockNumber"),
+            "block_hash": log.get("blockHash").hex(),
+            "transaction_index": log.get("transactionIndex"),
+            "transaction_hash": log.get("transactionHash").hex(),
+            "removed": log.get("removed")
+        }, receipt.get("logs", []))),
+    })
+
+
 def create_block_event(dict):
     from .block_event import BlockEvent  # avoid circular import
     return BlockEvent(dict)

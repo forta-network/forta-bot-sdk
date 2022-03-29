@@ -1,14 +1,15 @@
-import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import _ from 'lodash'
 import { jsonc } from 'jsonc'
 import { Keccak } from 'sha3'
 import { ShellString } from 'shelljs'
-import { BlockEvent, EventType, TransactionEvent } from "../../sdk"
+import { getContractAddress } from '@ethersproject/address'
+
+import { BlockEvent, EventType, Log, TransactionEvent } from "../../sdk"
 import { Trace } from '../../sdk/trace'
-import { JsonRpcBlock } from './get.block.with.transactions'
-import { JsonRpcTransactionReceipt } from './get.transaction.receipt'
+import { JsonRpcBlock, JsonRpcTransaction } from './get.block.with.transactions'
+import { JsonRpcLog } from './get.transaction.receipt'
 
 export type GetJsonFile = (filePath: string) => any
 export const getJsonFile: GetJsonFile = (filePath: string) => {
@@ -45,6 +46,10 @@ export const formatAddress = (address: string) => {
   return _.isString(address) ? address.toLowerCase() : address
 }
 
+export const isZeroAddress = (address: string | null) => {
+  return "0x0000000000000000000000000000000000000000" === address
+}
+
 // creates a Forta BlockEvent from a json-rpc block object
 export type CreateBlockEvent = (block: JsonRpcBlock, networkId: number) => BlockEvent
 export const createBlockEvent: CreateBlockEvent = (block: JsonRpcBlock, networkId: number) => {
@@ -74,14 +79,14 @@ export const createBlockEvent: CreateBlockEvent = (block: JsonRpcBlock, networkI
 }
 
 // creates a Forta TransactionEvent from a json-rpc transaction receipt and block object
-export type CreateTransactionEvent = (receipt: JsonRpcTransactionReceipt, block: JsonRpcBlock, networkId: number, traces: Trace[]) => TransactionEvent
+export type CreateTransactionEvent = (transaction: JsonRpcTransaction, block: JsonRpcBlock, networkId: number, traces: Trace[], logs: JsonRpcLog[]) => TransactionEvent
 export const createTransactionEvent: CreateTransactionEvent = (
-  receipt: JsonRpcTransactionReceipt, 
+  transaction: JsonRpcTransaction, 
   block: JsonRpcBlock, 
   networkId: number, 
-  traces: Trace[] = []
+  traces: Trace[] = [],
+  logs: JsonRpcLog[] = []
 ) => {
-  const transaction = block.transactions.find(tx => tx.hash === receipt.transactionHash)!
   const tx = {
     hash: transaction.hash,
     from: formatAddress(transaction.from),
@@ -101,31 +106,7 @@ export const createTransactionEvent: CreateTransactionEvent = (
   if (tx.to) {
     addresses[tx.to] = true;
   }
-
-  const rcpt = {
-    blockNumber: parseInt(receipt.blockNumber),
-    blockHash: receipt.blockHash,
-    transactionIndex: parseInt(receipt.transactionIndex),
-    transactionHash: receipt.transactionHash,
-    status: receipt.status === "0x1",
-    logsBloom: receipt.logsBloom,
-    contractAddress: receipt.contractAddress ? formatAddress(receipt.contractAddress) : null,
-    gasUsed: receipt.gasUsed,
-    cumulativeGasUsed: receipt.cumulativeGasUsed,
-    logs: receipt.logs.map(log => ({
-      address: formatAddress(log.address),
-      topics: log.topics,
-      data: log.data,
-      logIndex: parseInt(log.logIndex),
-      blockNumber: parseInt(log.blockNumber),
-      blockHash: log.blockHash,
-      transactionIndex: parseInt(log.transactionIndex),
-      transactionHash: log.transactionHash,
-      removed: log.removed,
-    })),
-    root: receipt.root ?? '',
-  }
-  rcpt.logs.forEach(log => addresses[log.address] = true)
+  logs.forEach(log => addresses[log.address] = true)
 
   const blok = {
     hash: block.hash,
@@ -169,13 +150,31 @@ export const createTransactionEvent: CreateTransactionEvent = (
     })
   })
 
+  const lgs = logs.map(log => ({
+    address: formatAddress(log.address),
+    topics: log.topics,
+    data: log.data,
+    logIndex: parseInt(log.logIndex),
+    blockNumber: parseInt(log.blockNumber),
+    blockHash: log.blockHash,
+    transactionIndex: parseInt(log.transactionIndex),
+    transactionHash: log.transactionHash,
+    removed: log.removed,
+  }))
+
+  let contractAddress = null
+  if (isZeroAddress(transaction.to)) {
+    contractAddress = formatAddress(getContractAddress({ from: transaction.from, nonce: transaction.nonce }))
+  }
+
   return new TransactionEvent(
     EventType.BLOCK,
     networkId,
     tx,
-    rcpt,
     trcs,
     addresses,
-    blok
+    blok,
+    lgs,
+    contractAddress
   )
 }

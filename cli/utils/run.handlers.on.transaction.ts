@@ -31,8 +31,9 @@ export function provideRunHandlersOnTransaction(
     const networkId = await getNetworkId()
     const receipt = await getTransactionReceipt(txHash)
     const block = await getBlockWithTransactions(parseInt(receipt.blockNumber))
+    const transaction = block.transactions.find(tx => tx.hash === receipt.transactionHash)!
     const traces = await getTraceData(receipt.transactionHash)
-    const txEvent = createTransactionEvent(receipt, block, networkId, traces)
+    const txEvent = createTransactionEvent(transaction, block, networkId, traces, receipt.logs)
 
     const findings = await handleTransaction(txEvent)
     console.log(`${findings.length} findings for transaction ${txHash} ${findings}`)

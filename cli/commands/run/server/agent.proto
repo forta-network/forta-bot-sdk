@@ -221,9 +221,12 @@ message TransactionEvent {
 
   EventType type = 1;
   EthTransaction transaction = 2;
-  EthReceipt receipt = 3;
+  EthReceipt receipt = 3 [deprecated=true];
   Network network = 4;
   repeated Trace traces = 5;
   map<string, bool> addresses = 6;
   EthBlock block = 7;
+  repeated Log logs = 8;
+  bool isContractDeployment = 9;
+  string contractAddress = 10;
 }
