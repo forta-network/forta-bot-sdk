@@ -106,7 +106,6 @@ export const createTransactionEvent: CreateTransactionEvent = (
   if (tx.to) {
     addresses[tx.to] = true;
   }
-  logs.forEach(log => addresses[log.address] = true)
 
   const blok = {
     hash: block.hash,
@@ -161,6 +160,7 @@ export const createTransactionEvent: CreateTransactionEvent = (
     transactionHash: log.transactionHash,
     removed: log.removed,
   }))
+  lgs.forEach(log => addresses[log.address] = true)
 
   let contractAddress = null
   if (isZeroAddress(transaction.to)) {

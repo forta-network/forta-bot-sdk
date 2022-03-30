@@ -34,10 +34,14 @@ describe("runHandlersOnTransaction", () => {
     mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
     const mockNetworkId = 1
     mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
-    const mockReceipt = { blockNumber: 123, transactionHash: mockTxHash }
+    const mockLog = { some: 'log' }
+    const mockReceipt = { blockNumber: 123, transactionHash: mockTxHash, logs: [mockLog] }
     mockGetTransactionReceipt.mockReturnValueOnce(mockReceipt)
-    const mockBlock = { hash: '0xabc' }
+    const mockTransaction = { hash: mockTxHash }
+    const mockBlock = { hash: '0xabc', transactions: [mockTransaction] }
     mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
+    const mockTrace = { some: 'trace' }
+    mockGetTraceData.mockReturnValueOnce([mockTrace])
     const mockTxEvent = {}
     mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
 
@@ -54,7 +58,7 @@ describe("runHandlersOnTransaction", () => {
     expect(mockGetTraceData).toHaveBeenCalledTimes(1)
     expect(mockGetTraceData).toHaveBeenCalledWith(mockReceipt.transactionHash)
     expect(mockCreateTransactionEvent).toHaveBeenCalledTimes(1)
-    expect(mockCreateTransactionEvent).toHaveBeenCalledWith(mockReceipt, mockBlock, mockNetworkId, [])
+    expect(mockCreateTransactionEvent).toHaveBeenCalledWith(mockTransaction, mockBlock, mockNetworkId, [mockTrace], [mockLog])
     expect(mockHandleTransaction).toHaveBeenCalledTimes(1)
     expect(mockHandleTransaction).toHaveBeenCalledWith(mockTxEvent)
   })

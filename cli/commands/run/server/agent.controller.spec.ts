@@ -68,29 +68,17 @@ describe("AgentController", () => {
           "v": "0x0",
           "value": "400000000000000000"
         },
-        receipt: {
-          "root": "123abc",
-          "blockHash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
+        logs: [{
+          "address": "0xB9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
+          "topics": ["topic1"],
+          "data": "0xdata",
+          "logIndex": "1",
           "blockNumber": "13309526",
-          "contractAddress": "0x351d579AC59a1ea76afdedf567becc3518ee5deb",
-          "cumulativeGasUsed": "634772",
-          "gasUsed": "634772",
-          "logs": [{
-            "address": "0xB9f7bc0Ed37b821A34bFD508059c75460d6EFB37",
-            "topics": ["topic1"],
-            "data": "0xdata",
-            "logIndex": "1",
-            "blockNumber": "13309526",
-            "blockHash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
-            "transactionIndex": "1",
-            "transactionHash": "0xfadb14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147fb28",
-            "removed": false
-          }],
-          "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-          "status": "0x0",
+          "blockHash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
+          "transactionIndex": "1",
           "transactionHash": "0xfadb14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147fb28",
-          "transactionIndex": "0",
-        },
+          "removed": false
+        }],
         traces: [{
           "blockHash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
           "blockNumber": 13309526,
@@ -347,14 +335,8 @@ describe("AgentController", () => {
         s: grpcTx.s,
         v: grpcTx.v,
       })
-      const grpcReceipt = mockTxRequest.request.event.receipt
-      expect(txEvent.receipt).toStrictEqual({
-        status: false,
-        root: grpcReceipt.root,
-        gasUsed: grpcReceipt.gasUsed,
-        cumulativeGasUsed: grpcReceipt.cumulativeGasUsed,
-        logsBloom: grpcReceipt.logsBloom,
-        logs: grpcReceipt.logs.map((log) => ({
+      const grpcLogs = mockTxRequest.request.event.logs
+      expect(txEvent.logs).toStrictEqual(grpcLogs.map(log => ({
           address: formatAddress(log.address),
           topics: log.topics,
           data: log.data,
@@ -364,13 +346,8 @@ describe("AgentController", () => {
           transactionIndex: parseInt(log.transactionIndex),
           transactionHash: log.transactionHash,
           removed: log.removed,
-        })),
-        contractAddress: formatAddress(grpcReceipt.contractAddress),
-        blockNumber: parseInt(grpcReceipt.blockNumber),
-        blockHash: grpcReceipt.blockHash,
-        transactionIndex: parseInt(grpcReceipt.transactionIndex),
-        transactionHash: grpcReceipt.transactionHash,
-      })
+        }))
+      )
       const grpcTraces = mockTxRequest.request.event.traces
       expect(txEvent.traces).toStrictEqual(grpcTraces.map((trace) => ({
         action: {
