@@ -199,7 +199,7 @@ module.exports = class AgentController {
       addresses,
       blok,
       logs,
-      contractAddress
+      formatAddress(contractAddress)
     );
   }
 };

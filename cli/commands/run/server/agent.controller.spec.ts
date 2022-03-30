@@ -113,7 +113,8 @@ describe("AgentController", () => {
           "blockHash": "0x550bf22138e7cd31602ecc180fac4e1d719ac52cfad41c8320078683a3b90859",
           "blockNumber": "13309526",
           "blockTimestamp": "1632768366"
-        }
+        },
+        contractAddress: "0xABcD14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147eF12"
       }
     }
   })
@@ -384,6 +385,7 @@ describe("AgentController", () => {
         number: parseInt(grpcBlock.blockNumber),
         timestamp: parseInt(grpcBlock.blockTimestamp),
       })
+      expect(txEvent.contractAddress).toStrictEqual(formatAddress(mockTxRequest.request.event.contractAddress))
     })
   })
 })
