@@ -28,12 +28,16 @@ export function provideRunHandlersOnTransaction(
       throw new Error("no transaction handler found")
     }
       
-    const networkId = await getNetworkId()
-    const receipt = await getTransactionReceipt(txHash)
+    const [ networkId, receipt, traces ] = await Promise.all([
+      getNetworkId(),
+      getTransactionReceipt(txHash),
+      getTraceData(txHash)
+    ])
     const block = await getBlockWithTransactions(parseInt(receipt.blockNumber))
-    const traces = await getTraceData(receipt.transactionHash)
-    const txEvent = createTransactionEvent(receipt, block, networkId, traces)
 
+    txHash = txHash.toLowerCase()
+    const transaction = block.transactions.find(tx => tx.hash.toLowerCase() === txHash)!
+    const txEvent = createTransactionEvent(transaction, block, networkId, traces, receipt.logs)
     const findings = await handleTransaction(txEvent)
     console.log(`${findings.length} findings for transaction ${txHash} ${findings}`)
   }

@@ -122,10 +122,11 @@ module.exports = class AgentController {
       type,
       network,
       transaction: tx,
-      receipt: rcpt,
+      logs: lgs,
       traces: trcs,
       addresses,
       block,
+      contractAddress
     } = request.event;
 
     const transaction = {
@@ -142,31 +143,17 @@ module.exports = class AgentController {
       v: tx.v,
     };
 
-    const receipt = {
-      status: rcpt.status === "0x1",
-      root: rcpt.root,
-      gasUsed: rcpt.gasUsed,
-      cumulativeGasUsed: rcpt.cumulativeGasUsed,
-      logsBloom: rcpt.logsBloom,
-      logs: rcpt.logs.map((log) => ({
-        address: formatAddress(log.address),
-        topics: log.topics,
-        data: log.data,
-        logIndex: parseInt(log.logIndex),
-        blockNumber: parseInt(log.blockNumber),
-        blockHash: log.blockHash,
-        transactionIndex: parseInt(log.transactionIndex),
-        transactionHash: log.transactionHash,
-        removed: log.removed,
-      })),
-      contractAddress: rcpt.contractAddress
-        ? formatAddress(rcpt.contractAddress)
-        : null,
-      blockNumber: parseInt(rcpt.blockNumber),
-      blockHash: rcpt.blockHash,
-      transactionIndex: parseInt(rcpt.transactionIndex),
-      transactionHash: rcpt.transactionHash,
-    };
+    const logs = lgs.map((log) => ({
+      address: formatAddress(log.address),
+      topics: log.topics,
+      data: log.data,
+      logIndex: parseInt(log.logIndex),
+      blockNumber: parseInt(log.blockNumber),
+      blockHash: log.blockHash,
+      transactionIndex: parseInt(log.transactionIndex),
+      transactionHash: log.transactionHash,
+      removed: log.removed,
+    }))
 
     const traces = !trcs
       ? []
@@ -208,10 +195,11 @@ module.exports = class AgentController {
       type,
       parseInt(network.chainId),
       transaction,
-      receipt,
       traces,
       addresses,
-      blok
+      blok,
+      logs,
+      formatAddress(contractAddress)
     );
   }
 };

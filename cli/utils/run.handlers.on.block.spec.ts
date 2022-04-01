@@ -5,8 +5,8 @@ describe("runHandlersOnBlock", () => {
   const mockGetAgentHandlers = jest.fn()
   const mockGetNetworkId = jest.fn()
   const mockGetBlockWithTransactions = jest.fn()
-  const mockGetTransactionReceipt = jest.fn()
   const mockGetTraceData = jest.fn().mockReturnValue([])
+  const mockGetLogsForBlock = jest.fn().mockReturnValue([])
   const mockCreateBlockEvent = jest.fn()
   const mockCreateTransactionEvent = jest.fn()
   const mockBlockHash = '0xabc'
@@ -14,7 +14,8 @@ describe("runHandlersOnBlock", () => {
 
   beforeAll(() => {
     runHandlersOnBlock = provideRunHandlersOnBlock(
-      mockGetAgentHandlers, mockGetNetworkId, mockGetBlockWithTransactions, mockGetTransactionReceipt, mockGetTraceData, mockCreateBlockEvent, mockCreateTransactionEvent
+      mockGetAgentHandlers, mockGetNetworkId, mockGetBlockWithTransactions, mockGetTraceData, 
+      mockGetLogsForBlock, mockCreateBlockEvent, mockCreateTransactionEvent
     )
   })
 
@@ -37,12 +38,15 @@ describe("runHandlersOnBlock", () => {
     mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
     const mockNetworkId = 1
     mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
-    const mockBlock = { hash: mockBlockHash, number: 7, transactions: [{ hash: mockTxHash }] }
+    const mockTransaction = { hash: mockTxHash }
+    const mockBlock = { hash: mockBlockHash, number: 7, transactions: [mockTransaction] }
     mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
     const mockBlockEvent = {}
     mockCreateBlockEvent.mockReturnValueOnce(mockBlockEvent)
-    const mockReceipt = { transactionHash: mockTxHash }
-    mockGetTransactionReceipt.mockReturnValueOnce(mockReceipt)
+    const mockTrace = { transactionHash: mockTxHash, some: 'trace' }
+    mockGetTraceData.mockReturnValueOnce([mockTrace])
+    const mockLog = { transactionHash: mockTxHash, some: 'log' }
+    mockGetLogsForBlock.mockReturnValueOnce([mockLog])
     const mockTxEvent = {}
     mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
 
@@ -58,12 +62,12 @@ describe("runHandlersOnBlock", () => {
     expect(mockCreateBlockEvent).toHaveBeenCalledWith(mockBlock, mockNetworkId)
     expect(mockHandleBlock).toHaveBeenCalledTimes(1)
     expect(mockHandleBlock).toHaveBeenCalledWith(mockBlockEvent)
+    expect(mockGetLogsForBlock).toHaveBeenCalledTimes(1)
+    expect(mockGetLogsForBlock).toHaveBeenCalledWith(mockBlock.number)
     expect(mockGetTraceData).toHaveBeenCalledTimes(1)
     expect(mockGetTraceData).toHaveBeenCalledWith(mockBlock.number)
-    expect(mockGetTransactionReceipt).toHaveBeenCalledTimes(1)
-    expect(mockGetTransactionReceipt).toHaveBeenCalledWith(mockTxHash)
     expect(mockCreateTransactionEvent).toHaveBeenCalledTimes(1)
-    expect(mockCreateTransactionEvent).toHaveBeenCalledWith(mockReceipt, mockBlock, mockNetworkId, undefined)
+    expect(mockCreateTransactionEvent).toHaveBeenCalledWith(mockTransaction, mockBlock, mockNetworkId, [mockTrace], [mockLog])
     expect(mockHandleTransaction).toHaveBeenCalledTimes(1)
     expect(mockHandleTransaction).toHaveBeenCalledWith(mockTxEvent)
   })

@@ -47,6 +47,7 @@ import provideGetKeyfile from './utils/get.keyfile'
 import provideInitKeystore from './utils/init.keystore'
 import provideInitKeyfile from './utils/init.keyfile'
 import provideInitConfig from './utils/init.config'
+import provideGetLogsForBlock from './utils/get.logs.for.block'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -181,6 +182,7 @@ export default function configureContainer(args: any = {}) {
     getNetworkId: asFunction(provideGetNetworkId),
     getBlockWithTransactions: asFunction(provideGetBlockWithTransactions),
     getTransactionReceipt: asFunction(provideGetTransactionReceipt),
+    getLogsForBlock: asFunction(provideGetLogsForBlock),
 
     getTraceData: asFunction(provideGetTraceData),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
