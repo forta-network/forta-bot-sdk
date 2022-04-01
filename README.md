@@ -6,7 +6,16 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
-### 0.0.41
+### 0.1
+
+- Update gRPC agent.proto to deprecate `TransactionEvent.Receipt`
+- Update SDK to remove `receipt`, `status` and `gasUsed` properties from `TransactionEvent`
+- Add `getTransactionReceipt` convenience method to SDK
+- Update CLI `run` command to not fetch transaction receipts
+- Update starter projects to detect for large Tether transfers
+- Update terms of use URL
+
+### [0.0.41](https://github.com/forta-protocol/forta-agent-sdk/commit/1b401ebaa8a36b949e71d4a34fe167d0d55b78bc)
 
 - Set default `jsonRpcUrl` to https://cloudflare-eth.com
 - Expose CLI functionality using `configureContainer` method
