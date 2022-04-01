@@ -56,6 +56,10 @@ describe("high tether transfer agent", () => {
           alertId: "FORTA-1",
           severity: FindingSeverity.Low,
           type: FindingType.Info,
+          metadata: {
+            to: mockTetherTransferEvent.args.to,
+            from: mockTetherTransferEvent.args.from,
+          },
         }),
       ]);
       expect(mockTxEvent.filterLog).toHaveBeenCalledTimes(1);

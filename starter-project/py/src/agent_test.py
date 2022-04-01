@@ -34,3 +34,5 @@ class TestHighTetherTransferAgent:
         assert finding.alert_id == "FORTA-1"
         assert finding.severity == FindingSeverity.Low
         assert finding.type == FindingType.Info
+        assert finding.metadata['to'] == mock_transfer_event['args']['to']
+        assert finding.metadata['from'] == mock_transfer_event['args']['from']

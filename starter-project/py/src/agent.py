@@ -19,16 +19,25 @@ def handle_transaction(transaction_event):
         ERC20_TRANSFER_EVENT, TETHER_ADDRESS)
 
     for transfer_event in tether_transfer_events:
+        # extract transfer event arguments
+        to = transfer_event['args']['to']
+        from_ = transfer_event['args']['from']
+        value = transfer_event['args']['value']
         # shift decimals of transfer value
-        value = transfer_event['args']['value'] / 10 ** TETHER_DECIMALS
+        normalized_value = value / 10 ** TETHER_DECIMALS
+
         # if more than 10,000 Tether were transferred, report it
-        if value > 10000:
+        if normalized_value > 10000:
             findings.append(Finding({
                 'name': 'High Tether Transfer',
-                'description': f'High amount of USDT transferred: {value}',
+                'description': f'High amount of USDT transferred: {normalized_value}',
                 'alert_id': 'FORTA-1',
                 'severity': FindingSeverity.Low,
                 'type': FindingType.Info,
+                'metadata': {
+                    'to': to,
+                    'from': from_,
+                }
             }))
             findings_count += 1
 

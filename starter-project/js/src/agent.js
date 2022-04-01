@@ -19,17 +19,24 @@ const handleTransaction = async (txEvent) => {
   );
 
   tetherTransferEvents.forEach((transferEvent) => {
+    // extract transfer event arguments
+    const { to, from, value } = transferEvent.args;
     // shift decimals of transfer value
-    const value = transferEvent.args.value.div(10 ** TETHER_DECIMALS);
+    const normalizedValue = value.div(10 ** TETHER_DECIMALS);
+
     // if more than 10,000 Tether were transferred, report it
-    if (value.gt(10000)) {
+    if (normalizedValue.gt(10000)) {
       findings.push(
         Finding.fromObject({
           name: "High Tether Transfer",
-          description: `High amount of USDT transferred: ${value}`,
+          description: `High amount of USDT transferred: ${normalizedValue}`,
           alertId: "FORTA-1",
           severity: FindingSeverity.Low,
           type: FindingType.Info,
+          metadata: {
+            to,
+            from,
+          },
         })
       );
       findingsCount++;
