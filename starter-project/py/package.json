@@ -2,6 +2,9 @@
   "name": "forta-agent-starter",
   "version": "0.0.1",
   "description": "Forta Agent Python starter project",
+  "chainIds": [
+    1
+  ],
   "scripts": {
     "postinstall": "python3 -m pip install -r requirements_dev.txt",
     "start": "npm run start:dev",
