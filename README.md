@@ -6,7 +6,13 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
-### 0.1
+### 0.1.1
+
+- Update AgentRegistry contract ABI
+- Add default `chainIds` to starter project package.json
+- Fix Python starter project dependencies
+
+### [0.1](https://github.com/forta-protocol/forta-agent-sdk/commit/c90888a1165dbf5a511e9ca03419d18050a05a6d)
 
 - Update gRPC agent.proto to deprecate `TransactionEvent.Receipt`
 - Update SDK to remove `receipt`, `status` and `gasUsed` properties from `TransactionEvent`
