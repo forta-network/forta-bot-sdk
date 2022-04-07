@@ -6,7 +6,11 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
-### 0.1.1
+### 0.1.2
+
+- Update starter project README
+
+### [0.1.1](https://github.com/forta-protocol/forta-agent-sdk/commit/3fd681c2414c8995f5fd80b8d89b47fa540cb34b)
 
 - Update AgentRegistry contract ABI
 - Add default `chainIds` to starter project package.json
