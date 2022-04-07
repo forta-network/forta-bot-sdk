@@ -6,7 +6,11 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
-### 0.1.2
+### 0.1.3
+
+- Set `contextPath` when building image
+
+### [0.1.2](https://github.com/forta-protocol/forta-agent-sdk/commit/b4ec0b28522673074942df9d9f38f0ac03449c4c)
 
 - Update starter project README
 
