@@ -3,6 +3,7 @@ import provideUploadImage, { UploadImage } from "./upload.image"
 describe("uploadImage", () => {
   let uploadImage: UploadImage
   const mockShell = {
+    cd: jest.fn(),
     exec: jest.fn()
   } as any
   const mockPrompt = jest.fn() as any
@@ -15,14 +16,16 @@ describe("uploadImage", () => {
   const mockImageDigestLine = `sha256:${mockImageDigest}`
   const mockImageIpfsCid = "bafybeiggh632bloor6td2xintgpvk674jowua2tyomlzekdwrxfqpdzl5e"
   const mockImageCidLine = `${mockImageIpfsCid}:somethingelse`
+  const mockContextPath = '/some/agent/path'
 
   const resetMocks = () => {
+    mockShell.cd.mockReset()
     mockShell.exec.mockReset()
   }
 
   beforeAll(() => {
     uploadImage = provideUploadImage(mockShell, mockPrompt, mockImageRepositoryUrl, 
-      mockImageRepositoryUsername, mockImageRepositoryPassword, mockAgentId)
+      mockImageRepositoryUsername, mockImageRepositoryPassword, mockAgentId, mockContextPath)
   })
 
   beforeEach(() => resetMocks())
@@ -131,6 +134,8 @@ describe("uploadImage", () => {
 
     const imageRef = await uploadImage()
 
+    expect(mockShell.cd).toHaveBeenCalledTimes(1)
+    expect(mockShell.cd).toHaveBeenCalledWith(mockContextPath)
     expect(imageRef).toBe(`${mockImageIpfsCid}@sha256:${mockImageDigest}`)
     expect(mockShell.exec).toHaveBeenCalledTimes(5)
   })

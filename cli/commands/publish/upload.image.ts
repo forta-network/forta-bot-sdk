@@ -11,14 +11,19 @@ export default function provideUploadImage(
   imageRepositoryUrl: string,
   imageRepositoryUsername: string,
   imageRepositoryPassword: string,
-  agentName: string
+  agentName: string,
+  contextPath: string,
 ): UploadImage {
   assertExists(shell, 'shell')
   assertExists(prompt, 'prompt')
   assertIsNonEmptyString(imageRepositoryUrl, 'imageRepositoryUrl')
   assertIsNonEmptyString(agentName, 'agentName')
+  assertIsNonEmptyString(contextPath, 'contextPath')
 
   return async function uploadImage() {
+    // change directory to context path
+    shell.cd(contextPath)
+
     // authenticate against repository if credentials provided
     if (imageRepositoryUsername && imageRepositoryPassword) {
       const loginResult = shell.exec(`docker login ${imageRepositoryUrl} -u ${imageRepositoryUsername} -p ${imageRepositoryPassword}`)
