@@ -1,4 +1,4 @@
-# Forta Agent SDK and CLI
+# Forta Detection Bot SDK and CLI
 
 [![npm version](https://badge.fury.io/js/forta-agent.svg)](https://badge.fury.io/js/forta-agent)
 
