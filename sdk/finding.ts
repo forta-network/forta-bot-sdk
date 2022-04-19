@@ -25,7 +25,8 @@ export class Finding {
     readonly protocol: string,
     readonly severity: FindingSeverity,
     readonly type: FindingType,
-    readonly metadata: { [key: string]: string}
+    readonly metadata: { [key: string]: string},
+    readonly addresses: string[]
   ) {}
 
   toString() {
@@ -43,7 +44,8 @@ export class Finding {
     protocol = 'ethereum',
     severity,
     type,
-    metadata = {}
+    metadata = {},
+    addresses = []
   } : {
     name: string,
     description: string,
@@ -51,7 +53,8 @@ export class Finding {
     protocol?: string,
     severity: FindingSeverity,
     type: FindingType,
-    metadata?: { [key: string]: string}
+    metadata?: { [key: string]: string},
+    addresses?: string[],
   }) {
     assertIsNonEmptyString(name, 'name')
     assertIsNonEmptyString(description, 'description')
@@ -61,6 +64,6 @@ export class Finding {
     assertIsFromEnum(type, FindingType, 'type')
     // TODO assert metadata keys and values are strings
 
-    return new Finding(name, description, alertId, protocol, severity, type, metadata)
+    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses)
   }
 }
