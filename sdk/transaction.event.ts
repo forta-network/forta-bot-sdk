@@ -14,6 +14,7 @@ export interface TxEventBlock {
 // used for decoded logs, simply including the originating address of the log
 export type LogDescription = ethers.utils.LogDescription & {
   address: string;
+  logIndex: number;
 };
 
 export class TransactionEvent {
