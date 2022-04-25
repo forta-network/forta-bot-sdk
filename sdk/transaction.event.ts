@@ -14,6 +14,7 @@ export interface TxEventBlock {
 // used for decoded logs, simply including the originating address of the log
 export type LogDescription = ethers.utils.LogDescription & {
   address: string;
+  logIndex: number;
 };
 
 export class TransactionEvent {
@@ -81,7 +82,7 @@ export class TransactionEvent {
     for (const log of logs) {
       try {
         const parsedLog = iface.parseLog(log);
-        results.push(Object.assign(parsedLog, { address: log.address }));
+        results.push(Object.assign(parsedLog, { address: log.address, logIndex: log.logIndex }));
       } catch (e) {} // TODO see if theres a better way to handle 'no matching event' error
     }
     return results;
