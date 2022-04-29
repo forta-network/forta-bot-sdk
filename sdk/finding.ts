@@ -17,6 +17,17 @@ export enum FindingType {
   Info
 }
 
+type FindingInput = {
+  name: string,
+  description: string,
+  alertId: string,
+  protocol?: string,
+  severity: FindingSeverity,
+  type: FindingType,
+  metadata?: { [key: string]: string},
+  addresses?: string[],
+}
+
 export class Finding {
   private constructor(
     readonly name: string,
@@ -37,6 +48,10 @@ export class Finding {
     }, null, 2)
   }
 
+  static from(findingInput: FindingInput) {
+    return this.fromObject(findingInput)
+  }
+
   static fromObject({
     name,
     description,
@@ -46,16 +61,7 @@ export class Finding {
     type,
     metadata = {},
     addresses = []
-  } : {
-    name: string,
-    description: string,
-    alertId: string,
-    protocol?: string,
-    severity: FindingSeverity,
-    type: FindingType,
-    metadata?: { [key: string]: string},
-    addresses?: string[],
-  }) {
+  }: FindingInput) {
     assertIsNonEmptyString(name, 'name')
     assertIsNonEmptyString(description, 'description')
     assertIsNonEmptyString(alertId, 'alertId')
