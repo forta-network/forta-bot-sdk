@@ -68,6 +68,7 @@ message Finding {
   string description = 7;
   string everestId = 8;
   bool private = 9;
+  repeated string addresses = 10;
 }
 
 message EvaluateTxResponse {
