@@ -1,8 +1,12 @@
-import { ethers, providers, Wallet } from "ethers"
+import { BigNumber, ethers, providers, Wallet } from "ethers"
 import AgentRegistryAbi from "./agent.registry.abi.json"
 
 const GAS_MULTIPLIER = 1.15
 const GAS_PRICE_MULTIPLIER = 1.5
+const FALLBACK_CREATE_AGENT_GAS_LIMIT = BigNumber.from(350_000)
+const FALLBACK_UPDATE_AGENT_GAS_LIMIT = BigNumber.from(95_000)
+const FALLBACK_ENABLE_AGENT_GAS_LIMIT = BigNumber.from(55_000)
+const FALLBACK_DISABLE_AGENT_GAS_LIMIT = BigNumber.from(70_000)
 
 type AgentDescription = {
   created: boolean;
@@ -29,7 +33,9 @@ export default class AgentRegistry {
   async createAgent(fromWallet: Wallet, agentId: string, reference: string, chainIds: number[]) {
     const from = fromWallet.address
     const contract = this.getContract(fromWallet)
-    const gas = await contract.estimateGas.createAgent(agentId, from, reference, chainIds)
+    let gas = FALLBACK_CREATE_AGENT_GAS_LIMIT;
+    try { gas = await contract.estimateGas.createAgent(agentId, from, reference, chainIds)}
+    catch (e) { console.log(`unable to estimate gas for createAgent, using fallback gas limit (${gas})`) }
     const txOptions = await this.getTxOptions(gas, fromWallet)
     const tx = await contract.createAgent(agentId, from, reference, chainIds, txOptions)
     await tx.wait()
@@ -38,7 +44,9 @@ export default class AgentRegistry {
 
   async updateAgent(fromWallet: Wallet, agentId: string, reference: string, chainIds: number[]) {
     const contract = this.getContract(fromWallet)
-    const gas = await contract.estimateGas.updateAgent(agentId, reference, chainIds)
+    let gas = FALLBACK_UPDATE_AGENT_GAS_LIMIT
+    try { gas = await contract.estimateGas.updateAgent(agentId, reference, chainIds) }
+    catch(e) { console.log(`unable to estimate gas for updateAgent, using fallback gas limit (${gas})`) }
     const txOptions = await this.getTxOptions(gas, fromWallet)
     const tx = await contract.updateAgent(agentId, reference, chainIds, txOptions)
     await tx.wait()
@@ -51,7 +59,9 @@ export default class AgentRegistry {
 
   async disableAgent(fromWallet: Wallet, agentId: string) {
     const contract = this.getContract(fromWallet)
-    const gas = await contract.estimateGas.disableAgent(agentId, 1)// Permission.OWNER = 1
+    let gas = FALLBACK_DISABLE_AGENT_GAS_LIMIT
+    try { gas = await contract.estimateGas.disableAgent(agentId, 1)/* Permission.OWNER = 1 */ }
+    catch(e) { console.log(`unable to estimate gas for disableAgent, using fallback gas limit (${gas})`) }
     const txOptions = await this.getTxOptions(gas, fromWallet)
     const tx = await contract.disableAgent(agentId, 1, txOptions)
     await tx.wait()
@@ -60,7 +70,9 @@ export default class AgentRegistry {
 
   async enableAgent(fromWallet: Wallet, agentId: string) {
     const contract = this.getContract(fromWallet)
-    const gas = await contract.estimateGas.enableAgent(agentId, 1)// Permission.OWNER = 1
+    let gas = FALLBACK_ENABLE_AGENT_GAS_LIMIT
+    try { gas = await contract.estimateGas.enableAgent(agentId, 1)/* Permission.OWNER = 1 */ }
+    catch(e) { console.log(`unable to estimate gas for enableAgent, using fallback gas limit (${gas})`) }
     const txOptions = await this.getTxOptions(gas, fromWallet)
     const tx = await contract.enableAgent(agentId, 1, txOptions)
     await tx.wait()
