@@ -1,3 +1,4 @@
+import { Wallet } from "ethers"
 import providePublish from "."
 import { CommandHandler } from "../.."
 
@@ -13,7 +14,7 @@ describe("publish", () => {
   })
 
   it("publishes the agent correctly", async () => {
-    const mockPrivateKey = "0x456"
+    const mockPrivateKey = "0x4567"
     mockGetCredentials.mockReturnValueOnce({ privateKey: mockPrivateKey})
     const mockImageRef = "abc123"
     mockUploadImage.mockReturnValueOnce(mockImageRef)
@@ -32,6 +33,9 @@ describe("publish", () => {
     expect(mockUploadManifest).toHaveBeenCalledWith(mockImageRef, mockPrivateKey)
     expect(mockUploadManifest).toHaveBeenCalledBefore(mockPushToRegistry)
     expect(mockPushToRegistry).toHaveBeenCalledTimes(1)
-    expect(mockPushToRegistry).toHaveBeenCalledWith(mockManifestRef, mockPrivateKey)
+    const [manifestRef, fromWallet] = mockPushToRegistry.mock.calls[0]
+    expect(manifestRef).toEqual(mockManifestRef)
+    expect(fromWallet).toBeInstanceOf(Wallet)
+    expect(fromWallet.address).toEqual(new Wallet(mockPrivateKey).address)
   })
 })

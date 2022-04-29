@@ -4,6 +4,7 @@ import { GetCredentials } from '../../utils/get.credentials'
 import { UploadImage } from './upload.image'
 import { UploadManifest } from './upload.manifest'
 import { PushToRegistry } from './push.to.registry'
+import { Wallet } from 'ethers'
 
 export default function providePublish(
   getCredentials: GetCredentials,
@@ -20,6 +21,6 @@ export default function providePublish(
     const imageReference = await uploadImage()
     const { privateKey } = await getCredentials()
     const manifestReference = await uploadManifest(imageReference, privateKey)
-    await pushToRegistry(manifestReference, privateKey)
+    await pushToRegistry(manifestReference, new Wallet(privateKey))
   } 
 }

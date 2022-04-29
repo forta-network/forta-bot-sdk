@@ -4,6 +4,12 @@ import AgentRegistryAbi from "./agent.registry.abi.json"
 const GAS_MULTIPLIER = 1.15
 const GAS_PRICE_MULTIPLIER = 1.5
 
+type AgentDescription = {
+  created: boolean;
+  owner: string;
+  metadata: string;
+}
+
 export default class AgentRegistry {
 
   constructor(
@@ -11,9 +17,13 @@ export default class AgentRegistry {
     private agentRegistryContractAddress: string
   ) {}
 
+  async getAgent(agentId: string): Promise<AgentDescription> {
+    return this.getContract().getAgent(agentId)
+  }
+
   async agentExists(agentId: string) {
-    const agent = await this.getContract().getAgent(agentId)
-    return !!agent.metadata
+    const agent = await this.getAgent(agentId)
+    return agent.created
   }
   
   async createAgent(fromWallet: Wallet, agentId: string, reference: string, chainIds: number[]) {

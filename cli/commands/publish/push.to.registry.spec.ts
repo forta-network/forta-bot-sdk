@@ -1,46 +1,73 @@
-import { Wallet } from "ethers"
+import { BigNumber } from "ethers"
 import providePushToRegistry, { PushToRegistry } from "./push.to.registry"
 
 describe("pushToRegistry", () => {
   let pushToRegistry: PushToRegistry
   const mockAppendToFile = jest.fn()
   const mockAgentRegistry = {
-    agentExists: jest.fn(),
+    getAgent: jest.fn(),
     createAgent: jest.fn(),
     updateAgent: jest.fn()
-  } as any
+  }
   const mockAgentId = "0xagentId"
   const mockManifestRef = "abc123"
-  const mockPrivateKey = "0xabcd"
+  const mockFromAddress = "0x123"
   const mockChainIds = [1]
+  const mockFromWallet = {
+    getBalance: jest.fn(),
+    address: mockFromAddress
+  }
 
   const resetMocks = () => {
     mockAppendToFile.mockReset()
-    mockAgentRegistry.agentExists.mockReset()
+    mockAgentRegistry.getAgent.mockReset()
     mockAgentRegistry.createAgent.mockReset()
     mockAgentRegistry.updateAgent.mockReset()
   }
 
   beforeAll(() => {
-    pushToRegistry = providePushToRegistry(mockAppendToFile, mockAgentRegistry, mockAgentId, mockChainIds)
+    pushToRegistry = providePushToRegistry(mockAppendToFile, mockAgentRegistry as any, mockAgentId, mockChainIds)
   })
 
   beforeEach(() => resetMocks())
 
+  it("throws error if insufficient funds to deploy", async () => {
+    mockAgentRegistry.getAgent.mockReturnValueOnce({created: false})
+    mockFromWallet.getBalance.mockReturnValueOnce(BigNumber.from(0))
+
+    try {
+      await pushToRegistry(mockManifestRef, mockFromWallet as any)
+    } catch (e) {
+      expect(e.message).toBe(`insufficient balance to deploy agent for ${mockFromWallet.address}`)
+    }
+  })
+
+  it("throws error if updating agent from address which is not owner", async () => {
+    const mockOwner = "0xabc"
+    mockAgentRegistry.getAgent.mockReturnValueOnce({created: true, owner: mockOwner})
+    mockFromWallet.getBalance.mockReturnValueOnce(BigNumber.from(1))
+
+    try {
+      await pushToRegistry(mockManifestRef, mockFromWallet as any)
+    } catch (e) {
+      expect(e.message).toBe(`agent can only be updated by owner (${mockOwner})`)
+    }
+  })
+
   it("adds agent to registry if it does not already exist", async () => {
     const systemTime = new Date()
     jest.useFakeTimers('modern').setSystemTime(systemTime)
-    mockAgentRegistry.agentExists.mockReturnValueOnce(false)
+    mockAgentRegistry.getAgent.mockReturnValueOnce({created: false})
+    mockFromWallet.getBalance.mockReturnValueOnce(BigNumber.from(1))
 
-    await pushToRegistry(mockManifestRef, mockPrivateKey)
+    await pushToRegistry(mockManifestRef, mockFromWallet as any)
 
-    expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
-    expect(mockAgentRegistry.agentExists).toHaveBeenCalledBefore(mockAgentRegistry.createAgent)
+    expect(mockAgentRegistry.getAgent).toHaveBeenCalledTimes(1)
+    expect(mockAgentRegistry.getAgent).toHaveBeenCalledWith(mockAgentId)
+    expect(mockAgentRegistry.getAgent).toHaveBeenCalledBefore(mockAgentRegistry.createAgent)
     expect(mockAgentRegistry.createAgent).toHaveBeenCalledTimes(1)
     const [fromWallet, agentId, manifestReference, chainIds] = mockAgentRegistry.createAgent.mock.calls[0]
-    expect(fromWallet).toBeInstanceOf(Wallet)
-    expect(fromWallet.getAddress()).toEqual(new Wallet(mockPrivateKey).getAddress())
+    expect(fromWallet).toEqual(mockFromWallet)
     expect(agentId).toEqual(mockAgentId)
     expect(manifestReference).toEqual(mockManifestRef)
     expect(chainIds).toEqual(mockChainIds)
@@ -53,17 +80,17 @@ describe("pushToRegistry", () => {
   it("updates agent in registry if it already exists", async () => {
     const systemTime = new Date()
     jest.useFakeTimers('modern').setSystemTime(systemTime)
-    mockAgentRegistry.agentExists.mockReturnValueOnce(true)
+    mockAgentRegistry.getAgent.mockReturnValueOnce({created: true, owner: mockFromAddress})
+    mockFromWallet.getBalance.mockReturnValueOnce(BigNumber.from(1))
 
-    await pushToRegistry(mockManifestRef, mockPrivateKey)
+    await pushToRegistry(mockManifestRef,  mockFromWallet as any)
 
-    expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
-    expect(mockAgentRegistry.agentExists).toHaveBeenCalledWith(mockAgentId)
-    expect(mockAgentRegistry.agentExists).toHaveBeenCalledBefore(mockAgentRegistry.updateAgent)
+    expect(mockAgentRegistry.getAgent).toHaveBeenCalledTimes(1)
+    expect(mockAgentRegistry.getAgent).toHaveBeenCalledWith(mockAgentId)
+    expect(mockAgentRegistry.getAgent).toHaveBeenCalledBefore(mockAgentRegistry.updateAgent)
     expect(mockAgentRegistry.updateAgent).toHaveBeenCalledTimes(1)
     const [fromWallet, agentId, manifestReference, chainIds] = mockAgentRegistry.updateAgent.mock.calls[0]
-    expect(fromWallet).toBeInstanceOf(Wallet)
-    expect(fromWallet.getAddress()).toEqual(new Wallet(mockPrivateKey).getAddress())
+    expect(fromWallet).toEqual(mockFromWallet)
     expect(agentId).toEqual(mockAgentId)
     expect(manifestReference).toEqual(mockManifestRef)
     expect(chainIds).toEqual(mockChainIds)
