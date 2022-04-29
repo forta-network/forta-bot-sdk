@@ -115,7 +115,10 @@ class TransactionEvent:
             "0x0000000000000000000000000000000000000000", abi=abi)
         for source in sources:
             try:
-                results.append(contract.decode_function_input(source['data']))
+                decoded_function = contract.decode_function_input(
+                    source['data'])
+                decoded_function["address"] = source['to'].lower()
+                results.append(decoded_function)
             except:
                 continue  # TODO see if theres a better way to handle 'no matching function' error
         return results

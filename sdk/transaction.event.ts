@@ -11,10 +11,15 @@ export interface TxEventBlock {
   timestamp: number;
 }
 
-// used for decoded logs, simply including the originating address of the log
+// used for decoded logs, simply including the originating address of the log and logIndex
 export type LogDescription = ethers.utils.LogDescription & {
   address: string;
   logIndex: number;
+};
+
+// used for decoded function calls, simply including the address of where the function was called
+export type TransactionDescription = ethers.utils.TransactionDescription & {
+  address: string;
 };
 
 export class TransactionEvent {
@@ -82,7 +87,12 @@ export class TransactionEvent {
     for (const log of logs) {
       try {
         const parsedLog = iface.parseLog(log);
-        results.push(Object.assign(parsedLog, { address: log.address, logIndex: log.logIndex }));
+        results.push(
+          Object.assign(parsedLog, {
+            address: log.address,
+            logIndex: log.logIndex,
+          })
+        );
       } catch (e) {} // TODO see if theres a better way to handle 'no matching event' error
     }
     return results;
@@ -91,7 +101,7 @@ export class TransactionEvent {
   filterFunction(
     functionAbi: string | string[],
     contractAddress?: string | string[]
-  ): ethers.utils.TransactionDescription[] {
+  ): TransactionDescription[] {
     functionAbi = _.isArray(functionAbi) ? functionAbi : [functionAbi];
     // determine where to look for function calls (i.e. transaction object or traces)
     let sources: { data: string; value: string; to?: string | null }[] = [
@@ -118,11 +128,16 @@ export class TransactionEvent {
       );
     }
     // parse function inputs
-    const results: ethers.utils.TransactionDescription[] = [];
+    const results: TransactionDescription[] = [];
     const iface = new ethers.utils.Interface(functionAbi);
     for (const source of sources) {
       try {
-        results.push(iface.parseTransaction(source));
+        const parsedTransaction = iface.parseTransaction(source);
+        results.push(
+          Object.assign(parsedTransaction, {
+            address: source.to?.toLowerCase()!,
+          })
+        );
       } catch (e) {} // TODO see if theres a better way to handle 'no matching function' error
     }
     return results;
