@@ -1,5 +1,4 @@
 import shelljs from "shelljs"
-import prompts from "prompts"
 import { assertExists, assertIsNonEmptyString, assertShellResult } from "../../utils"
 
 // uploads agent image to repository and returns image reference
@@ -7,7 +6,6 @@ export type UploadImage = () => Promise<string>
 
 export default function provideUploadImage(
   shell: typeof shelljs,
-  prompt: typeof prompts,
   imageRepositoryUrl: string,
   imageRepositoryUsername: string,
   imageRepositoryPassword: string,
@@ -15,7 +13,6 @@ export default function provideUploadImage(
   contextPath: string,
 ): UploadImage {
   assertExists(shell, 'shell')
-  assertExists(prompt, 'prompt')
   assertIsNonEmptyString(imageRepositoryUrl, 'imageRepositoryUrl')
   assertIsNonEmptyString(agentName, 'agentName')
   assertIsNonEmptyString(contextPath, 'contextPath')

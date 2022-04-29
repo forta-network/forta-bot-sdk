@@ -6,7 +6,6 @@ describe("uploadImage", () => {
     cd: jest.fn(),
     exec: jest.fn()
   } as any
-  const mockPrompt = jest.fn() as any
   const mockImageRepositoryUrl = "mock.image.repository"
   const mockImageRepositoryUsername = "username"
   const mockImageRepositoryPassword = "pw"
@@ -24,7 +23,7 @@ describe("uploadImage", () => {
   }
 
   beforeAll(() => {
-    uploadImage = provideUploadImage(mockShell, mockPrompt, mockImageRepositoryUrl, 
+    uploadImage = provideUploadImage(mockShell, mockImageRepositoryUrl, 
       mockImageRepositoryUsername, mockImageRepositoryPassword, mockAgentId, mockContextPath)
   })
 
