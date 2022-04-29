@@ -6,6 +6,16 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
+### 0.1.4
+
+- Update gRPC agent.proto to add `Finding.addresses`
+- Add support for `addresses` field to `Finding`
+- Add verification for account balance and ownership when running `publish` CLI command
+- Provide default gas estimates when interacting with registry smart contract functions
+- Include `logIndex` in result of `TransactionEvent.filterLog`
+- Include `address` in result of `TransactionEvent.filterFunction`
+- Add `Finding.from` alias method for `Finding.fromObject`
+
 ### 0.1.3
 
 - Set `contextPath` when building image
