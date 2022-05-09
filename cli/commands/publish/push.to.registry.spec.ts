@@ -13,8 +13,12 @@ describe("pushToRegistry", () => {
   const mockManifestRef = "abc123"
   const mockFromAddress = "0x123"
   const mockChainIds = [1]
+  const mockEthersProvider = {
+    
+  }
   const mockFromWallet = {
     getBalance: jest.fn(),
+    connect: jest.fn().mockReturnThis(),
     address: mockFromAddress
   }
 
@@ -26,7 +30,7 @@ describe("pushToRegistry", () => {
   }
 
   beforeAll(() => {
-    pushToRegistry = providePushToRegistry(mockAppendToFile, mockAgentRegistry as any, mockAgentId, mockChainIds)
+    pushToRegistry = providePushToRegistry(mockAppendToFile, mockAgentRegistry as any, mockAgentId, mockChainIds, mockEthersProvider as any)
   })
 
   beforeEach(() => resetMocks())
@@ -39,6 +43,8 @@ describe("pushToRegistry", () => {
       await pushToRegistry(mockManifestRef, mockFromWallet as any)
     } catch (e) {
       expect(e.message).toBe(`insufficient balance to deploy agent for ${mockFromWallet.address}`)
+      expect(mockFromWallet.connect).toHaveBeenCalledTimes(1)
+      expect(mockFromWallet.connect).toHaveBeenCalledWith(mockEthersProvider)
     }
   })
 

@@ -1,4 +1,4 @@
-import { Wallet } from "ethers"
+import { Wallet, providers } from "ethers"
 import { assertExists, assertIsNonEmptyString } from "../../utils"
 import { AppendToFile } from '../../utils/append.to.file'
 import AgentRegistry from "../../contracts/agent.registry"
@@ -10,17 +10,19 @@ export default function providePushToRegistry(
   appendToFile: AppendToFile,
   agentRegistry: AgentRegistry,
   agentId: string,
-  chainIds: number[]
+  chainIds: number[],
+  ethersAgentRegistryProvider: providers.JsonRpcProvider
 ): PushToRegistry {
   assertExists(appendToFile, 'appendToFile')
   assertExists(agentRegistry, 'agentRegistry')
   assertIsNonEmptyString(agentId, 'agentId')
   assertExists(chainIds, 'chainIds')
+  assertExists(ethersAgentRegistryProvider, 'ethersAgentRegistryProvider')
   
   return async function pushToRegistry(manifestReference: string, fromWallet: Wallet) {
     const [agent, fromWalletBalance] = await Promise.all([
       agentRegistry.getAgent(agentId),
-      fromWallet.getBalance()
+      fromWallet.connect(ethersAgentRegistryProvider).getBalance()
     ])
     const agentExists = agent.created
     // verify wallet has some balance to pay transaction fee
