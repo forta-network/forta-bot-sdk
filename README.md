@@ -6,7 +6,11 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
-### 0.1.5
+### 0.1.6
+
+- Fix sort order for `chainIds` array
+
+### [0.1.5](https://github.com/forta-network/forta-bot-sdk/commit/eaa0e9048a25d93690a42c94b691ec94790c8a61)
 
 - Fix issue for CLI `publish` command when querying account balance
 
