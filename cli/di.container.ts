@@ -127,7 +127,7 @@ export default function configureContainer(args: any = {}) {
       if (!chainIds || !chainIds.length) {
         throw new Error("please specify chainIds array in package.json for where this agent should deploy e.g. [1] = Ethereum mainnet")
       }
-      return chainIds.sort()
+      return chainIds.sort((a: number, b: number) => a-b)// sort by ascending integers
     }).singleton(),
     version: asFunction((packageJson: any) => packageJson.version),
     documentation: asFunction((contextPath: string) => { return join(contextPath, 'README.md') }).singleton(),
