@@ -6,7 +6,11 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
-### 0.1.4
+### 0.1.5
+
+- Fix issue for CLI `publish` command when querying account balance
+
+### [0.1.4](https://github.com/forta-network/forta-bot-sdk/commit/1142feca952c8998c358338224574a592f9ef179)
 
 - Update gRPC agent.proto to add `Finding.addresses`
 - Add support for `addresses` field to `Finding`
@@ -16,7 +20,7 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 - Include `address` in result of `TransactionEvent.filterFunction`
 - Add `Finding.from` alias method for `Finding.fromObject`
 
-### 0.1.3
+### [0.1.3](https://github.com/forta-network/forta-bot-sdk/commit/d46e9a7e1f547296cc85c23fae7c22e8c3ce3fbf)
 
 - Set `contextPath` when building image
 
