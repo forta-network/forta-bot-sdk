@@ -14,6 +14,6 @@ export default function provideListKeyfiles(
   assertIsNonEmptyString(configFilename, 'configFilename')
   
   return function listKeyfiles() {
-    return shell.ls(fortaKeystore).filter(filename => filename !== configFilename)
+    return shell.ls(fortaKeystore).filter(filename => filename.startsWith("UTC") && filename !== configFilename)
   }
 }
