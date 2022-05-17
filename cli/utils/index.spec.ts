@@ -1,5 +1,5 @@
 import { getContractAddress } from '@ethersproject/address'
-import { createBlockEvent, createTransactionEvent, formatAddress, keccak256 } from "."
+import { assertIsISOString, createBlockEvent, createTransactionEvent, formatAddress, isValidTimeRange, keccak256 } from "."
 import { BlockEvent, EventType, Network, TransactionEvent } from "../../sdk"
 
 describe("keccak256", () => {
@@ -19,6 +19,54 @@ describe("formatAddress", () => {
     const formattedAddress = formatAddress(address)
 
     expect(formattedAddress).toEqual("0xabc123def")
+  })
+})
+
+describe("assertIsISOString", () => {
+  it("does not throw error for valid ISO string", () => {
+    const isoString = "2022-03-20T12:42:00.000Z"
+    assertIsISOString(isoString)
+  })
+
+  it("does not throw error for invalid ISO string", () => {
+    const isoString = "2022-03-20T12:42"
+    assertIsISOString(isoString)
+  })
+})
+
+describe("isValidTimeRange", () => {
+  it("should return true for valid time range", () => {
+    const earliestTimestamp = new Date("2022-03-20T12:42:00Z");
+    const latestTimestamp = new Date("2022-03-22T12:42:00Z");
+    const isValid = isValidTimeRange(earliestTimestamp, latestTimestamp);
+
+    expect(isValid).toBe(true)
+  })
+
+  it("should return true given only an earliestTimestamp", () => {
+    const earliestTimestamp = new Date("2022-03-20T12:42:00Z");
+    const isValid = isValidTimeRange(earliestTimestamp, undefined);
+
+    expect(isValid).toBe(true)
+  })
+
+  it("should return true given only an latestTimestamp", () => {
+    const latestTimestamp = new Date("2022-03-20T12:42:00Z");
+    const isValid = isValidTimeRange(undefined, latestTimestamp);
+
+    expect(isValid).toBe(true)
+  })
+
+  it("should return true when no dates passed in", () => {
+    const isValid = isValidTimeRange(undefined, undefined);
+    expect(isValid).toBe(true)
+  })
+
+  it("should return false if earliestTimestamp is after the latestTimestamp", () => {
+    const earliestTimestamp = new Date("2022-03-20T12:42:00Z");
+    const latestTimestamp = new Date("2022-03-19T12:42:00Z");
+    const isValid = isValidTimeRange(earliestTimestamp, latestTimestamp);
+    expect(isValid).toBe(false)
   })
 })
 

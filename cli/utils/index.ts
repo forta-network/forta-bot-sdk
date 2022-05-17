@@ -30,10 +30,27 @@ export const assertIsNonEmptyString = (str: string, varName: string) => {
   }
 };
 
+export const assertIsISOString = (str: string) => {
+  let parsedDate = new Date(Date.parse(str))
+
+  if(parsedDate.toISOString() !== str) {
+    throw new Error(`${str} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mm:ss.sssZ`)
+  }
+}
+
 export const assertShellResult = (result: ShellString, errMsg: string) => {
   if (result.code !== 0) {
     throw new Error(`${errMsg}: ${result.stderr}`)
   }
+}
+
+export const isValidTimeRange = (earliestTimestamp?: Date, latestTimestamp?: Date): boolean => {
+  // If given a start range and end range
+  if(earliestTimestamp && latestTimestamp) {
+    return earliestTimestamp < latestTimestamp;
+  } else { 
+    return true;
+  };
 }
 
 export const keccak256 = (str: string) => {

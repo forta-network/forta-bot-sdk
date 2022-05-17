@@ -2,7 +2,7 @@
 import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
 
-type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile"
+type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile" | "logs"
 export type CommandHandler = (args?: any) => Promise<void>
 
 async function executeCommand(cliCommandName: CommandName, cliArgs: any) {
@@ -83,5 +83,23 @@ yargs
     (yargs: Argv) => {},
     (cliArgs: any) => executeCommand("keyfile", cliArgs)
   )
+  .command('logs', 'Retrieve logs on Forta Agent',
+    (yargs: Argv) => {
+      yargs
+      .option('after', {
+        description: 'An ISO timestamp representing the oldest time to include in logs',
+        type: 'string'
+      }).option('before', {
+        description: 'An ISO timestamp representing the latest time to include in logs',
+        type: 'string'
+      }).option('agentId', {
+        description: 'Id of agent',
+        type: 'string'
+      })
+    },
+    (cliArgs: any) => {
+      console.log(`Excecuting cliArgs: ${cliArgs}`)
+      executeCommand("logs", cliArgs)
+    })
   .strict()
   .argv
