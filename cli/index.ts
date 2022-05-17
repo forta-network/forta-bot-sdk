@@ -86,6 +86,8 @@ yargs
   .command('logs', 'Retrieve logs on Forta Agent',
     (yargs: Argv) => {
       yargs
+      .requiresArg('before')
+      .requiresArg('after')
       .option('after', {
         description: 'An ISO timestamp representing the oldest time to include in logs',
         type: 'string'
