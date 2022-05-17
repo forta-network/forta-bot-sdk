@@ -9,16 +9,18 @@ export default function provideLogs(
   container: AwilixContainer,
   agentId: string,
   getAgentLogs: GetAgentLogs,
-  before: string,
-  after: string,
+  args: any,
 ): CommandHandler {
   assertExists(container, 'container')
+  assertExists(args, 'args')
+  assertIsNonEmptyString(agentId, "agentId");
 
   return async function logs(cliArgs: any) {
-    assertIsNonEmptyString(agentId, "agentId");
 
-    let latestTimestamp = before
-    let earliestTimestamp = after
+    args = {...args, ...cliArgs}
+
+    let latestTimestamp = args.before
+    let earliestTimestamp = args.after
 
     // If no time range entered
     if(!latestTimestamp && !earliestTimestamp) {
@@ -31,7 +33,7 @@ export default function provideLogs(
     if(earliestTimestamp) { assertIsISOString(earliestTimestamp) }
     if(latestTimestamp) { assertIsISOString(latestTimestamp)}
 
-    if(!isValidTimeRange(new Date(earliestTimestamp), new Date(latestTimestamp))) throw Error(`Provided date range is invalid`)
+    if(!isValidTimeRange(earliestTimestamp, latestTimestamp)) throw Error(`Provided date range is invalid`)
 
 
     const scanDirection = shouldScanForwardOrBackward(earliestTimestamp, latestTimestamp)
@@ -45,7 +47,7 @@ export default function provideLogs(
       const logs = await getAgentLogs(agentId, curMinute)
 
       if(logs?.length > 0) {
-        logs.filter(log => !cliArgs.scannerId || log.scanner === cliArgs.scannerId) // Filter logs by scannerId if provided
+        logs.filter(log => !args.scannerId || log.scanner === args.scannerId) // Filter logs by scannerId if provided
         .forEach(log => console.log(log))
       }
 

@@ -33,7 +33,7 @@ describe("logs", () => {
   beforeEach(() => resetMocks())
 
   beforeAll(() => {
-    logs = provideLogs(mockContainer, mockAgentId, mockGetAgentLogs, "2022-03-20T12:41:00Z", "2022-03-20T13:00:00Z"" )
+    logs = provideLogs(mockContainer, mockAgentId, mockGetAgentLogs, {})
   })
 
   it("throws error if no agentId provided", async () => {

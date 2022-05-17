@@ -92,14 +92,12 @@ yargs
       }).option('before', {
         description: 'An ISO timestamp representing the latest time to include in logs',
         type: 'string'
-      }).option('agentId', {
-        description: 'Id of agent',
+      }).option('scannerId', {
+        description: 'Only returns logs for specified scannerId',
         type: 'string'
       })
     },
-    (cliArgs: any) => {
-      console.log(`Excecuting cliArgs: ${cliArgs}`)
-      executeCommand("logs", cliArgs)
-    })
+    (cliArgs: any) => executeCommand("logs", cliArgs)
+  )
   .strict()
   .argv
