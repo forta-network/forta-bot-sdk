@@ -98,6 +98,10 @@ yargs
         description: 'Only returns logs for specified scannerId',
         type: 'string'
       })
+      .option('agentId', {
+        description: 'Agent id to retrive logs for. Default value is the value stored in forta.config.js',
+        type: 'string'
+      })
     },
     (cliArgs: any) => executeCommand("logs", cliArgs)
   )

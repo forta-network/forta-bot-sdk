@@ -1,23 +1,21 @@
-import { AwilixContainer } from 'awilix';
 import { CommandHandler } from "../..";
 import { assertExists, assertIsISOString, assertIsNonEmptyString, isValidTimeRange } from "../../utils";
 import { GetAgentLogs } from '../../utils/get.agent.logs';
 
 
 export default function provideLogs(
-  container: AwilixContainer,
   agentId: string,
   getAgentLogs: GetAgentLogs,
   args: any,
 ): CommandHandler {
-  assertExists(container, 'container')
   assertExists(args, 'args')
-  assertIsNonEmptyString(agentId, "agentId");
+  assertIsNonEmptyString(agentId, "agentId"); // agentId retrieved from forta.config.json
 
 
-  return async function logs(cliArgs: any = {}) {
+  return async function logs() {
 
-    args = { ...args, cliArgs }
+    const cliAgentId = args.agentId;
+
     let latestTimestamp = args.before
     let earliestTimestamp = args.after
 
@@ -32,7 +30,8 @@ export default function provideLogs(
     let curMinute: Date | undefined = earliestDateTime;
 
     while(curMinute) {
-      const logs = await getAgentLogs(agentId, curMinute)
+      const finalAgentId = cliAgentId ? cliAgentId : agentId;
+      const logs = await getAgentLogs(finalAgentId, curMinute)
 
       if(logs?.length > 0) {
         logs.filter(log => !args.scannerId || log.scanner === args.scannerId) // Filter logs by scannerId if provided
@@ -43,9 +42,6 @@ export default function provideLogs(
     }
   }
 }
-
-export type ScanDirection = 'forward' | 'backward';
-
 
 
 export const getNextMinute = (curMinute: Date, latestDateTime: Date): Date | undefined => {
