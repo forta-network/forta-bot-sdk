@@ -35,7 +35,7 @@ export default function provideLogs(
 
       if(logs?.length > 0) {
         logs.filter(log => !args.scannerId || log.scanner === args.scannerId) // Filter logs by scannerId if provided
-        .forEach(log => console.log(log))
+        console.log(logs)
       }
 
       curMinute = getNextMinute(curMinute, latestDateTime)
