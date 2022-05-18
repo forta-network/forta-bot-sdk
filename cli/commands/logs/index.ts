@@ -24,11 +24,10 @@ export default function provideLogs(
     assertIsISOString(latestTimestamp)
     assertIsISOString(earliestTimestamp)
 
+    const earliestDateTime = new Date(Date.parse(earliestTimestamp))
+    const latestDateTime = new Date(Date.parse(latestTimestamp))
 
-    if(!isValidTimeRange(new Date(earliestTimestamp), new Date(latestTimestamp))) throw Error(`Provided date range is invalid`)
-
-    const earliestDateTime = new Date(earliestTimestamp)
-    const latestDateTime = new Date(latestTimestamp)
+    if(!isValidTimeRange(earliestDateTime, latestDateTime)) throw Error(`Provided date range is invalid`)
 
     let curMinute: Date | undefined = earliestDateTime;
 
@@ -51,5 +50,5 @@ export type ScanDirection = 'forward' | 'backward';
 
 export const getNextMinute = (curMinute: Date, latestDateTime: Date): Date | undefined => {
   const nextMinute = new Date(curMinute.getTime() + (60 * 1000))
-  return !latestDateTime || nextMinute <= latestDateTime ? nextMinute : undefined
+  return nextMinute <= latestDateTime ? nextMinute : undefined
 }
