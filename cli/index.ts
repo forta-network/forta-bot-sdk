@@ -86,15 +86,15 @@ yargs
   .command('logs', 'Retrieve logs on Forta Agent',
     (yargs: Argv) => {
       yargs
-      .requiresArg('before')
-      .requiresArg('after')
       .option('after', {
         description: 'An ISO timestamp representing the oldest time to include in logs',
         type: 'string'
       }).option('before', {
         description: 'An ISO timestamp representing the latest time to include in logs',
         type: 'string'
-      }).option('scannerId', {
+      }).demandOption('before')
+      .demandOption('after')
+      .option('scannerId', {
         description: 'Only returns logs for specified scannerId',
         type: 'string'
       })
