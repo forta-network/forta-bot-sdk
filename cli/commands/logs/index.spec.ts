@@ -1,4 +1,4 @@
-import provideLogs, { getNextMinute, shouldScanForwardOrBackward } from "."
+import provideLogs, { getNextMinute } from "."
 import { CommandHandler } from "../.."
 
 const data = [
@@ -36,20 +36,12 @@ describe("logs", () => {
     logs = provideLogs(mockContainer, mockAgentId, mockGetAgentLogs, {})
   })
 
-  it("throws error if no agentId provided", async () => {
-    try {
-      logs(undefined)
-    } catch(e) {
-      expect(e.message).toBe("No agentId provided")
-    }
-  })
-
   it("throws error if invalid timestamp provided for --after ", async () => {
     const earliestTimestamp = "2022-03-20T12:42"
     try {
       logs({agentId: mockAgentId, after: earliestTimestamp})
     } catch(e) {
-      expect(e.message).toBe(`${earliestTimestamp} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mm:ss.sssZ`)
+      expect(e.message).toBe(`${earliestTimestamp} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mmZ`)
     }
   })
 
@@ -58,7 +50,7 @@ describe("logs", () => {
     try {
       logs({agentId: mockAgentId, before: latestTimestamp})
     } catch(e) {
-      expect(e.message).toBe(`${latestTimestamp} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mm:ss.sssZ`)
+      expect(e.message).toBe(`${latestTimestamp} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mmZ`)
     }
   })
 
@@ -145,60 +137,21 @@ describe("logs", () => {
   })
 })
 
-describe("shouldScanForwardOrBackward", () => {
-  it("return forward given a range of time", async () => {
-    const earliestTimestamp = "2022-03-20T12:34:00.000Z";
-    const latestTimestamp = "2022-03-20T13:04:00.000Z";
-
-    const result = shouldScanForwardOrBackward(earliestTimestamp, latestTimestamp);
-    expect(result).toBe("forward")
-  }) 
-
-  it("return forward given only an earliest timestamp", async () => {
-    const earliestTimestamp = "2022-03-20T12:34:00.000Z";
-
-    const result = shouldScanForwardOrBackward(earliestTimestamp);
-    expect(result).toBe("forward")
-  }) 
-
-  it("return backward given only an latest timestamp", async () => {
-    const latestTimestamp = "2022-03-20T12:34:00.000Z";
-
-    const result = shouldScanForwardOrBackward(undefined, latestTimestamp);
-    expect(result).toBe("backward")
-  }) 
-})
-
 describe("getNextMinute", () => {
   it("return undefined if current minute is equal to the latest requested timestamp", async () => {
     const latestTimestamp = new Date("2022-03-20T13:04:00.000Z");
     const curTimestamp = latestTimestamp;
 
-    const result = getNextMinute(curTimestamp, "forward", undefined,latestTimestamp);
+    const result = getNextMinute(curTimestamp,latestTimestamp);
     expect(result).toBe(undefined)
   }) 
 
-  it("return undefined if current minute is equal to the earliest requested timestamp", async () => {
-    const earliestTimestamp = new Date("2022-03-20T13:04:00.000Z");
-    const curTimestamp = earliestTimestamp;
-
-    const result = getNextMinute(curTimestamp, "backward", earliestTimestamp,undefined);
-    expect(result).toBe(undefined)
-  }) 
 
   it("return Date 1 minute in the future if current minute is less than latest requested timestamp", async () => {
     const latestTimestamp = new Date("2022-03-20T13:04:00.000Z");
     const curTimestamp = new Date("2022-03-20T12:04:00.000Z");;
 
-    const result = getNextMinute(curTimestamp, "forward", undefined,latestTimestamp);
+    const result = getNextMinute(curTimestamp,latestTimestamp);
     expect(result?.toISOString()).toBe("2022-03-20T12:05:00.000Z")
-  }) 
-
-  it("return Date 1 minute in the past if current minute is greater than earliest requested timestamp", async () => {
-    const curTimestamp = new Date("2022-03-20T13:04:00.000Z");
-    const earliestTimestamp = new Date("2022-03-20T12:04:00.000Z");;
-
-    const result = getNextMinute(curTimestamp, "backward", earliestTimestamp, undefined);
-    expect(result?.toISOString()).toBe("2022-03-20T13:03:00.000Z")
   }) 
 })

@@ -43,25 +43,6 @@ describe("isValidTimeRange", () => {
     expect(isValid).toBe(true)
   })
 
-  it("should return true given only an earliestTimestamp", () => {
-    const earliestTimestamp = new Date("2022-03-20T12:42:00Z");
-    const isValid = isValidTimeRange(earliestTimestamp, undefined);
-
-    expect(isValid).toBe(true)
-  })
-
-  it("should return true given only an latestTimestamp", () => {
-    const latestTimestamp = new Date("2022-03-20T12:42:00Z");
-    const isValid = isValidTimeRange(undefined, latestTimestamp);
-
-    expect(isValid).toBe(true)
-  })
-
-  it("should return true when no dates passed in", () => {
-    const isValid = isValidTimeRange(undefined, undefined);
-    expect(isValid).toBe(true)
-  })
-
   it("should return false if earliestTimestamp is after the latestTimestamp", () => {
     const earliestTimestamp = new Date("2022-03-20T12:42:00Z");
     const latestTimestamp = new Date("2022-03-19T12:42:00Z");
