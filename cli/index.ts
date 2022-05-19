@@ -98,7 +98,7 @@ yargs
         type: 'string'
       })
       .option('agentId', {
-        description: 'Agent id to retrive logs for. Default value is the value stored in forta.config.js',
+        description: 'Agent id to retrive logs for. Default value is this agent',
         type: 'string'
       })
     },

@@ -9,7 +9,7 @@ export default function provideLogs(
   args: any,
 ): CommandHandler {
   assertExists(args, 'args')
-  assertIsNonEmptyString(agentId, "agentId"); // agentId retrieved from forta.config.json
+  assertIsNonEmptyString(agentId, "agentId"); // agentId retrieved from forta.config.json or hashing the package.json name
 
 
   return async function logs() {
