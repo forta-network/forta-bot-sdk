@@ -28,11 +28,14 @@ describe("getAgentLogs", () => {
     getAgentLogs = provideGetAgentLogs(mockAxios, mockFortaApiUrl)
   })
 
-  it("returns empty array when know fortaApiUrl is provided", async () => {
-    const getAgentLogs = provideGetAgentLogs(mockAxios, "")
+  it("throws error when fortaApiUrl is provided", async () => {
+    try {
+      const getAgentLogs = provideGetAgentLogs(mockAxios, "")
+      await getAgentLogs(mockAgentId, new Date())
+    } catch(e) {
+      expect(e.message).toBe(`fortaApiUrl must be non-empty string`)
+    }
 
-    await getAgentLogs(mockAgentId, new Date())
-    expect(mockAxios.get).toHaveBeenCalledTimes(0)
   })
 
   it("returns array with single log found during a given minute", async () => {
