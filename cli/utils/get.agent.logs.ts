@@ -1,7 +1,7 @@
 import { AxiosStatic } from "axios";
 import { assertExists, assertIsNonEmptyString } from ".";
 
-export type GetAgentLogs = (agentId: string, minute: Date) => Promise<any[]>
+export type GetAgentLogs = (agentId: string, minute: Date) => Promise<FortaAgentLogResponse[]>
 
 export function provideGetAgentLogs(
   axios: AxiosStatic,
@@ -24,4 +24,10 @@ export function provideGetAgentLogs(
 
     return data;
   }
+}
+
+export interface FortaAgentLogResponse {
+  scanner: string;
+  timestamp: string;
+  logs: string;
 }

@@ -1,6 +1,6 @@
 import { CommandHandler } from "../..";
 import { assertExists, assertIsISOString, assertIsNonEmptyString, isValidTimeRange } from "../../utils";
-import { GetAgentLogs } from '../../utils/get.agent.logs';
+import { FortaAgentLogResponse, GetAgentLogs } from '../../utils/get.agent.logs';
 
 
 export default function provideLogs(
@@ -35,12 +35,18 @@ export default function provideLogs(
 
       if(logs?.length > 0) {
         logs.filter(log => !args.scannerId || log.scanner === args.scannerId) // Filter logs by scannerId if provided
-        console.log(logs)
+        logs.forEach(log => printLogToConsole(log))
       }
 
       curMinute = getNextMinute(curMinute, latestDateTime)
     }
   }
+}
+
+export const printLogToConsole = (log: FortaAgentLogResponse) => {
+  console.log(`${log.scanner} - ${log.timestamp}`);
+  console.log('----------------------------------------------------------------- \n');
+  console.log(log.logs);
 }
 
 
