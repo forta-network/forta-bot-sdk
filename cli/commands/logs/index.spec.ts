@@ -21,7 +21,6 @@ describe("logs", () => {
   const mockAgentsLogs: any[] = data;
   let consoleSpy = jest.spyOn(console, 'log');
 
-  const mockScannerId = mockAgentsLogs[0].scanner;
   const mockAgentId = "0x15293"
 
   const resetMocks = () => {
@@ -43,7 +42,7 @@ describe("logs", () => {
       logs = provideLogs(mockAgentId, mockGetAgentLogs, {agentId: mockAgentId, after: earliestTimestamp, before: latestTimestamp})
       await logs()
     } catch(e) {
-      expect(e.message).toBe(`${earliestTimestamp} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mmZ`)
+      expect(e.message).toBe(`Field name \'after\' has invalid value. ${earliestTimestamp} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mmZ`)
     }
   })
 
@@ -54,7 +53,7 @@ describe("logs", () => {
       logs = provideLogs(mockAgentId, mockGetAgentLogs, {agentId: mockAgentId, after: earliestTimestamp, before: latestTimestamp})
       await logs()
     } catch(e) {
-      expect(e.message).toBe(`${latestTimestamp} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mmZ`)
+      expect(e.message).toBe(`Field name \'before\' has invalid value. ${latestTimestamp} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mmZ`)
     }
   })
 
@@ -80,7 +79,7 @@ describe("logs", () => {
     await logs()
 
     expect(mockGetAgentLogs).toHaveBeenCalledTimes(5);
-    expect(consoleSpy).toBeCalledTimes(1)
+    expect(consoleSpy).toBeCalledTimes(3)
   })
 
   it("only prints 5 logs for agent in given time range", async () => {
@@ -97,7 +96,7 @@ describe("logs", () => {
     await logs()
 
     expect(mockGetAgentLogs).toHaveBeenCalledTimes(30); // 1 call for every minute in range
-    expect(consoleSpy).toBeCalledTimes(5)
+    expect(consoleSpy).toBeCalledTimes(15)
   })
 })
 

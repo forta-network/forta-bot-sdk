@@ -92,8 +92,7 @@ yargs
       }).option('before', {
         description: 'An ISO timestamp representing the latest time to include in logs',
         type: 'string'
-      }).demandOption('before')
-      .demandOption('after')
+      })
       .option('scannerId', {
         description: 'Only returns logs for specified scannerId',
         type: 'string'

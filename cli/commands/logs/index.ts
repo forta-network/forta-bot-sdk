@@ -17,29 +17,38 @@ export default function provideLogs(
     const cliAgentId = args.agentId;
 
     let latestTimestamp = args.before
-    let earliestTimestamp = args.after
+    let earliestTimestamp = args.after;
 
-    assertIsISOString(latestTimestamp)
-    assertIsISOString(earliestTimestamp)
+    const finalAgentId = cliAgentId ? cliAgentId : agentId;
 
-    const earliestDateTime = new Date(Date.parse(earliestTimestamp))
-    const latestDateTime = new Date(Date.parse(latestTimestamp))
+    if(!latestTimestamp && !earliestTimestamp) {
+      const logs = await getAgentLogs(finalAgentId);
+      processLogs(logs);
+    } else {
+      assertIsISOString(latestTimestamp, "\'before\'")
+      assertIsISOString(earliestTimestamp, "\'after\'")
 
-    if(!isValidTimeRange(earliestDateTime, latestDateTime)) throw Error(`Provided date range is invalid`)
+      const earliestDateTime = new Date(Date.parse(earliestTimestamp))
+      const latestDateTime = new Date(Date.parse(latestTimestamp))
 
-    let curMinute: Date | undefined = earliestDateTime;
+      if(!isValidTimeRange(earliestDateTime, latestDateTime)) throw Error(`Provided date range is invalid`)
 
-    while(curMinute) {
-      const finalAgentId = cliAgentId ? cliAgentId : agentId;
-      const logs = await getAgentLogs(finalAgentId, curMinute)
+      let curMinute: Date | undefined = earliestDateTime;
 
-      if(logs?.length > 0) {
-        logs.filter(log => !args.scannerId || log.scanner === args.scannerId) // Filter logs by scannerId if provided
-        logs.forEach(log => printLogToConsole(log))
+      while(curMinute) {
+        const logs = await getAgentLogs(finalAgentId, curMinute)
+        processLogs(logs);
+
+        curMinute = getNextMinute(curMinute, latestDateTime)
       }
-
-      curMinute = getNextMinute(curMinute, latestDateTime)
     }
+  }
+}
+
+const processLogs = (logs: FortaAgentLogResponse[], scannerId?: string) => {
+  if(logs?.length > 0) {
+    logs.filter(log => !scannerId || log.scanner === scannerId) // Filter logs by scannerId if provided
+    logs.forEach(log => printLogToConsole(log))
   }
 }
 

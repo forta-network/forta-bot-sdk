@@ -30,9 +30,10 @@ export const assertIsNonEmptyString = (str: string, varName: string) => {
   }
 };
 
-export const assertIsISOString = (str: string) => {
+export const assertIsISOString = (str: string, fieldName?: string) => {
+  const fieldNameText = fieldName ? `Field name ${fieldName}` : "";
   if(isNaN(Date.parse(str))) {
-    throw new Error(`${str} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mmZ`)
+    throw new Error(`${fieldNameText} has invalid value. ${str} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mmZ`)
   }
 }
 
