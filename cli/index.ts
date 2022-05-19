@@ -98,7 +98,7 @@ yargs
         type: 'string'
       })
       .option('agentId', {
-        description: 'Agent id to retrive logs for. Default value is this agent',
+        description: 'Agent id to retrieve logs for. Default value is this agent',
         type: 'string'
       })
     },
