@@ -48,6 +48,8 @@ import provideInitKeystore from './utils/init.keystore'
 import provideInitKeyfile from './utils/init.keyfile'
 import provideInitConfig from './utils/init.config'
 import provideGetLogsForBlock from './utils/get.logs.for.block'
+import { provideGetAgentLogs } from './utils/get.agent.logs'
+import provideLogs from './commands/logs'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -91,6 +93,7 @@ export default function configureContainer(args: any = {}) {
 
     init: asFunction(provideInit),
     run: asFunction(provideRun),
+    logs: asFunction(provideLogs),
     publish: asFunction(providePublish),
     push: asFunction(providePush),
     disable: asFunction(provideDisable),
@@ -185,6 +188,8 @@ export default function configureContainer(args: any = {}) {
     getLogsForBlock: asFunction(provideGetLogsForBlock),
 
     getTraceData: asFunction(provideGetTraceData),
+    getAgentLogs: asFunction(provideGetAgentLogs),
+    fortaApiUrl: asValue('https://api.forta.network'),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.traceRpcUrl
     }).singleton(),
