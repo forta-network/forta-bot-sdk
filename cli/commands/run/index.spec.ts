@@ -9,22 +9,42 @@ describe("run", () => {
   const mockCache = {
     save: jest.fn()
   } as any
+  const mockEthersProvider = {
+    getNetwork: jest.fn()
+  } as any
   const mockExit = jest.spyOn(process, 'exit').mockImplementation();
 
   const resetMocks = () => {
     mockContainer.resolve.mockReset()
+    mockEthersProvider.getNetwork.mockReset()
     mockCache.save.mockReset()
     mockExit.mockReset()
   }
 
-  beforeEach(() => resetMocks())
+  const defaultChainIds = [1];
+
+  beforeEach(() => {
+    resetMocks();
+    (mockEthersProvider.getNetwork as jest.Mock<any,any>).mockReturnValueOnce({chainId: 1, name: "test"})
+  })
+
+  it("throws an error if detected chainId is not in list of configured chainIds", async () => {
+    resetMocks();
+    (mockEthersProvider.getNetwork as jest.Mock<any,any>).mockReturnValueOnce({chainId: 234, name: "test"})
+
+    try{
+      run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, {})
+    } catch(e) {
+      expect(e.message).toBe(`Detected chainId [234] is missing from the package.json.`)
+    }
+  })
 
   it("invokes runTransaction if --tx argument is provided", async () => {
     const mockCliArgs = {tx: '0x123'}
     const mockRunTransaction = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunTransaction)
 
-    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
@@ -41,7 +61,7 @@ describe("run", () => {
     const mockRunBlock = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunBlock)
 
-    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
@@ -58,7 +78,7 @@ describe("run", () => {
     const mockRunBlockRange = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunBlockRange)
 
-    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
@@ -75,7 +95,7 @@ describe("run", () => {
     const mockRunFile = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunFile)
 
-    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
@@ -92,7 +112,7 @@ describe("run", () => {
     const mockRunProdServer = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunProdServer)
 
-    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
@@ -109,7 +129,7 @@ describe("run", () => {
     const mockRunLive = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunLive)
 
-    run = provideRun(mockContainer, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
