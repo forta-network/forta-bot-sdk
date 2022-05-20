@@ -1,4 +1,5 @@
 import { AwilixContainer } from 'awilix';
+import { providers } from 'ethers';
 import { Cache } from 'flat-cache';
 import { CommandHandler } from '../..';
 import { assertExists } from '../../utils';
@@ -11,15 +12,25 @@ import { RunProdServer } from './server';
 
 export default function provideRun(
   container: AwilixContainer,
+  ethersProvider: providers.JsonRpcProvider,
+  chainIds: number[],
   cache: Cache,
   args: any
 ): CommandHandler {
   assertExists(container, 'container')
   assertExists(cache, 'cache')
+  assertExists(chainIds, 'chainIds')
+  assertExists(ethersProvider, "ethersProvider");
   assertExists(args, 'args')
 
   return async function run(runtimeArgs: any = {}) {
     args = { ...args, ...runtimeArgs }
+
+    const network = await ethersProvider.getNetwork();
+
+    if(!network) throw Error(`No network detected at rpc url.`);
+
+    if(!chainIds.includes(network.chainId)) throw Error(`Detected chainId [${network.chainId}] is missing from the package.json.`)
 
     // we manually inject the run functions here (instead of through the provide function above) so that
     // we get RUNTIME errors if certain configuration is missing for that run function e.g. jsonRpcUrl
