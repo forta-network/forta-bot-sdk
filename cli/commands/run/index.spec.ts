@@ -22,20 +22,21 @@ describe("run", () => {
   }
 
   const defaultChainIds = [1];
+  const testRpcUrl = "https://test.com";
 
   beforeEach(() => {
     resetMocks();
-    (mockEthersProvider.getNetwork as jest.Mock<any,any>).mockReturnValueOnce({chainId: 1, name: "test"})
+    (mockEthersProvider.getNetwork as jest.Mock).mockReturnValueOnce({chainId: 1, name: "test"})
   })
 
   it("throws an error if detected chainId is not in list of configured chainIds", async () => {
     resetMocks();
-    (mockEthersProvider.getNetwork as jest.Mock<any,any>).mockReturnValueOnce({chainId: 234, name: "test"})
+    (mockEthersProvider.getNetwork as jest.Mock).mockReturnValueOnce({chainId: 234, name: "test"})
 
     try{
-      run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, {})
+      run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, testRpcUrl, mockCache, {})
     } catch(e) {
-      expect(e.message).toBe(`Detected chainId [234] is missing from the package.json.`)
+      expect(e.message).toBe(`Detected chainId mismatch between ${testRpcUrl} [chainId: 234] and package.json [chainIds: 1].`)
     }
   })
 
@@ -44,7 +45,7 @@ describe("run", () => {
     const mockRunTransaction = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunTransaction)
 
-    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, testRpcUrl, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
@@ -61,7 +62,7 @@ describe("run", () => {
     const mockRunBlock = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunBlock)
 
-    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, testRpcUrl, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
@@ -78,7 +79,7 @@ describe("run", () => {
     const mockRunBlockRange = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunBlockRange)
 
-    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, testRpcUrl, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
@@ -95,7 +96,7 @@ describe("run", () => {
     const mockRunFile = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunFile)
 
-    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, testRpcUrl, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
@@ -112,7 +113,7 @@ describe("run", () => {
     const mockRunProdServer = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunProdServer)
 
-    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, testRpcUrl, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
@@ -129,7 +130,7 @@ describe("run", () => {
     const mockRunLive = jest.fn()
     mockContainer.resolve.mockReturnValueOnce(mockRunLive)
 
-    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, mockCache, mockCliArgs)
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, testRpcUrl, mockCache, mockCliArgs)
     await run()
 
     expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
