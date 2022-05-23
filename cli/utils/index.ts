@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import _ from 'lodash'
-import {parse } from "comment-json";
+import { parse } from "comment-json";
 import { Keccak } from 'sha3'
 import { ShellString } from 'shelljs'
 import { getContractAddress } from '@ethersproject/address'

@@ -1,7 +1,7 @@
 import os from 'os'
 import fs from 'fs'
 import { join } from 'path'
-import { jsonc } from 'jsonc'
+import { parse, assign } from "comment-json"
 import _ from 'lodash'
 import { Keccak } from 'sha3'
 import { BlockEvent, EventType, FortaConfig, Network, Trace, TransactionEvent } from '.'
@@ -24,14 +24,14 @@ const getFortaConfig: () => FortaConfig = () => {
   // try to read from global config
   const globalConfigPath = join(os.homedir(), '.forta', 'forta.config.json')
   if (fs.existsSync(globalConfigPath)) {
-    config = Object.assign(config, jsonc.parse(fs.readFileSync(globalConfigPath, 'utf8')))
+    config = assign(config, parse(fs.readFileSync(globalConfigPath, 'utf8'), undefined, true))
   }
   // try to read from local project config
   const configFlagIndex = process.argv.indexOf('--config')
   const configFile = configFlagIndex == -1 ? undefined : process.argv[configFlagIndex + 1]
   const localConfigPath = join(process.cwd(), configFile || 'forta.config.json')
   if (fs.existsSync(localConfigPath)) {
-    config = Object.assign(config, jsonc.parse(fs.readFileSync(localConfigPath, 'utf8')))
+    config = assign(config, parse(fs.readFileSync(localConfigPath, 'utf8'), undefined, true))
   }
   return config
 }

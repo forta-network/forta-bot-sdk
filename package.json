@@ -35,7 +35,6 @@
     "ethers": "^5.5.1",
     "flat-cache": "^3.0.4",
     "form-data": "^4.0.0",
-    "jsonc": "^2.0.0",
     "keythereum": "^1.2.0",
     "lodash": "^4.17.21",
     "n-readlines": "^1.0.1",

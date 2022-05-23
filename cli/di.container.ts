@@ -5,7 +5,7 @@ import { asClass, asFunction, asValue, createContainer, InjectionMode } from "aw
 import { ethers } from "ethers"
 import shell from 'shelljs'
 import prompts from 'prompts'
-import { jsonc } from 'jsonc'
+import { parse } from "comment-json"
 import axios, { AxiosRequestConfig } from 'axios'
 import flatCache from 'flat-cache'
 import provideInit from "./commands/init"
@@ -157,7 +157,7 @@ export default function configureContainer(args: any = {}) {
       if (fs.existsSync(join(contextPath, "src", "agent.ts"))) {
         // point to compiled javascript agent in output folder
         const tsConfigPath = join(contextPath, "tsconfig.json")
-        const { compilerOptions } = jsonc.parse(fs.readFileSync(tsConfigPath, 'utf8'))
+        const { compilerOptions } = parse(fs.readFileSync(tsConfigPath, 'utf8')) as any
         agentPath = join(contextPath, compilerOptions.outDir, "agent")
       }
       // check if python agent
