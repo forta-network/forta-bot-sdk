@@ -35,8 +35,8 @@ export default function provideInitConfig(
       const fortaCon = getFortaConfig();
 
       // Save initial forta config
-      console.log(`Saving agentId: ${agentId} in forta.congif.js`);
-      
+      console.log(`Saving agentId: ${agentId} in ${configFilename}`);
+
       const data = assign({agentId}, fortaCon);
       fs.writeFileSync(filePath, stringify(data, undefined, 1))
     } else {
