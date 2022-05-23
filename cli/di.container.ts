@@ -50,6 +50,7 @@ import provideInitConfig from './utils/init.config'
 import provideGetLogsForBlock from './utils/get.logs.for.block'
 import { provideGetAgentLogs } from './utils/get.agent.logs'
 import provideLogs from './commands/logs'
+import { randomUUID } from 'crypto'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -122,8 +123,8 @@ export default function configureContainer(args: any = {}) {
     }).singleton(),
     agentName: asFunction((packageJson: any) => packageJson.name).singleton(),
     description: asFunction((packageJson: any) => packageJson.description).singleton(),
-    agentId: asFunction((fortaConfig: FortaConfig, agentName: string) => {
-      return fortaConfig.agentId || keccak256(agentName)
+    agentId: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.agentId || keccak256(randomUUID())
     }).singleton(),
     chainIds: asFunction((packageJson: any) => {
       const { chainIds } = packageJson
