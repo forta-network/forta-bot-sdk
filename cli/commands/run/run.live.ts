@@ -20,6 +20,9 @@ export function provideRunLive(
 
     const network = await ethersProvider.getNetwork();
     const { chainId } = network;
+
+    const { blockTimeInSeconds } = getBlockChainNetworkConfig(chainId)
+    
     // poll for latest blocks
     while (shouldContinuePolling()) {
       const latestBlockNumber = await ethersProvider.getBlockNumber();
@@ -30,7 +33,7 @@ export function provideRunLive(
       // if no new blocks
       if (currBlockNumber > latestBlockNumber) {
         // wait for a bit
-        const { blockTimeInSeconds } = getBlockChainNetworkConfig(chainId)
+
         await sleep(blockTimeInSeconds);
       } else {
         // process new blocks
