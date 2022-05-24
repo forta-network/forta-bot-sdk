@@ -1,5 +1,5 @@
 import { providers } from "ethers";
-import { assertExists } from "../../utils";
+import { assertExists, getBlockChainNetworkConfig } from "../../utils";
 import { RunHandlersOnBlock } from "../../utils/run.handlers.on.block";
 
 // runs agent handlers against live blockchain data
@@ -18,6 +18,11 @@ export function provideRunLive(
     console.log("listening for blockchain data...");
     let currBlockNumber;
 
+    const network = await ethersProvider.getNetwork();
+    const { chainId } = network;
+
+    const { blockTimeInSeconds } = getBlockChainNetworkConfig(chainId)
+    
     // poll for latest blocks
     while (shouldContinuePolling()) {
       const latestBlockNumber = await ethersProvider.getBlockNumber();
@@ -28,7 +33,8 @@ export function provideRunLive(
       // if no new blocks
       if (currBlockNumber > latestBlockNumber) {
         // wait for a bit
-        await sleep(15000);
+
+        await sleep(blockTimeInSeconds);
       } else {
         // process new blocks
         while (currBlockNumber <= latestBlockNumber) {
