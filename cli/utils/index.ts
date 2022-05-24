@@ -190,3 +190,75 @@ export const createTransactionEvent: CreateTransactionEvent = (
     contractAddress
   )
 }
+
+type NetworkName = "ethereum" | "polygon" | "binance_smart_chain" | "avalanche" | "arbitrum" | "optimism" | "fantom";
+
+const DEFAULTS_BLOCK_TIME_IN_SECONDS = 15;
+
+export interface BlockchainNetworkConfig {
+  chainId: number,
+  blockTimeInSeconds: number
+}
+
+
+export const getBlockChainNetworkConfig = (chainId: number): BlockchainNetworkConfig => {
+  switch(chainId) {
+    case(1): {
+      return SUPPORTED_NETWORKS['ethereum']
+    }
+    case(137): {
+      return SUPPORTED_NETWORKS['polygon']
+    }
+    case(56): {
+      return SUPPORTED_NETWORKS['binance_smart_chain']
+    }
+    case(43114): {
+      return SUPPORTED_NETWORKS['avalanche']
+    }
+    case(42161): {
+      return SUPPORTED_NETWORKS['arbitrum']
+    }
+    case(10): {
+      return SUPPORTED_NETWORKS['optimism']
+    }
+    case(250): {
+      return SUPPORTED_NETWORKS['fantom']
+    }
+    default:
+      return {
+        chainId,
+        blockTimeInSeconds: DEFAULTS_BLOCK_TIME_IN_SECONDS
+      }
+  }
+}
+
+const SUPPORTED_NETWORKS: {[key in NetworkName]: BlockchainNetworkConfig} = {
+  "ethereum": {
+    chainId: 1,
+    blockTimeInSeconds: DEFAULTS_BLOCK_TIME_IN_SECONDS
+  },
+  "polygon": {
+    chainId: 137,
+    blockTimeInSeconds: 3 // https://polygonscan.com/chart/blocktime
+  },
+  "binance_smart_chain": {
+    chainId: 56,
+    blockTimeInSeconds: 5 // https://bscscan.com/chart/blocktime
+  },
+  "avalanche": {
+    chainId: 43114,
+    blockTimeInSeconds: 3 // https://avascan.info/
+  },
+  "arbitrum": {
+    chainId: 42161,
+    blockTimeInSeconds: DEFAULTS_BLOCK_TIME_IN_SECONDS
+  },
+  "optimism": {
+    chainId: 10,
+    blockTimeInSeconds: DEFAULTS_BLOCK_TIME_IN_SECONDS
+  },
+  "fantom": {
+    chainId: 250,
+    blockTimeInSeconds: 5 // https://ftmscan.com/chart/blocktime
+  }
+}
