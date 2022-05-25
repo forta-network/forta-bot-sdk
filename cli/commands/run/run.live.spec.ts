@@ -3,7 +3,8 @@ import { provideRunLive, RunLive } from "./run.live"
 describe("runLive", () => {
   let runLive: RunLive
   const mockEthersProvider = {
-    getBlockNumber: jest.fn()
+    getBlockNumber: jest.fn(),
+    getNetwork: jest.fn()
   } as any
   const mockRunHandlersOnBlock = jest.fn()
   const mockSleep = jest.fn()
@@ -13,9 +14,12 @@ describe("runLive", () => {
   const resetMocks = () => {
     mockRunHandlersOnBlock.mockReset()
     mockEthersProvider.getBlockNumber.mockReset()
+    mockEthersProvider.getNetwork.mockReset()
     mockSleep.mockReset()
     mockShouldContinuePolling.mockReset()
   }
+
+  const blockChainNetwork = { chainId: 1 }
 
   beforeAll(() => {
     runLive = provideRunLive(mockEthersProvider, mockRunHandlersOnBlock, mockSleep)
@@ -26,6 +30,7 @@ describe("runLive", () => {
   it("processes latest block on first iteration", async () => {
     mockShouldContinuePolling.mockReturnValueOnce(true).mockReturnValueOnce(false)
     mockEthersProvider.getBlockNumber.mockReturnValueOnce(latestBlockNumber)
+    mockEthersProvider.getNetwork.mockReturnValueOnce(blockChainNetwork)
 
     await runLive(mockShouldContinuePolling)
 
@@ -39,6 +44,7 @@ describe("runLive", () => {
   it("processes new blocks on following iterations", async () => {
     mockShouldContinuePolling.mockReturnValueOnce(true).mockReturnValueOnce(true).mockReturnValueOnce(false)
     mockEthersProvider.getBlockNumber.mockReturnValueOnce(latestBlockNumber).mockReturnValueOnce(latestBlockNumber+3)
+    mockEthersProvider.getNetwork.mockReturnValueOnce(blockChainNetwork)
 
     await runLive(mockShouldContinuePolling)
 
@@ -55,6 +61,7 @@ describe("runLive", () => {
   it("waits if there are no new blocks", async () => {
     mockShouldContinuePolling.mockReturnValueOnce(true).mockReturnValueOnce(true).mockReturnValueOnce(false)
     mockEthersProvider.getBlockNumber.mockReturnValueOnce(latestBlockNumber).mockReturnValueOnce(latestBlockNumber)
+    mockEthersProvider.getNetwork.mockReturnValueOnce(blockChainNetwork)
 
     await runLive(mockShouldContinuePolling)
 

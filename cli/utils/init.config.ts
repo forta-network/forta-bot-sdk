@@ -45,6 +45,6 @@ export default function provideInitConfig(
     console.log(`Saving agentId: ${agentId} in project ${localConfigFilename}`);
 
     const data: FortaConfig = { agentId };
-    fs.writeFileSync(localFilePath, jsonc.stringify(data))
+    filesystem.writeFileSync(localFilePath, jsonc.stringify(data))
   };
 }
