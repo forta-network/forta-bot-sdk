@@ -2,8 +2,9 @@ import { join } from "path";
 import fs from "fs";
 import shelljs from "shelljs";
 import { assertExists, assertIsNonEmptyString, assertShellResult } from ".";
-import {stringify, assign} from "comment-json";
-import { GetFortaConfig } from "./get.forta.config";
+import { jsonc } from 'jsonc';
+import { v4 as uuidv4 } from 'uuid';
+import { FortaConfig, keccak256 } from "../../sdk";
 
 // create global forta.config.json if doesnt already exist
 export type InitConfig = () => Promise<void>;
@@ -13,34 +14,37 @@ export default function provideInitConfig(
   filesystem: typeof fs,
   fortaKeystore: string,
   configFilename: string,
-  agentId: string,
-  getFortaConfig: GetFortaConfig
+  contextPath: string,
+  localConfigFilename: string,
 ) {
   assertExists(shell, "shell");
   assertExists(filesystem, "filesystem");
   assertIsNonEmptyString(fortaKeystore, "fortaKeystore");
   assertIsNonEmptyString(configFilename, "configFilename");
+  assertIsNonEmptyString(contextPath, "contextPath");
+  assertIsNonEmptyString(localConfigFilename, "localConfigFilename");
 
   return async function initConfig() {
     const filePath = join(fortaKeystore, configFilename);
+    const localFilePath = join(contextPath, localConfigFilename);
+
     if (!filesystem.existsSync(filePath)) {
-      // Create file
+      // Create global file
       console.log(`Creating ${configFilename}...`);
       const copyConfigResult = shell.cp(
         join(__dirname, "..", "commands", "init", configFilename),
         fortaKeystore
       );
       assertShellResult(copyConfigResult, `Error creating ${configFilename}`);
-
-      const fortaCon = getFortaConfig();
-
-      // Save initial forta config
-      console.log(`Saving agentId: ${agentId} in ${configFilename}`);
-
-      const data = assign({agentId}, fortaCon);
-      fs.writeFileSync(filePath, stringify(data, undefined, 1))
     } else {
-      console.log(`Found existing ${configFilename} in ${fortaKeystore}`);
+      console.log(`Found existing global ${configFilename} in ${fortaKeystore}`);
     }
+
+    // Save random agentId in initial project forta config
+    const agentId = keccak256(uuidv4())
+    console.log(`Saving agentId: ${agentId} in project ${localConfigFilename}`);
+
+    const data: FortaConfig = { agentId };
+    fs.writeFileSync(localFilePath, jsonc.stringify(data))
   };
 }

@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { join } from "path";
 import provideInitConfig, { InitConfig } from "./init.config";
 
@@ -12,8 +11,8 @@ describe("initConfig", () => {
   } as any;
   const mockFortaKeystore = "/some/keystore/path";
   const mockConfigFilename = "forta.config.json";
-  const mockGetFortaConfig = jest.fn();
-  const agentId = randomUUID();
+  const contextPath = "~/";
+  const localConfigFilename = "forta.test.config";
 
   const resetMocks = () => {
     mockShell.cp.mockReset();
@@ -28,8 +27,8 @@ describe("initConfig", () => {
       mockFilesystem,
       mockFortaKeystore,
       mockConfigFilename,
-      agentId,
-      mockGetFortaConfig
+      contextPath,
+      localConfigFilename
     );
   });
 
