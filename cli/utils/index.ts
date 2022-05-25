@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import _ from 'lodash'
-import { parse } from "comment-json";
+import { jsonc } from 'jsonc'
 import { Keccak } from 'sha3'
 import { ShellString } from 'shelljs'
 import { getContractAddress } from '@ethersproject/address'
@@ -11,13 +11,13 @@ import { Trace } from '../../sdk/trace'
 import { JsonRpcBlock, JsonRpcTransaction } from './get.block.with.transactions'
 import { JsonRpcLog } from './get.transaction.receipt'
 
-export type GetJsonFile = (filePath: string, removeComments?: boolean ) => any
-export const getJsonFile: GetJsonFile = (filePath: string, removeComments: boolean = true) => {
+export type GetJsonFile = (filePath: string) => any
+export const getJsonFile: GetJsonFile = (filePath: string) => {
   if (filePath.startsWith(`.${path.sep}`)) {
     filePath = filePath.replace(`.${path.sep}`, `${process.cwd()}${path.sep}`)
   }
-  const data = fs.readFileSync(filePath, 'utf8').toString()
-  return parse(data, undefined, removeComments)
+  const data = fs.readFileSync(filePath, 'utf8')
+  return jsonc.parse(data)
 }
 
 export const assertExists = (obj: any, objName: string) => {

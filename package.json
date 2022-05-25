@@ -29,12 +29,13 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.3.6",
     "@grpc/proto-loader": "^0.6.4",
+    "@types/uuid": "^8.3.4",
     "awilix": "^4.3.4",
     "axios": "^0.21.1",
-    "comment-json": "^4.2.2",
     "ethers": "^5.5.1",
     "flat-cache": "^3.0.4",
     "form-data": "^4.0.0",
+    "jsonc": "^2.0.0",
     "keythereum": "^1.2.0",
     "lodash": "^4.17.21",
     "n-readlines": "^1.0.1",
@@ -42,6 +43,7 @@
     "python-shell": "^3.0.0",
     "sha3": "^2.1.4",
     "shelljs": "^0.8.4",
+    "uuid": "^8.3.2",
     "yargs": "^17.0.1"
   },
   "devDependencies": {

@@ -71,7 +71,7 @@ export default function provideInit(
 
     // make sure keystore folder exists
     await initKeystore()
-    // create global forta.config.json if doesnt already exist
+    // create global forta.config.json and local forta.config.json if doesnt already exist
     await initConfig()
     // create keyfile if one doesnt already exist
     await initKeyfile()

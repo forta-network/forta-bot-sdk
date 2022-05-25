@@ -1,6 +1,5 @@
 import { join } from "path"
 import fs from 'fs'
-import {assign} from "comment-json";
 import { FortaConfig } from "../../sdk"
 import { assertExists, assertIsNonEmptyString, GetJsonFile } from "."
 
@@ -36,7 +35,7 @@ export default function provideGetFortaConfig(
     // try to read from global config file
     if (globalConfigExists) {
       try {
-        config = assign(config, getJsonFile(globalConfigPath, false))
+        config = Object.assign(config, getJsonFile(globalConfigPath))
       } catch (e) {
         throw new Error(`unable to parse config file ${configFilename}: ${e.message}`)
       }
@@ -45,7 +44,7 @@ export default function provideGetFortaConfig(
     // try to read from local (project-specific) config file
     if (localConfigExists) {
       try {
-        config = assign(config, getJsonFile(localConfigPath, false))
+        config = Object.assign(config, getJsonFile(localConfigPath))
       } catch (e) {
         throw new Error(`unable to parse project config file ${localConfigFilename}: ${e.message}`)
       }

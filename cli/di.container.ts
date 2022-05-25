@@ -5,7 +5,7 @@ import { asClass, asFunction, asValue, createContainer, InjectionMode } from "aw
 import { ethers } from "ethers"
 import shell from 'shelljs'
 import prompts from 'prompts'
-import { parse } from "comment-json"
+import { jsonc } from 'jsonc'
 import axios, { AxiosRequestConfig } from 'axios'
 import flatCache from 'flat-cache'
 import provideInit from "./commands/init"
@@ -50,7 +50,6 @@ import provideInitConfig from './utils/init.config'
 import provideGetLogsForBlock from './utils/get.logs.for.block'
 import { provideGetAgentLogs } from './utils/get.agent.logs'
 import provideLogs from './commands/logs'
-import { randomUUID } from 'crypto'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -123,8 +122,8 @@ export default function configureContainer(args: any = {}) {
     }).singleton(),
     agentName: asFunction((packageJson: any) => packageJson.name).singleton(),
     description: asFunction((packageJson: any) => packageJson.description).singleton(),
-    agentId: asFunction((fortaConfig: FortaConfig) => {
-      return fortaConfig.agentId || keccak256(randomUUID())
+    agentId: asFunction((fortaConfig: FortaConfig, agentName: string) => {
+      return fortaConfig.agentId || keccak256(agentName)
     }).singleton(),
     chainIds: asFunction((packageJson: any) => {
       const { chainIds } = packageJson
@@ -157,7 +156,7 @@ export default function configureContainer(args: any = {}) {
       if (fs.existsSync(join(contextPath, "src", "agent.ts"))) {
         // point to compiled javascript agent in output folder
         const tsConfigPath = join(contextPath, "tsconfig.json")
-        const { compilerOptions } = parse(fs.readFileSync(tsConfigPath, 'utf8')) as any
+        const { compilerOptions } = jsonc.parse(fs.readFileSync(tsConfigPath, 'utf8'))
         agentPath = join(contextPath, compilerOptions.outDir, "agent")
       }
       // check if python agent
