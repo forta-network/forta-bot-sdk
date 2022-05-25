@@ -1,37 +1,35 @@
 import { Trace } from "../../sdk";
-import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetTraceData } from "./get.trace.data";
-import { assertExists, CreateBlockEvent, CreateTransactionEvent } from ".";
+import { assertExists, CreateGrpcEvaluateBlockRequest, CreateGrpcEvaluateTxRequest, stringifyFindings } from ".";
 import { GetNetworkId } from "./get.network.id";
 import { GetBlockWithTransactions } from "./get.block.with.transactions";
 import { JsonRpcLog } from "./get.transaction.receipt";
 import { GetLogsForBlock } from "./get.logs.for.block";
+import { GrpcHandleTransaction } from "../proto/grpc.handle.transaction";
+import { GrpcHandleBlock } from "../proto/grpc.handle.block";
 
 export type RunHandlersOnBlock = (blockHashOrNumber: string | number) => Promise<void>
 
 export function provideRunHandlersOnBlock(
-  getAgentHandlers: GetAgentHandlers,
   getNetworkId: GetNetworkId,
   getBlockWithTransactions: GetBlockWithTransactions,
   getTraceData: GetTraceData,
   getLogsForBlock: GetLogsForBlock,
-  createBlockEvent: CreateBlockEvent,
-  createTransactionEvent: CreateTransactionEvent
+  createGrpcEvaluateBlockRequest: CreateGrpcEvaluateBlockRequest,
+  grpcHandleBlock: GrpcHandleBlock,
+  createGrpcEvaluateTxRequest: CreateGrpcEvaluateTxRequest,
+  grpcHandleTransaction: GrpcHandleTransaction
 ): RunHandlersOnBlock {
-  assertExists(getAgentHandlers, 'getAgentHandlers')
   assertExists(getNetworkId, 'getNetworkId')
   assertExists(getBlockWithTransactions, 'getBlockWithTransactions')
   assertExists(getTraceData, 'getTraceData')
   assertExists(getLogsForBlock, 'getLogsForBlock')
-  assertExists(createBlockEvent, 'createBlockEvent')
-  assertExists(createTransactionEvent, 'createTransactionEvent')
+  assertExists(createGrpcEvaluateBlockRequest, 'createGrpcEvaluateBlockRequest')
+  assertExists(grpcHandleBlock, 'grpcHandleBlock')
+  assertExists(createGrpcEvaluateTxRequest, 'createGrpcEvaluateTxRequest')
+  assertExists(grpcHandleTransaction, 'grpcHandleTransaction')
 
   return async function runHandlersOnBlock(blockHashOrNumber: string | number) {
-    const { handleBlock, handleTransaction } = await getAgentHandlers()
-    if (!handleBlock && !handleTransaction) {
-      throw new Error("no block/transaction handler found")
-    }
-
     console.log(`fetching block ${blockHashOrNumber}...`)
     const [networkId, block] = await Promise.all([
       getNetworkId(),
@@ -39,21 +37,18 @@ export function provideRunHandlersOnBlock(
     ]) 
 
     // run block handler
-    if (handleBlock) {
-      const blockEvent = createBlockEvent(block, networkId)
-      const findings = await handleBlock(blockEvent)
-      console.log(`${findings.length} findings for block ${block.hash} ${findings}`)
-    }
+    const request = createGrpcEvaluateBlockRequest(block, networkId)
+    const findings = await grpcHandleBlock(request)
+    console.log(`${findings.length} findings for block ${block.hash} ${stringifyFindings(findings)}`)
 
-    if (!handleTransaction) return
-    
+    // get block logs and trace data to run transaction handler
     const blockNumber = parseInt(block.number)
     const [logs, traces] = await Promise.all([
       getLogsForBlock(blockNumber),
       getTraceData(blockNumber)
     ])
 
-    // get logs for block and build map for each transaction
+    // build map of logs for each transaction
     const logMap: { [txHash: string]: JsonRpcLog[] } = {}
     logs.forEach(log => {
       if (!log.transactionHash) return
@@ -62,7 +57,7 @@ export function provideRunHandlersOnBlock(
       logMap[txHash].push(log)
     })
 
-    // get trace data for block and build map for each transaction
+    // build map of trace data for each transaction
     const traceMap: { [txHash: string]: Trace[]} = {}
     traces.forEach(trace => {
       if (!trace.transactionHash) return
@@ -74,9 +69,9 @@ export function provideRunHandlersOnBlock(
     // run transaction handler on all block transactions
     for (const transaction of block.transactions) {
       const txHash = transaction.hash.toLowerCase()
-      const txEvent = createTransactionEvent(transaction, block, networkId, traceMap[txHash], logMap[txHash])
-      const findings = await handleTransaction(txEvent)
-      console.log(`${findings.length} findings for transaction ${transaction.hash} ${findings}`)
+      const request = createGrpcEvaluateTxRequest(transaction, block, networkId, traceMap[txHash], logMap[txHash])
+      const findings = await grpcHandleTransaction(request)
+      console.log(`${findings.length} findings for transaction ${transaction.hash} ${stringifyFindings(findings)}`)
     }
   }
 }

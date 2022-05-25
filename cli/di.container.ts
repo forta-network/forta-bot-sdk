@@ -8,6 +8,8 @@ import prompts from 'prompts'
 import { jsonc } from 'jsonc'
 import axios, { AxiosRequestConfig } from 'axios'
 import flatCache from 'flat-cache'
+import { loadPackageDefinition, credentials } from "@grpc/grpc-js";
+import { loadSync } from "@grpc/proto-loader";
 import provideInit from "./commands/init"
 import provideRun from "./commands/run"
 import providePublish from "./commands/publish"
@@ -25,7 +27,7 @@ import provideRunServer from "./commands/run/server"
 import provideUploadImage from './commands/publish/upload.image'
 import provideUploadManifest from './commands/publish/upload.manifest'
 import providePushToRegistry from './commands/publish/push.to.registry'
-import { createBlockEvent, createTransactionEvent, getJsonFile, keccak256 } from "./utils"
+import { createBlockEvent, createGrpcEvaluateBlockRequest, createGrpcEvaluateTxRequest, createTransactionEvent, getJsonFile, keccak256 } from "./utils"
 import AgentRegistry from "./contracts/agent.registry"
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
 import { provideDecryptKeyfile } from "./utils/decrypt.keyfile"
@@ -48,6 +50,8 @@ import provideInitKeystore from './utils/init.keystore'
 import provideInitKeyfile from './utils/init.keyfile'
 import provideInitConfig from './utils/init.config'
 import provideGetLogsForBlock from './utils/get.logs.for.block'
+import provideGrpcHandleTransaction from './proto/grpc.handle.transaction'
+import provideGrpcHandleBlock from './proto/grpc.handle.block'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -195,8 +199,31 @@ export default function configureContainer(args: any = {}) {
       return fortaConfig.traceTransactionMethod || "trace_transaction"
     }).singleton(),
 
-    agentController: asClass(AgentController),
     port: asValue(process.env.AGENT_GRPC_PORT || "50051"),
+    protoFilename: asValue("agent.proto"),
+    protoFilepath: asFunction((protoFilename: string) => join(__dirname, 'proto', protoFilename)),
+    agentProto: asFunction((protoFilepath: string) => {
+      const packageDefinition = loadSync(protoFilepath, {
+        keepCase: true,
+        longs: String,
+        enums: String,
+        defaults: true,
+        oneofs: true,
+      });
+      return loadPackageDefinition(packageDefinition);
+    }),
+    agentGrpcClient: asFunction((port: string, agentProto: any) => {
+      return new agentProto.network.forta.Agent(
+        `0.0.0.0:${port}`,
+        credentials.createInsecure()
+      );
+    }).singleton(),
+    createGrpcEvaluateBlockRequest: asValue(createGrpcEvaluateBlockRequest),
+    grpcHandleBlock: asFunction(provideGrpcHandleBlock),
+    createGrpcEvaluateTxRequest: asValue(createGrpcEvaluateTxRequest),
+    grpcHandleTransaction: asFunction(provideGrpcHandleTransaction),
+
+    agentController: asClass(AgentController),
 
     imageRepositoryUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.imageRepositoryUrl || "disco.forta.network"

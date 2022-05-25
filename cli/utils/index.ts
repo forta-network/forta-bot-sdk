@@ -6,10 +6,11 @@ import { Keccak } from 'sha3'
 import { ShellString } from 'shelljs'
 import { getContractAddress } from '@ethersproject/address'
 
-import { BlockEvent, EventType, Log, TransactionEvent } from "../../sdk"
+import { BlockEvent, EventType, TransactionEvent } from "../../sdk"
 import { Trace } from '../../sdk/trace'
 import { JsonRpcBlock, JsonRpcTransaction } from './get.block.with.transactions'
 import { JsonRpcLog } from './get.transaction.receipt'
+import { GrpcEvaluateBlockRequest, GrpcEvaluateTxRequest, GrpcEventType, GrpcFinding, GrpcFindingSeverity, GrpcFindingType } from '../proto/types'
 
 export type GetJsonFile = (filePath: string) => any
 export const getJsonFile: GetJsonFile = (filePath: string) => {
@@ -50,7 +51,138 @@ export const isZeroAddress = (address: string | null) => {
   return "0x0000000000000000000000000000000000000000" === address
 }
 
-// creates a Forta BlockEvent from a json-rpc block object
+export const capitalizeFirstLetter = (word: string) => {
+  if (!word || !word.length) return ''
+
+  const firstLetter = word.charAt(0)
+  const restOfWord = word.substring(1, word.length)
+  return `${firstLetter.toUpperCase()}${restOfWord.toLowerCase()}`
+}
+
+export const stringifyFindings = (findings: GrpcFinding[]): string => {
+  return findings.map(finding => JSON.stringify({
+    name: finding.name,
+    description: finding.description,
+    alertId: finding.alertId,
+    protocol: finding.protocol,
+    severity: capitalizeFirstLetter(finding.severity.toString()),
+    type: capitalizeFirstLetter(finding.type.toString()),
+    metadata: finding.metadata,
+    addresses: finding.addresses
+  }, null, 2)).join('\n')
+}
+
+// creates a GrpcEvaluateBlockRequest from a raw json-rpc block
+export type CreateGrpcEvaluateBlockRequest = (block: JsonRpcBlock, networkId: number) => GrpcEvaluateBlockRequest
+export const createGrpcEvaluateBlockRequest: CreateGrpcEvaluateBlockRequest = (block: JsonRpcBlock, networkId: number) => {
+  return {
+    requestId: `${Date.now()}`,
+    event: {
+      type: GrpcEventType.BLOCK,
+      network: {
+        chainId: `${networkId}`
+      },
+      blockHash: block.hash,
+      blockNumber: block.number,
+      block: {
+        difficulty: block.difficulty,
+        extraData: block.extraData,
+        gasLimit: block.gasLimit,
+        gasUsed: block.gasUsed,
+        hash: block.hash,
+        logsBloom: block.logsBloom,
+        miner: formatAddress(block.miner),
+        mixHash: block.mixHash,
+        nonce: block.nonce,
+        number: block.number,
+        parentHash: block.parentHash,
+        receiptsRoot: block.receiptsRoot,
+        sha3Uncles: block.sha3Uncles,
+        size: block.size,
+        stateRoot: block.stateRoot,
+        timestamp: block.timestamp,
+        totalDifficulty: block.totalDifficulty,
+        transactions: block.transactions.map(tx => tx.hash),
+        transactionsRoot: block.transactionsRoot,
+        uncles: block.uncles
+      }
+    }
+  }
+}
+
+// creates a GrpcEvaluateTxRequest from a raw json-rpc transaction and block
+export type CreateGrpcEvaluateTxRequest = (transaction: JsonRpcTransaction, block: JsonRpcBlock, networkId: number, traces: Trace[], logs: JsonRpcLog[]) => GrpcEvaluateTxRequest
+export const createGrpcEvaluateTxRequest: CreateGrpcEvaluateTxRequest = (
+  transaction: JsonRpcTransaction,
+  block: JsonRpcBlock, 
+  networkId: number, 
+  traces: Trace[] = [],
+  logs: JsonRpcLog[] = []
+) => {
+  const addresses = {
+    [formatAddress(transaction.from)]: true
+  }
+  if (transaction.to) {
+    addresses[formatAddress(transaction.to)] = true;
+  }
+  traces.forEach(trace => {
+    addresses[formatAddress(trace.action.address)] = true
+    addresses[formatAddress(trace.action.refundAddress)] = true
+    addresses[formatAddress(trace.action.to)] = true
+    addresses[formatAddress(trace.action.from)] = true
+  })
+  logs.forEach(log => addresses[formatAddress(log.address)] = true)
+  const contractAddress = isZeroAddress(transaction.to) ? formatAddress(getContractAddress({ from: transaction.from, nonce: transaction.nonce })) : ''
+
+  return {
+    requestId: `${Date.now()}`,
+    event: {
+      type: GrpcEventType.BLOCK,
+      network: {
+        chainId: `${networkId}`
+      },
+      transaction: {
+        type: '',
+        nonce: transaction.nonce,
+        gasPrice: transaction.gasPrice,
+        gas: transaction.gas,
+        value: transaction.value,
+        input: transaction.input,
+        v: transaction.v,
+        r: transaction.r,
+        s: transaction.s,
+        to: transaction.to ? formatAddress(transaction.to) : '',
+        hash: transaction.hash,
+        from: formatAddress(transaction.from)
+      },
+      receipt: {
+        root: '',
+        status: "0x1",
+        cumulativeGasUsed: '',
+        logsBloom: '',
+        logs: logs,
+        transactionHash: transaction.hash,
+        contractAddress: contractAddress,
+        gasUsed: transaction.gas,
+        blockHash: block.hash,
+        blockNumber: block.number,
+        transactionIndex: ''
+      },
+      block: {
+        blockHash: block.hash,
+        blockNumber: block.number,
+        blockTimestamp: block.timestamp
+      },
+      addresses: addresses,
+      traces: traces,
+      logs: logs,
+      isContractDeployment: isZeroAddress(transaction.to),
+      contractAddress: contractAddress
+    }
+  }
+}
+
+// creates a SDK BlockEvent from a raw json-rpc block
 export type CreateBlockEvent = (block: JsonRpcBlock, networkId: number) => BlockEvent
 export const createBlockEvent: CreateBlockEvent = (block: JsonRpcBlock, networkId: number) => {
   const blok = {
@@ -78,7 +210,7 @@ export const createBlockEvent: CreateBlockEvent = (block: JsonRpcBlock, networkI
   return new BlockEvent(EventType.BLOCK, networkId, blok)
 }
 
-// creates a Forta TransactionEvent from a json-rpc transaction receipt and block object
+// creates a SDK TransactionEvent from a raw json-rpc transaction and block
 export type CreateTransactionEvent = (transaction: JsonRpcTransaction, block: JsonRpcBlock, networkId: number, traces: Trace[], logs: JsonRpcLog[]) => TransactionEvent
 export const createTransactionEvent: CreateTransactionEvent = (
   transaction: JsonRpcTransaction, 
