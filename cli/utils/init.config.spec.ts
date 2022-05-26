@@ -8,13 +8,17 @@ describe("initConfig", () => {
   } as any;
   const mockFilesystem = {
     existsSync: jest.fn(),
+    writeFileSync: jest.fn()
   } as any;
   const mockFortaKeystore = "/some/keystore/path";
   const mockConfigFilename = "forta.config.json";
+  const contextPath = "~/";
+  const localConfigFilename = "forta.test.config";
 
   const resetMocks = () => {
     mockShell.cp.mockReset();
     mockFilesystem.existsSync.mockReset();
+    mockFilesystem.writeFileSync.mockReset();
   };
 
   beforeEach(() => resetMocks());
@@ -24,7 +28,8 @@ describe("initConfig", () => {
       mockShell,
       mockFilesystem,
       mockFortaKeystore,
-      mockConfigFilename
+      mockConfigFilename,
+      contextPath
     );
   });
 
@@ -54,6 +59,7 @@ describe("initConfig", () => {
 
   it("does nothing if config file already exists", async () => {
     mockFilesystem.existsSync.mockReturnValueOnce(true);
+    mockFilesystem.writeFileSync.mockResolvedValue();
 
     await initConfig();
 
@@ -62,5 +68,6 @@ describe("initConfig", () => {
       join(mockFortaKeystore, mockConfigFilename)
     );
     expect(mockShell.cp).toHaveBeenCalledTimes(0);
+    expect(mockFilesystem.writeFileSync).toHaveBeenCalledTimes(1);
   });
 });

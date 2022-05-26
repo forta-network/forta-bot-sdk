@@ -34,7 +34,7 @@ export function provideRunLive(
       if (currBlockNumber > latestBlockNumber) {
         // wait for a bit
 
-        await sleep(blockTimeInSeconds);
+        await sleep(blockTimeInSeconds * 1000);
       } else {
         // process new blocks
         while (currBlockNumber <= latestBlockNumber) {
