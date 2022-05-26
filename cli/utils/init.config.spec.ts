@@ -29,8 +29,7 @@ describe("initConfig", () => {
       mockFilesystem,
       mockFortaKeystore,
       mockConfigFilename,
-      contextPath,
-      localConfigFilename
+      contextPath
     );
   });
 

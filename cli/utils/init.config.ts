@@ -14,19 +14,18 @@ export default function provideInitConfig(
   filesystem: typeof fs,
   fortaKeystore: string,
   configFilename: string,
-  contextPath: string,
-  localConfigFilename: string,
+  contextPath: string
 ) {
   assertExists(shell, "shell");
   assertExists(filesystem, "filesystem");
   assertIsNonEmptyString(fortaKeystore, "fortaKeystore");
   assertIsNonEmptyString(configFilename, "configFilename");
   assertIsNonEmptyString(contextPath, "contextPath");
-  assertIsNonEmptyString(localConfigFilename, "localConfigFilename");
+  
 
   return async function initConfig() {
     const filePath = join(fortaKeystore, configFilename);
-    const localFilePath = join(contextPath, localConfigFilename);
+    const localFilePath = join(contextPath, configFilename);
 
     if (!filesystem.existsSync(filePath)) {
       // Create global file
@@ -42,7 +41,7 @@ export default function provideInitConfig(
 
     // Save random agentId in initial project forta config
     const agentId = keccak256(uuidv4())
-    console.log(`Saving agentId: ${agentId} in project ${localConfigFilename}`);
+    console.log(`Saving agentId: ${agentId} in project ${configFilename}`);
 
     const data: FortaConfig = { agentId };
     filesystem.writeFileSync(localFilePath, jsonc.stringify(data))
