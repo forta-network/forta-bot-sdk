@@ -1,4 +1,5 @@
 import { BigNumber, ethers, providers, Wallet } from "ethers"
+import { EventFragment, Interface } from "ethers/lib/utils"
 import AgentRegistryAbi from "./agent.registry.abi.json"
 
 const GAS_MULTIPLIER = 1.15
@@ -12,6 +13,27 @@ type AgentDescription = {
   created: boolean;
   owner: string;
   metadata: string;
+}
+
+export const AGENT_REGISTRY_ABI = new Interface(AgentRegistryAbi);
+export const AGENT_REGESTRY_EVENT_FRAGMENTS = AGENT_REGISTRY_ABI.fragments.filter(fragment => fragment.type === "event") as EventFragment[];
+
+const RELEVANT_SMART_CONTRACT_EVENTS = ["AgentEnabled", "AgentUpdated", "Transfer"] as const;
+export type StateChangeContractEvent = (typeof RELEVANT_SMART_CONTRACT_EVENTS)[number];
+export const isRelevantSmartContractEvent = (str: any): str is StateChangeContractEvent => RELEVANT_SMART_CONTRACT_EVENTS.includes(str);
+
+
+export const getTopicHashFromEventName = (eventName: StateChangeContractEvent): string | undefined => {
+  const fragment = AGENT_REGESTRY_EVENT_FRAGMENTS.find(fragment => fragment.name === eventName);
+
+  if(fragment){
+      return AGENT_REGISTRY_ABI.getEventTopic(fragment);
+  }
+  return;
+}
+
+export const getEventNameFromTopicHash = (topicHash: string): EventFragment => {
+  return AGENT_REGISTRY_ABI.getEvent(topicHash)
 }
 
 export default class AgentRegistry {

@@ -50,6 +50,8 @@ import provideInitConfig from './utils/init.config'
 import provideGetLogsForBlock from './utils/get.logs.for.block'
 import { provideGetAgentLogs } from './utils/get.agent.logs'
 import provideLogs from './commands/logs'
+import provideInfo from './commands/info'
+import provideGetFromIpfs from './utils/ipfs/get.from.ipfs'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -92,6 +94,7 @@ export default function configureContainer(args: any = {}) {
     }).singleton(),
 
     init: asFunction(provideInit),
+    info: asFunction(provideInfo),
     run: asFunction(provideRun),
     logs: asFunction(provideLogs),
     publish: asFunction(providePublish),
@@ -177,6 +180,7 @@ export default function configureContainer(args: any = {}) {
     createKeyfile: asFunction(provideCreateKeyfile),
     listKeyfiles: asFunction(provideListKeyfiles),
     addToIpfs: asFunction(provideAddToIpfs),
+    getFromIpfs: asFunction(provideGetFromIpfs),
     appendToFile: asFunction(provideAppendToFile),
     initKeystore: asFunction(provideInitKeystore),
     initKeyfile: asFunction(provideInitKeyfile),

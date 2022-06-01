@@ -5,6 +5,9 @@ describe("getTransactionReceipt", () => {
   const mockEthersProvider = {
     send: jest.fn()
   } as any
+  const mockRegistryEthersProvider = {
+    send: jest.fn()
+  } as any
   const mockCache = {
     getKey: jest.fn(),
     setKey: jest.fn()
@@ -17,7 +20,7 @@ describe("getTransactionReceipt", () => {
   }
 
   beforeAll(() => {
-    getTransactionReceipt = provideGetTransactionReceipt(mockEthersProvider, mockCache)
+    getTransactionReceipt = provideGetTransactionReceipt(mockEthersProvider, mockRegistryEthersProvider, mockCache)
   })
 
   beforeEach(() => resetMocks())
