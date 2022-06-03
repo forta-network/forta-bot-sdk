@@ -32,8 +32,15 @@ export const getTopicHashFromEventName = (eventName: StateChangeContractEvent): 
   return;
 }
 
-export const getEventNameFromTopicHash = (topicHash: string): EventFragment => {
-  return AGENT_REGISTRY_ABI.getEvent(topicHash)
+export const getEventNameFromTopicHash = (topicHash: string): string => {
+  const eventFragment = AGENT_REGISTRY_ABI.getEvent(topicHash);
+  const name = eventFragment.name;
+
+  if(name === "Transfer") {
+    return "Create Agent";
+  }
+
+  return name;
 }
 
 export default class AgentRegistry {
