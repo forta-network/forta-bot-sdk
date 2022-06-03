@@ -34,12 +34,7 @@ export const getTopicHashFromEventName = (eventName: StateChangeContractEvent): 
 
 export const getEventNameFromTopicHash = (topicHash: string): string => {
   const eventFragment = AGENT_REGISTRY_ABI.getEvent(topicHash);
-  const name = eventFragment.name;
-
-  if(name === "Transfer") {
-    return "Create Agent";
-  }
-
+  let name = eventFragment.name;
   return name;
 }
 

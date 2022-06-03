@@ -6,7 +6,7 @@ import AgentRegistry,
   isRelevantSmartContractEvent, 
   StateChangeContractEvent } from "../../contracts/agent.registry";
 import { assertExists, assertIsNonEmptyString, getBlockChainNetworkConfig } from "../../utils";
-import { GetFromIpfs, IpfsMetadata } from "../../utils/ipfs/get.from.ipfs";
+import { formatIpfsData, GetFromIpfs, IpfsMetadata } from "../../utils/ipfs/get.from.ipfs";
 import { providers } from "ethers";
 import { GetTransactionReceipt } from "../../utils/get.transaction.receipt";
 import { flatten } from "lodash";
@@ -31,12 +31,12 @@ export default function provideInfo(
         assertIsNonEmptyString(finalAgentId, 'agentId');
 
         const agent = await agentRegistry.getAgent(finalAgentId);
-        const currentState = await agentRegistry.isEnabled(finalAgentId)
+        const currentState = await agentRegistry.isEnabled(finalAgentId) as boolean
         const ipfsMetaHash = agent.metadata;
 
 
         const ipfsData = await getFromIpfs(ipfsMetaHash)
-        printIpfsMetaData(ipfsData)
+        printIpfsMetaData(ipfsData,currentState)
 
         console.log(`Recent Activity (Last ${DAYS_TO_SCAN} days): \n`);
 
@@ -83,7 +83,7 @@ export default function provideInfo(
                 if(transaction.from.toLowerCase() === ipfsData.from.toLowerCase()) {
                     const block = await ethersAgentRegistryProvider.getBlock(log.blockNumber)
                     const eventName = getEventNameFromTopicHash(log.topics[0]);
-                    console.log(` - ${eventName} by ${ipfsData.from} on ${new Date(block.timestamp * 1000)} (https://polygonscan.com/tx/${transaction.transactionHash})\n \n`)
+                    console.log(` - ${formatEventName(eventName)} by ${ipfsData.from} on ${new Date(block.timestamp * 1000)} (https://polygonscan.com/tx/${transaction.transactionHash})\n \n`)
                 }
             }
 
@@ -92,8 +92,18 @@ export default function provideInfo(
     }
 }
 
-const printIpfsMetaData = (ipfsData: IpfsMetadata) => {
+const printIpfsMetaData = (ipfsData: IpfsMetadata, botStatus: boolean) => {
+    const formattedData = formatIpfsData(ipfsData, botStatus)
     console.log("\n")
-    Object.entries(ipfsData).forEach(([key, value]) => console.log(`${key}: ${value}`))
+    Object.entries(formattedData).forEach(([key, value]) => console.log(`${key}: ${value}`))
+    console.log("\n")
+}
+
+const formatEventName = (eventName: string): string => {
+    if(eventName === "Transfer") {
+        return "Bot Created";
+    }
+
+    return eventName.replace("Agent", "Bot ");
 }
 
