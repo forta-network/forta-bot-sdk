@@ -12,7 +12,7 @@ import { GetTransactionReceipt } from "../../utils/get.transaction.receipt";
 import { flatten } from "lodash";
 
 const SECONDS_IN_DAY = 86000;
-const DAYS_TO_SCAN = 30;
+const DEFAULT_DAYS_TO_SCAN = 30;
 
 export default function provideInfo(
     agentId: string,
@@ -25,7 +25,7 @@ export default function provideInfo(
 ): CommandHandler {
     assertExists(getFromIpfs, 'getFromIpfs')
 
-    return async function info() {
+    return async function info(daysToScan = DEFAULT_DAYS_TO_SCAN) {
         const finalAgentId = args.agentId ? args.agentId : agentId;
 
         assertIsNonEmptyString(finalAgentId, 'agentId');
@@ -38,7 +38,7 @@ export default function provideInfo(
         const ipfsData = await getFromIpfs(ipfsMetaHash)
         printIpfsMetaData(ipfsData,currentState)
 
-        console.log(`Recent Activity (Last ${DAYS_TO_SCAN} days): \n`);
+        console.log(`Recent Activity (Last ${daysToScan} days): \n`);
 
         const blockEventTopicFilters = AGENT_REGESTRY_EVENT_FRAGMENTS
             .filter(fragment => isRelevantSmartContractEvent(fragment.name))
@@ -50,7 +50,7 @@ export default function provideInfo(
         const { chainId } = network;
         const { blockTimeInSeconds } = getBlockChainNetworkConfig(chainId);
 
-        const endingBlock = Math.floor(latestBlockNumber - ((DAYS_TO_SCAN * SECONDS_IN_DAY)/(blockTimeInSeconds)));
+        const endingBlock = Math.floor(latestBlockNumber - ((daysToScan * SECONDS_IN_DAY)/(blockTimeInSeconds)));
 
         const increment = 1000;
         let startingBlock = latestBlockNumber - (increment * 5);
