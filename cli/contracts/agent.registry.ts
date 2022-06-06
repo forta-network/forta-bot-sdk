@@ -9,7 +9,7 @@ const FALLBACK_UPDATE_AGENT_GAS_LIMIT = BigNumber.from(95_000)
 const FALLBACK_ENABLE_AGENT_GAS_LIMIT = BigNumber.from(55_000)
 const FALLBACK_DISABLE_AGENT_GAS_LIMIT = BigNumber.from(70_000)
 
-type AgentDescription = {
+ export type AgentDescription = {
   created: boolean;
   owner: string;
   metadata: string;

@@ -23,7 +23,12 @@ export default function provideInfo(
     getFromIpfs: GetFromIpfs,
     getTransactionReceipt: GetTransactionReceipt,
 ): CommandHandler {
+    assertExists(args, 'args')
+    assertExists(ethersAgentRegistryProvider, 'ethersAgentRegistryProvider')
+    assertExists(agentRegistry, 'agentRegistry')
+    assertExists(agentRegistryContractAddress, 'agentRegistryContractAddress')
     assertExists(getFromIpfs, 'getFromIpfs')
+    assertExists(getTransactionReceipt, 'getTransactionReceipt')
 
     return async function info(daysToScan = DEFAULT_DAYS_TO_SCAN) {
         const finalAgentId = args.agentId ? args.agentId : agentId;
@@ -50,6 +55,7 @@ export default function provideInfo(
         const { chainId } = network;
         const { blockTimeInSeconds } = getBlockChainNetworkConfig(chainId);
 
+        console.log(`Days to scan is: ${daysToScan}, Block to subtract is: ${(daysToScan * SECONDS_IN_DAY)/(blockTimeInSeconds)}`)
         const endingBlock = Math.floor(latestBlockNumber - ((daysToScan * SECONDS_IN_DAY)/(blockTimeInSeconds)));
 
         const increment = 1000;
@@ -64,6 +70,7 @@ export default function provideInfo(
             });
         }
         
+        console.log(`Starting block: ${startingBlock} and ending Block: ${endingBlock}`)
         while(startingBlock > endingBlock) {
             
             // Get logs in parallel from 5 diffrent block ranges
@@ -75,7 +82,7 @@ export default function provideInfo(
                 getAgentLogs(startingBlock + (4 * increment) + 1, startingBlock + (increment * 5))
             ]))
 
-            const logs =  flatten(response)
+            const logs = flatten(response)
 
             for (let log of logs) {
                 const transaction = await getTransactionReceipt(log.transactionHash, true);
