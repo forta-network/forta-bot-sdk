@@ -23,15 +23,20 @@ export default function provideGetFromIpfs(
 
     return async function getIpfsByHash(metadataHash: string) {
         const { data } = await ipfsHttpClient.get(`/ipfs/${metadataHash}`);
-        return data.manifest;
+
+        if(data && data.manifest) {
+            return data.manifest;
+        }
+
+        throw Error(`No data found for ipfs hash ${metadataHash}`)
     }
 }
 
-export const formatIpfsData = (data: IpfsMetadata, botStatus: boolean) => {
+export const formatIpfsData = (data: IpfsMetadata, isBotEnabled: boolean) => {
     return {
         name: data.name,
         agentId: data.agentIdHash,
-        status: botStatus ? "Enabled" : "Disabled",
+        status: isBotEnabled ? "Enabled" : "Disabled",
         version: data.version,
         owner: data.from,
         image: data.imageReference,
