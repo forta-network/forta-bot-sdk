@@ -10,11 +10,11 @@ jobs:
         with:
           node-version: "12"
       
-      - name: Setup TS compile
-        run: npm install --dev typescript@latest
+      - name: Install dev dependencies
+        run: npm install --only=dev
 
       - name: Install Dependencies
-        run: npm install
+        run: npm install 
 
       - name: Build
         run: npm build
