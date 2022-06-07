@@ -55,7 +55,6 @@ export default function provideInfo(
         const { chainId } = network;
         const { blockTimeInSeconds } = getBlockChainNetworkConfig(chainId);
 
-        console.log(`Days to scan is: ${daysToScan}, Block to subtract is: ${(daysToScan * SECONDS_IN_DAY)/(blockTimeInSeconds)}`)
         const endingBlock = Math.floor(latestBlockNumber - ((daysToScan * SECONDS_IN_DAY)/(blockTimeInSeconds)));
 
         const increment = 1000;
@@ -70,7 +69,6 @@ export default function provideInfo(
             });
         }
         
-        console.log(`Starting block: ${startingBlock} and ending Block: ${endingBlock}`)
         while(startingBlock > endingBlock) {
             
             // Get logs in parallel from 5 diffrent block ranges
