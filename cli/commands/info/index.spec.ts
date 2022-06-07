@@ -9,6 +9,8 @@ import { IpfsMetadata } from "../../utils/ipfs/get.from.ipfs"
 
 describe("info", () => {
     let info: CommandHandler
+
+    // Mocks 
     const args = {
         agentId: "0x1234456"
     }
@@ -34,6 +36,7 @@ describe("info", () => {
         mockEthersAgentRegistryProvider.getBlockNumber.mockReset()
         mockEthersAgentRegistryProvider.getNetwork.mockReset()
         mockEthersAgentRegistryProvider.getLogs.mockReset()
+        mockEthersAgentRegistryProvider.getBlock.mockReset()
         mockAgentRegistry.getAgent.mockReset()
         mockAgentRegistry.isEnabled.mockReset()
         getFromIpfs.mockReset()
@@ -94,6 +97,7 @@ describe("info", () => {
         metadata: "0x23847"
     } 
 
+    // Helper variables and test callbacks
     const blockEventTopicFilters = AGENT_REGESTRY_EVENT_FRAGMENTS
             .filter(fragment => isRelevantSmartContractEvent(fragment.name))
             .map(eventFragment => getTopicHashFromEventName(eventFragment.name as StateChangeContractEvent)) as string[];
@@ -125,6 +129,8 @@ describe("info", () => {
         getTransactionReceipt.mockReturnValue({from: mockIpfsManifest.from, transactionHash: "0x34211"})
 
         mockEthersAgentRegistryProvider.getBlock.mockReturnValueOnce({timestamp: 1654440565}).mockReturnValue({timestamp: 1654430565})
+
+        console.log = jest.fn()
     }
 
     it("fetches the current state of a deployed bot", async () => {
@@ -150,31 +156,26 @@ describe("info", () => {
         })
     })
 
-    it.skip("fecthes 5 different block ranges of block logs in parallel", async () => {
+    it("fecthes 5 different block ranges of logs for the agent registry contract", async () => {
+        await info(testDaysToScan)
 
+        expect(mockEthersAgentRegistryProvider.getLogs).toBeCalledTimes(5)
     })
 
-    it.skip("prints a Bot Created event to console", async () => {
+    it("does not attempt to verify any logs if no logs found for agentId", async () => {
+        mockEthersAgentRegistryProvider.getLogs.mockReset()
+        mockEthersAgentRegistryProvider.getLogs.mockReturnValue([])
 
+        await info(testDaysToScan)
+        expect(getTransactionReceipt).toBeCalledTimes(0)
     })
 
-    it.skip("prints a Bot Updated event to console", async () => {
+    it("does not print anything if no relevant events found for agentId", async () => {
+        getTransactionReceipt.mockReset()
+        getTransactionReceipt.mockReturnValue({from: "0x49285772", transactionHash: "0x34211"})
 
-    })
+        await info(testDaysToScan)
 
-    it.skip("prints a Bot Enabled event to console", async () => {
-
-    })
-
-    it.skip("prints block logs in descending order (most recent logs on top) to console", async () => {
-
-    })
-
-    it.skip("does not print anything if no logs found for agentId", async () => {
-
-    })
-
-    it.skip("does not print anything if no relevant events found for agentId", async () => {
-
+        expect(mockEthersAgentRegistryProvider.getBlock).toBeCalledTimes(0)
     })
 })
