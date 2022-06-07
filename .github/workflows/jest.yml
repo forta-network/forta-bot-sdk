@@ -9,6 +9,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12"
+      
+      - name: Setup TS compile
+        run: npm uninstall -g typescript && npm install -g typescript
 
       - name: Install Dependencies
         run: npm install
