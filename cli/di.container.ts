@@ -52,6 +52,7 @@ import { provideGetAgentLogs } from './utils/get.agent.logs'
 import provideLogs from './commands/logs'
 import provideInfo from './commands/info'
 import provideGetFromIpfs from './utils/ipfs/get.from.ipfs'
+import provideGetLogsFromPolyscan from './utils/polyscan/get.logs.from.polyscan'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -181,6 +182,7 @@ export default function configureContainer(args: any = {}) {
     listKeyfiles: asFunction(provideListKeyfiles),
     addToIpfs: asFunction(provideAddToIpfs),
     getFromIpfs: asFunction(provideGetFromIpfs),
+    getLogsFromPolyscan: asFunction(provideGetLogsFromPolyscan),
     appendToFile: asFunction(provideAppendToFile),
     initKeystore: asFunction(provideInitKeystore),
     initKeyfile: asFunction(provideInitKeyfile),
@@ -194,6 +196,7 @@ export default function configureContainer(args: any = {}) {
     getTraceData: asFunction(provideGetTraceData),
     getAgentLogs: asFunction(provideGetAgentLogs),
     fortaApiUrl: asValue('https://api.forta.network'),
+    polyscanApiUrl: asValue('https://api.polygonscan.com/api'),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.traceRpcUrl
     }).singleton(),

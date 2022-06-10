@@ -28,7 +28,8 @@ describe("info", () => {
     }
 
     const getFromIpfs = jest.fn();
-    const getTransactionReceipt = jest.fn()
+    const getTransactionReceipt = jest.fn();
+    const getLogsFromPolyscan = jest.fn();
 
     const agentRegistryContractAddress = "0x987654";
 
@@ -111,7 +112,8 @@ describe("info", () => {
     const testDaysToScan = (5000.5 * blockTimeInSeconds) / 86000;
 
     beforeAll(() => {
-        info = provideInfo("", args, mockEthersAgentRegistryProvider as any, mockAgentRegistry as any ,agentRegistryContractAddress,getFromIpfs, getTransactionReceipt)
+        console.log(`Topic filters are: ${blockEventTopicFilters.forEach(hash => console.log(`\n ${hash}`))}`)
+        info = provideInfo("", args, mockEthersAgentRegistryProvider as any, mockAgentRegistry as any ,agentRegistryContractAddress,getFromIpfs, getTransactionReceipt,getLogsFromPolyscan)
     })
 
     // Helper methods

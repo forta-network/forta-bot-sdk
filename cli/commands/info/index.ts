@@ -9,10 +9,8 @@ import { assertExists, assertIsNonEmptyString, getBlockChainNetworkConfig } from
 import { formatIpfsData, GetFromIpfs, IpfsMetadata } from "../../utils/ipfs/get.from.ipfs";
 import { providers } from "ethers";
 import { GetTransactionReceipt } from "../../utils/get.transaction.receipt";
-import { flatten } from "lodash";
+import { EventFilter, GetLogsFromPolyscan, PolyscanLog } from "../../utils/polyscan/get.logs.from.polyscan";
 
-const SECONDS_IN_DAY = 86000;
-const DEFAULT_DAYS_TO_SCAN = 30;
 
 export default function provideInfo(
     agentId: string,
@@ -22,6 +20,7 @@ export default function provideInfo(
     agentRegistryContractAddress: string,
     getFromIpfs: GetFromIpfs,
     getTransactionReceipt: GetTransactionReceipt,
+    getLogsFromPolyscan: GetLogsFromPolyscan
 ): CommandHandler {
     assertExists(args, 'args')
     assertExists(ethersAgentRegistryProvider, 'ethersAgentRegistryProvider')
@@ -30,16 +29,14 @@ export default function provideInfo(
     assertExists(getFromIpfs, 'getFromIpfs')
     assertExists(getTransactionReceipt, 'getTransactionReceipt')
 
-    return async function info(daysToScan = DEFAULT_DAYS_TO_SCAN) {
+    return async function info() {
         const finalAgentId = args.agentId ? args.agentId : agentId;
 
         assertIsNonEmptyString(finalAgentId, 'agentId');
 
-        const [agent, currentState, latestBlockNumber, network] = await Promise.all([ 
+        const [agent, currentState] = await Promise.all([ 
              await agentRegistry.getAgent(finalAgentId), 
              await agentRegistry.isEnabled(finalAgentId) as boolean,
-             await ethersAgentRegistryProvider.getBlockNumber(),
-             await ethersAgentRegistryProvider.getNetwork()
         ]);
 
         
@@ -49,46 +46,33 @@ export default function provideInfo(
         const ipfsData = await getFromIpfs(ipfsMetaHash)
         printIpfsMetaData(ipfsData,currentState)
 
-        console.log(`Fetching bot info...`)
-        console.log(`Recent Activity (Last ${daysToScan} days): \n`);
+        console.log(`Recent Activity: \n`);
+        console.log(`Fetching bot info...`);
 
-        const blockEventTopicFilters = AGENT_REGISTRY_EVENT_FRAGMENTS
-            .filter(fragment => isRelevantSmartContractEvent(fragment.name))
-            .map(eventFragment => getTopicHashFromEventName(eventFragment.name as StateChangeContractEvent)) as string[];
 
-        const { chainId } = network;
-        const { blockTimeInSeconds } = getBlockChainNetworkConfig(chainId);
-
-        const endingBlock = Math.floor(latestBlockNumber - ((daysToScan * SECONDS_IN_DAY)/(blockTimeInSeconds)));
-
-        const increment = 1000;
-        let startingBlock = latestBlockNumber - (increment * 5);
-
-        const getAgentLogs = async (startBlock: number, endBlock: number) => {
-            return ethersAgentRegistryProvider.getLogs({
-                address: agentRegistryContractAddress,
-                fromBlock: startBlock,
-                toBlock: endBlock,
-                topics: [[...blockEventTopicFilters], null] // This assumes that each smart contract event is indexed so that the first topic is always an event of interest
+        const eventTopicFilters = AGENT_REGISTRY_EVENT_FRAGMENTS
+            .filter(fragment => (isRelevantSmartContractEvent(fragment.name)))
+            .map(eventFragment => {
+                return {
+                    type: eventFragment.name,
+                    topic_0: getTopicHashFromEventName(eventFragment.name as StateChangeContractEvent)
+                } as EventFilter
             });
-        }
+
+
+
+        const logs: PolyscanLog[] = [];
+
+        await Promise.all(eventTopicFilters.map(async filter => {
+            const eventLogs = await getLogsFromPolyscan(agentRegistryContractAddress, filter, finalAgentId);
+            logs.push(...eventLogs)
+        }))
         
-        while(startingBlock > endingBlock) {
-            
-            // Get logs in parallel from 5 diffrent block ranges
-            const responses = await Promise.all([0, 1, 2, 3, 4, 5].map(i => getAgentLogs(startingBlock + (i*increment) + i === 0 ? 0 : 1, startingBlock + ((i+1)*increment))))
-            const logs = flatten(responses)
-
-            for (let log of logs) {
-                const transaction = await getTransactionReceipt(log.transactionHash, true);
-
-                if(transaction.from.toLowerCase() === ipfsData.from.toLowerCase()) {
-                    const eventName = getEventNameFromTopicHash(log.topics[0]);
-                    console.log(` - ${formatEventName(eventName)} by ${ipfsData.from} on block ${log.blockNumber} (https://polygonscan.com/tx/${transaction.transactionHash})\n \n`)
-                }
-            }
-
-            startingBlock -= (increment * 5) + 1;
+        logs.sort((logOne, logTwo) => logOne.timeStamp < logTwo.timeStamp ? 1 : -1)
+        
+        for (let log of logs) {
+            const eventName = getEventNameFromTopicHash(log.topics[0]);
+            console.log(` - ${formatEventName(eventName)} by ${ipfsData.from} on  ${new Date(log.timeStamp * 1000)} (https://polygonscan.com/tx/${log.transactionHash})\n \n`)
         }
     }
 }
