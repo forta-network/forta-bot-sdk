@@ -16,7 +16,7 @@ const FALLBACK_DISABLE_AGENT_GAS_LIMIT = BigNumber.from(70_000)
 }
 
 export const AGENT_REGISTRY_ABI = new Interface(AgentRegistryAbi);
-export const AGENT_REGESTRY_EVENT_FRAGMENTS = AGENT_REGISTRY_ABI.fragments.filter(fragment => fragment.type === "event") as EventFragment[];
+export const AGENT_REGISTRY_EVENT_FRAGMENTS = AGENT_REGISTRY_ABI.fragments.filter(fragment => fragment.type === "event") as EventFragment[];
 
 const RELEVANT_SMART_CONTRACT_EVENTS = ["AgentEnabled", "AgentUpdated", "Transfer"] as const;
 export type StateChangeContractEvent = (typeof RELEVANT_SMART_CONTRACT_EVENTS)[number];
@@ -24,7 +24,7 @@ export const isRelevantSmartContractEvent = (str: any): str is StateChangeContra
 
 
 export const getTopicHashFromEventName = (eventName: StateChangeContractEvent): string | undefined => {
-  const fragment = AGENT_REGESTRY_EVENT_FRAGMENTS.find(fragment => fragment.name === eventName);
+  const fragment = AGENT_REGISTRY_EVENT_FRAGMENTS.find(fragment => fragment.name === eventName);
 
   if(fragment){
       return AGENT_REGISTRY_ABI.getEventTopic(fragment);

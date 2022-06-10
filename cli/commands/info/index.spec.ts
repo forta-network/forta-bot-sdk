@@ -2,7 +2,7 @@ import { Network } from "@ethersproject/networks"
 import { providers } from "ethers"
 import provideInfo from "."
 import { CommandHandler } from "../.."
-import { AgentDescription, AGENT_REGESTRY_EVENT_FRAGMENTS, getTopicHashFromEventName, isRelevantSmartContractEvent, StateChangeContractEvent } from "../../contracts/agent.registry"
+import { AgentDescription, AGENT_REGISTRY_EVENT_FRAGMENTS, getTopicHashFromEventName, isRelevantSmartContractEvent, StateChangeContractEvent } from "../../contracts/agent.registry"
 import { getBlockChainNetworkConfig } from "../../utils"
 import { IpfsMetadata } from "../../utils/ipfs/get.from.ipfs"
 
@@ -98,7 +98,7 @@ describe("info", () => {
     } 
 
     // Helper variables and test callbacks
-    const blockEventTopicFilters = AGENT_REGESTRY_EVENT_FRAGMENTS
+    const blockEventTopicFilters = AGENT_REGISTRY_EVENT_FRAGMENTS
             .filter(fragment => isRelevantSmartContractEvent(fragment.name))
             .map(eventFragment => getTopicHashFromEventName(eventFragment.name as StateChangeContractEvent)) as string[];
 

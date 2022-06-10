@@ -1,6 +1,6 @@
 import { CommandHandler } from "../..";
 import AgentRegistry, 
-{ AGENT_REGESTRY_EVENT_FRAGMENTS, 
+{ AGENT_REGISTRY_EVENT_FRAGMENTS, 
   getEventNameFromTopicHash, 
   getTopicHashFromEventName, 
   isRelevantSmartContractEvent, 
@@ -35,23 +35,27 @@ export default function provideInfo(
 
         assertIsNonEmptyString(finalAgentId, 'agentId');
 
-        const agent = await agentRegistry.getAgent(finalAgentId);
-        const currentState = await agentRegistry.isEnabled(finalAgentId) as boolean
+        const [agent, currentState, latestBlockNumber, network] = await Promise.all([ 
+             await agentRegistry.getAgent(finalAgentId), 
+             await agentRegistry.isEnabled(finalAgentId) as boolean,
+             await ethersAgentRegistryProvider.getBlockNumber(),
+             await ethersAgentRegistryProvider.getNetwork()
+        ]);
+
+        
         const ipfsMetaHash = agent.metadata;
 
 
         const ipfsData = await getFromIpfs(ipfsMetaHash)
         printIpfsMetaData(ipfsData,currentState)
 
+        console.log(`Fetching bot info...`)
         console.log(`Recent Activity (Last ${daysToScan} days): \n`);
 
-        const blockEventTopicFilters = AGENT_REGESTRY_EVENT_FRAGMENTS
+        const blockEventTopicFilters = AGENT_REGISTRY_EVENT_FRAGMENTS
             .filter(fragment => isRelevantSmartContractEvent(fragment.name))
             .map(eventFragment => getTopicHashFromEventName(eventFragment.name as StateChangeContractEvent)) as string[];
 
-        const latestBlockNumber = await ethersAgentRegistryProvider.getBlockNumber();
-
-        const network = await ethersAgentRegistryProvider.getNetwork();
         const { chainId } = network;
         const { blockTimeInSeconds } = getBlockChainNetworkConfig(chainId);
 
@@ -61,7 +65,7 @@ export default function provideInfo(
         let startingBlock = latestBlockNumber - (increment * 5);
 
         const getAgentLogs = async (startBlock: number, endBlock: number) => {
-            return await ethersAgentRegistryProvider.getLogs({
+            return ethersAgentRegistryProvider.getLogs({
                 address: agentRegistryContractAddress,
                 fromBlock: startBlock,
                 toBlock: endBlock,
@@ -72,23 +76,15 @@ export default function provideInfo(
         while(startingBlock > endingBlock) {
             
             // Get logs in parallel from 5 diffrent block ranges
-            const response = (await Promise.all([
-                getAgentLogs(startingBlock, startingBlock + increment), 
-                getAgentLogs(startingBlock + increment + 1, startingBlock + (increment * 2)),
-                getAgentLogs(startingBlock + (2 * increment) + 1, startingBlock + (increment * 3)),
-                getAgentLogs(startingBlock + (3 * increment) + 1, startingBlock + (increment * 4)),
-                getAgentLogs(startingBlock + (4 * increment) + 1, startingBlock + (increment * 5))
-            ]))
-
-            const logs = flatten(response)
+            const responses = await Promise.all([0, 1, 2, 3, 4, 5].map(i => getAgentLogs(startingBlock + (i*increment) + i === 0 ? 0 : 1, startingBlock + ((i+1)*increment))))
+            const logs = flatten(responses)
 
             for (let log of logs) {
                 const transaction = await getTransactionReceipt(log.transactionHash, true);
 
                 if(transaction.from.toLowerCase() === ipfsData.from.toLowerCase()) {
-                    const block = await ethersAgentRegistryProvider.getBlock(log.blockNumber)
                     const eventName = getEventNameFromTopicHash(log.topics[0]);
-                    console.log(` - ${formatEventName(eventName)} by ${ipfsData.from} on ${new Date(block.timestamp * 1000)} (https://polygonscan.com/tx/${transaction.transactionHash})\n \n`)
+                    console.log(` - ${formatEventName(eventName)} by ${ipfsData.from} on block ${log.blockNumber} (https://polygonscan.com/tx/${transaction.transactionHash})\n \n`)
                 }
             }
 
