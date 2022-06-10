@@ -10,6 +10,7 @@ import { formatIpfsData, GetFromIpfs, IpfsMetadata } from "../../utils/ipfs/get.
 import { providers } from "ethers";
 import { GetTransactionReceipt } from "../../utils/get.transaction.receipt";
 import { EventFilter, GetLogsFromPolyscan, PolyscanLog } from "../../utils/polyscan/get.logs.from.polyscan";
+import { chain } from "lodash";
 
 
 export default function provideInfo(
@@ -34,6 +35,8 @@ export default function provideInfo(
 
         assertIsNonEmptyString(finalAgentId, 'agentId');
 
+        console.log(`Fetching bot info...`);
+
         const [agent, currentState] = await Promise.all([ 
              await agentRegistry.getAgent(finalAgentId), 
              await agentRegistry.isEnabled(finalAgentId) as boolean,
@@ -47,7 +50,6 @@ export default function provideInfo(
         printIpfsMetaData(ipfsData,currentState)
 
         console.log(`Recent Activity: \n`);
-        console.log(`Fetching bot info...`);
 
 
         const eventTopicFilters = AGENT_REGISTRY_EVENT_FRAGMENTS
@@ -67,10 +69,23 @@ export default function provideInfo(
             const eventLogs = await getLogsFromPolyscan(agentRegistryContractAddress, filter, finalAgentId);
             logs.push(...eventLogs)
         }))
+
+        const filteredLogs = chain(logs)
+            .groupBy("timeStamp")
+            .map((value, key) => {
+                // Filter updated events fired at the same time as created event
+                if(value.length > 1 && value.find(el => el.topics[0] === getTopicHashFromEventName("Transfer"))) {
+                    return [value.find(el => el.topics[0] === getTopicHashFromEventName("Transfer"))] as PolyscanLog[]
+                }
+                return value
+            })
+            .flatten()
+            .value()
         
-        logs.sort((logOne, logTwo) => logOne.timeStamp < logTwo.timeStamp ? 1 : -1)
+            filteredLogs.sort((logOne, logTwo) => logOne.timeStamp < logTwo.timeStamp ? 1 : -1)
+
         
-        for (let log of logs) {
+        for (let log of filteredLogs) {
             const eventName = getEventNameFromTopicHash(log.topics[0]);
             console.log(` - ${formatEventName(eventName)} by ${ipfsData.from} on  ${new Date(log.timeStamp * 1000)} (https://polygonscan.com/tx/${log.transactionHash})\n \n`)
         }
