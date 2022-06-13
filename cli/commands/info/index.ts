@@ -45,7 +45,6 @@ export default function provideInfo(
         
         const ipfsMetaHash = agent.metadata;
 
-
         const ipfsData = await getFromIpfs(ipfsMetaHash)
         printIpfsMetaData(ipfsData,currentState)
 
@@ -57,7 +56,7 @@ export default function provideInfo(
             .map(eventFragment => {
                 return {
                     type: eventFragment.name,
-                    topic_0: getTopicHashFromEventName(eventFragment.name as StateChangeContractEvent)
+                    topicHash: getTopicHashFromEventName(eventFragment.name as StateChangeContractEvent)
                 } as EventFilter
             });
 
@@ -70,24 +69,14 @@ export default function provideInfo(
             logs.push(...eventLogs)
         }))
 
-        const filteredLogs = chain(logs)
-            .groupBy("timeStamp")
-            .map((value, key) => {
-                // Filter updated events fired at the same time as created event
-                if(value.length > 1 && value.find(el => el.topics[0] === getTopicHashFromEventName("Transfer"))) {
-                    return [value.find(el => el.topics[0] === getTopicHashFromEventName("Transfer"))] as PolyscanLog[]
-                }
-                return value
-            })
-            .flatten()
-            .value()
-        
-            filteredLogs.sort((logOne, logTwo) => logOne.timeStamp < logTwo.timeStamp ? 1 : -1)
+        const filteredLogs = filterSimultaneousEventsOnBotCreation(logs)
+
+        filteredLogs.sort((logOne, logTwo) => logOne.timeStamp < logTwo.timeStamp ? 1 : -1)
 
         
         for (let log of filteredLogs) {
             const eventName = getEventNameFromTopicHash(log.topics[0]);
-            console.log(` - ${formatEventName(eventName)} by ${ipfsData.from} on  ${new Date(log.timeStamp * 1000)} (https://polygonscan.com/tx/${log.transactionHash})\n \n`)
+            console.log(` ${formatDate(new Date(log.timeStamp * 1000))} ${formatEventName(eventName)} by ${ipfsData.from} (https://polygonscan.com/tx/${log.transactionHash})\n \n`)
         }
     }
 }
@@ -105,5 +94,26 @@ const formatEventName = (eventName: string): string => {
     }
 
     return eventName.replace("Agent", "Bot ");
+}
+
+const formatDate = (date: Date): string => {
+    const monthFormatter = new Intl.DateTimeFormat('default', {month: 'short'})
+    const dayFormatter = new Intl.DateTimeFormat('default', {day: '2-digit' })
+    return `[${dayFormatter.format(date)} ${monthFormatter.format(date)} ${date.toTimeString()}]`
+}
+
+const filterSimultaneousEventsOnBotCreation = (logs: PolyscanLog[]): PolyscanLog[] => {
+    return chain(logs)
+    .groupBy("timeStamp")
+    .map((value) => {
+        // Filter updated events fired at the same time as created event
+        const transferEvent = value.find(el => el.topics[0] === getTopicHashFromEventName("Transfer"))
+        if(value.length > 1 && transferEvent) {
+            return [transferEvent] as PolyscanLog[]
+        }
+        return value
+    })
+    .flatten()
+    .value()
 }
 
