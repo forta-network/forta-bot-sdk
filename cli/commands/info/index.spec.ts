@@ -5,6 +5,7 @@ import { CommandHandler } from "../.."
 import { AgentDescription, AGENT_REGISTRY_EVENT_FRAGMENTS, getTopicHashFromEventName, isRelevantSmartContractEvent, StateChangeContractEvent } from "../../contracts/agent.registry"
 import { getBlockChainNetworkConfig } from "../../utils"
 import { IpfsMetadata } from "../../utils/ipfs/get.from.ipfs"
+import { PolyscanLog } from "../../utils/polyscan/get.logs.from.polyscan"
 
 
 describe("info", () => {
@@ -19,7 +20,6 @@ describe("info", () => {
         getBlockNumber: jest.fn(),
         getBlock: jest.fn(),
         getNetwork: jest.fn(),
-        getLogs: jest.fn()
     }
 
     const mockAgentRegistry = {
@@ -28,7 +28,6 @@ describe("info", () => {
     }
 
     const getFromIpfs = jest.fn();
-    const getTransactionReceipt = jest.fn();
     const getLogsFromPolyscan = jest.fn();
 
     const agentRegistryContractAddress = "0x987654";
@@ -36,12 +35,11 @@ describe("info", () => {
     const resetMocks = () => {
         mockEthersAgentRegistryProvider.getBlockNumber.mockReset()
         mockEthersAgentRegistryProvider.getNetwork.mockReset()
-        mockEthersAgentRegistryProvider.getLogs.mockReset()
         mockEthersAgentRegistryProvider.getBlock.mockReset()
         mockAgentRegistry.getAgent.mockReset()
         mockAgentRegistry.isEnabled.mockReset()
         getFromIpfs.mockReset()
-        getTransactionReceipt.mockReset()
+        getLogsFromPolyscan.mockReset()
     }
 
     const testNetwork: Network = {
@@ -68,28 +66,16 @@ describe("info", () => {
         "publishedFrom":"Forta Explorer 0.0.2"
      } as IpfsMetadata
 
-     const mockLogOne: providers.Log = {
-        blockNumber: 1500000,
-        blockHash: "0x2345",
-        transactionIndex: 0,
-        removed: false,
-        address: "0x424",
-        data: "",
+     const mockLogOne: PolyscanLog = {
+        timeStamp: 1500000,
         topics: ["0xb3910705ae5b4ecc20f77ab0d947aafd48ed7328af2294ca08dea714b041d641"],
         transactionHash: "0x2352",
-        logIndex: 0
     }
 
-    const mockLogTwo: providers.Log = {
-        blockNumber: 1490000,
-        blockHash: "0x2345",
-        transactionIndex: 0,
-        removed: false,
-        address: "0x424",
-        data: "",
+    const mockLogTwo: PolyscanLog = {
+        timeStamp: 1490000,
         topics: ["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"],
         transactionHash: "0x235264",
-        logIndex: 0
     }
 
     const mockAgentDescription: AgentDescription = {
@@ -113,7 +99,7 @@ describe("info", () => {
 
     beforeAll(() => {
         console.log(`Topic filters are: ${blockEventTopicFilters.forEach(hash => console.log(`\n ${hash}`))}`)
-        info = provideInfo("", args, mockEthersAgentRegistryProvider as any, mockAgentRegistry as any ,agentRegistryContractAddress,getFromIpfs, getTransactionReceipt,getLogsFromPolyscan)
+        info = provideInfo("", args, mockEthersAgentRegistryProvider as any, mockAgentRegistry as any ,agentRegistryContractAddress,getFromIpfs,getLogsFromPolyscan)
     })
 
     // Helper methods
@@ -126,11 +112,9 @@ describe("info", () => {
 
         mockEthersAgentRegistryProvider.getBlockNumber.mockReturnValue(2000000)
         mockEthersAgentRegistryProvider.getNetwork.mockReturnValue(testNetwork)
-        mockEthersAgentRegistryProvider.getLogs.mockReturnValueOnce(mockLogOne).mockReturnValue(mockLogTwo)
-
-        getTransactionReceipt.mockReturnValue({from: mockIpfsManifest.from, transactionHash: "0x34211"})
-
         mockEthersAgentRegistryProvider.getBlock.mockReturnValueOnce({timestamp: 1654440565}).mockReturnValue({timestamp: 1654430565})
+
+        getLogsFromPolyscan.mockReturnValueOnce(mockLogOne).mockReturnValue(mockLogTwo)
 
         console.log = jest.fn()
     }
@@ -150,34 +134,16 @@ describe("info", () => {
     it("filters contract logs by relevent topics", async () => {
         await info(testDaysToScan)
 
-        expect(mockEthersAgentRegistryProvider.getLogs).toHaveBeenCalledWith({
-            address: expect.anything(),
-            fromBlock: expect.anything(),
-            toBlock: expect.anything(),
-            topics: [[...blockEventTopicFilters], null]
-        })
+        expect(getLogsFromPolyscan).toHaveBeenCalledWith(
+            agentRegistryContractAddress,
+            expect.anything(),
+            args.agentId,
+        )
     })
 
-    it("fecthes 5 different block ranges of logs for the agent registry contract", async () => {
+    it("fecthes logs for 3 different event topics", async () => {
         await info(testDaysToScan)
 
-        expect(mockEthersAgentRegistryProvider.getLogs).toBeCalledTimes(5)
-    })
-
-    it("does not attempt to verify any logs if no logs found for agentId", async () => {
-        mockEthersAgentRegistryProvider.getLogs.mockReset()
-        mockEthersAgentRegistryProvider.getLogs.mockReturnValue([])
-
-        await info(testDaysToScan)
-        expect(getTransactionReceipt).toBeCalledTimes(0)
-    })
-
-    it("does not print anything if no relevant events found for agentId", async () => {
-        getTransactionReceipt.mockReset()
-        getTransactionReceipt.mockReturnValue({from: "0x49285772", transactionHash: "0x34211"})
-
-        await info(testDaysToScan)
-
-        expect(mockEthersAgentRegistryProvider.getBlock).toBeCalledTimes(0)
+        expect(getLogsFromPolyscan).toBeCalledTimes(3)
     })
 })

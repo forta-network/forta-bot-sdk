@@ -20,7 +20,6 @@ export default function provideInfo(
     agentRegistry: AgentRegistry,
     agentRegistryContractAddress: string,
     getFromIpfs: GetFromIpfs,
-    getTransactionReceipt: GetTransactionReceipt,
     getLogsFromPolyscan: GetLogsFromPolyscan
 ): CommandHandler {
     assertExists(args, 'args')
@@ -28,7 +27,7 @@ export default function provideInfo(
     assertExists(agentRegistry, 'agentRegistry')
     assertExists(agentRegistryContractAddress, 'agentRegistryContractAddress')
     assertExists(getFromIpfs, 'getFromIpfs')
-    assertExists(getTransactionReceipt, 'getTransactionReceipt')
+    assertExists(getLogsFromPolyscan, 'getLogsFromPolyscan')
 
     return async function info() {
         const finalAgentId = args.agentId ? args.agentId : agentId;
