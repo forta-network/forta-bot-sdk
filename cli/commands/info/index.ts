@@ -74,7 +74,7 @@ export default function provideInfo(
 
         for (let log of filteredLogs) {
             const eventName = getEventNameFromTopicHash(log.topics[0]);
-            console.log(` ${formatDate(new Date(log.timeStamp * 1000))} ${formatEventName(eventName)} by ${ipfsData.from} (https://polygonscan.com/tx/${log.transactionHash})\n \n`)
+            console.log(` [${formatDate(new Date(log.timeStamp * 1000))}] ${formatEventName(eventName)} by ${ipfsData.from} (https://polygonscan.com/tx/${log.transactionHash})\n`)
         }
     }
 }
@@ -88,7 +88,7 @@ export const formatIpfsData = (data: IpfsManifestData, isBotEnabled: boolean) =>
         owner: data.from,
         image: data.imageReference,
         publishedFrom: data.publishedFrom,
-        timestamp: data.timestamp,
+        timestamp: formatDate(new Date(data.timestamp)),
         documentation: ` https://ipfs.io/ipfs/${data.documentation}`
     }
 }
@@ -109,9 +109,10 @@ const formatEventName = (eventName: string): string => {
 }
 
 const formatDate = (date: Date): string => {
-    const monthFormatter = new Intl.DateTimeFormat('default', {month: 'short'})
+    const timeFormatter = new Intl.DateTimeFormat('default', {hour: 'numeric', minute: '2-digit', second: '2-digit', timeZoneName: 'short', hour12: false})
+    const monthFormatter = new Intl.DateTimeFormat('default', {month: 'short', year: "numeric"})
     const dayFormatter = new Intl.DateTimeFormat('default', {day: '2-digit' })
-    return `[${dayFormatter.format(date)} ${monthFormatter.format(date)} ${date.toTimeString()}]`
+    return `${dayFormatter.format(date)} ${monthFormatter.format(date)} ${timeFormatter.format(date)}`
 }
 
 const filterSimultaneousEventsOnBotCreation = (logs: PolyscanLog[]): PolyscanLog[] => {
