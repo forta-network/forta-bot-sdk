@@ -2,7 +2,7 @@
 import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
 
-type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile" | "logs"
+type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile" | "logs" | "info"
 export type CommandHandler = (args?: any) => Promise<void>
 
 async function executeCommand(cliCommandName: CommandName, cliArgs: any) {
@@ -26,6 +26,15 @@ yargs
       })
     },
     (cliArgs: any) => executeCommand("init", cliArgs)
+  )
+  .command('info', 'Inspect state of the Forta Bot', 
+    (yargs: Argv) => {
+      yargs.option('agentId', {
+        description: 'Bot id to retrieve information for. Default value is this agent',
+        type: 'string'
+      })
+    },
+    (cliArgs: any) => executeCommand("info", cliArgs)
   )
   .command('run', 'Run the Forta Agent with latest blockchain data',
     (yargs: Argv) => {
