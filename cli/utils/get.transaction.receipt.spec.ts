@@ -5,9 +5,6 @@ describe("getTransactionReceipt", () => {
   const mockEthersProvider = {
     send: jest.fn()
   } as any
-  const mockRegistryEthersProvider = {
-    send: jest.fn()
-  } as any
   const mockCache = {
     getKey: jest.fn(),
     setKey: jest.fn()
@@ -20,7 +17,7 @@ describe("getTransactionReceipt", () => {
   }
 
   beforeAll(() => {
-    getTransactionReceipt = provideGetTransactionReceipt(mockEthersProvider, mockRegistryEthersProvider, mockCache)
+    getTransactionReceipt = provideGetTransactionReceipt(mockEthersProvider, mockCache)
   })
 
   beforeEach(() => resetMocks())
@@ -51,22 +48,6 @@ describe("getTransactionReceipt", () => {
     expect(mockCache.getKey).toHaveBeenCalledWith(mockTxHash.toLowerCase())
     expect(mockEthersProvider.send).toHaveBeenCalledTimes(1)
     expect(mockEthersProvider.send).toHaveBeenCalledWith('eth_getTransactionReceipt', [mockTxHash])
-    expect(mockCache.setKey).toHaveBeenCalledTimes(1)
-    expect(mockCache.setKey).toHaveBeenCalledWith(mockTxHash.toLowerCase(), mockReceipt)
-  })
-
-  it("invokes eth_getTransactionReceipt jsonrpc method on agent registry provider and returns receipt", async () => {
-    const mockTxHash = "0x123"
-    const mockReceipt = { hash: mockTxHash, blockNumber: 123 }
-    mockRegistryEthersProvider.send.mockReturnValueOnce(mockReceipt)
-
-    const receipt = await getTransactionReceipt(mockTxHash, true)
-
-    expect(receipt).toStrictEqual(mockReceipt)
-    expect(mockCache.getKey).toHaveBeenCalledTimes(1)
-    expect(mockCache.getKey).toHaveBeenCalledWith(mockTxHash.toLowerCase())
-    expect(mockRegistryEthersProvider.send).toHaveBeenCalledTimes(1)
-    expect(mockRegistryEthersProvider.send).toHaveBeenCalledWith('eth_getTransactionReceipt', [mockTxHash])
     expect(mockCache.setKey).toHaveBeenCalledTimes(1)
     expect(mockCache.setKey).toHaveBeenCalledWith(mockTxHash.toLowerCase(), mockReceipt)
   })

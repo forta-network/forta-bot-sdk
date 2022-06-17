@@ -18,26 +18,22 @@ export type JsonRpcTransactionReceipt = Omit<Receipt, 'status' | 'blockNumber' |
 }
 
 // returns a transaction receipt as provided by the "eth_getTransactionReceipt" json-rpc method
-export type GetTransactionReceipt = (txHash: string,  onAgentRegistry?: boolean) => Promise<JsonRpcTransactionReceipt>
+export type GetTransactionReceipt = (txHash: string) => Promise<JsonRpcTransactionReceipt>
 
 export default function provideGetTransactionReceipt(
   ethersProvider: providers.JsonRpcProvider,
-  ethersAgentRegistryProvider: providers.JsonRpcProvider,
   cache: Cache
 ) {
   assertExists(ethersProvider, 'ethersProvider')
-  assertExists(ethersAgentRegistryProvider, 'ethersAgentRegistryProvider')
   assertExists(cache, 'cache')
 
-  return async function getTransactionReceipt(txHash: string, onAgentRegistry: boolean = false) {
+  return async function getTransactionReceipt(txHash: string) {
     // check cache first
     const cachedReceipt = cache.getKey(txHash.toLowerCase())
     if (cachedReceipt) return cachedReceipt
 
     // fetch the receipt
-    const receipt =  onAgentRegistry ? 
-      await ethersAgentRegistryProvider.send('eth_getTransactionReceipt',[txHash]) :
-      await ethersProvider.send('eth_getTransactionReceipt',[txHash])
+    const receipt =  await ethersProvider.send('eth_getTransactionReceipt',[txHash])
 
     cache.setKey(txHash.toLowerCase(), receipt)
     return receipt

@@ -1,4 +1,5 @@
-import provideGetFromIpfs, { formatIpfsData, GetFromIpfs, IpfsMetadata } from "./get.from.ipfs";
+import { formatIpfsData } from "../../commands/info";
+import provideGetFromIpfs, { GetFromIpfs, IpfsData, IpfsManifestData } from "./get.from.ipfs";
 
 const mockIpfsData = {
     "manifest":{
@@ -18,8 +19,7 @@ const mockIpfsData = {
           1
        ],
        "publishedFrom":"Forta Explorer 0.0.2"
-    } as IpfsMetadata,
-    "signature":"0x53dec496268d1a963984485cc92481f838b9f2fffd72b9afc617e58c5ea79b31291b53ee33d4c383ec7e6a89fdc2b58bb2d383213c5e406c0d20666d0ce536bf1c"
+    } as IpfsManifestData
 }
 
 
@@ -50,7 +50,7 @@ describe("getFromIpfs", () => {
             version: dataManifest.version,
             owner: dataManifest.from,
             image: dataManifest.imageReference,
-            published_from: dataManifest.publishedFrom,
+            publishedFrom: dataManifest.publishedFrom,
             timestamp: dataManifest.timestamp,
             documentation: ` https://ipfs.io/ipfs/${dataManifest.documentation}`
         }
@@ -61,7 +61,7 @@ describe("getFromIpfs", () => {
     it("returns ipfs manifest", async () => {
         mockIpfsClient.get.mockReturnValueOnce({ data: mockIpfsData})
         const data = await getFromIpfs("12345")
-        expect(data).toEqual(mockIpfsData.manifest)
+        expect(data).toEqual(mockIpfsData)
     })
 
     it("throws an error if no data found for given ipfs hash", async () => {

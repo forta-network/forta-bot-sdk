@@ -27,10 +27,10 @@ yargs
     },
     (cliArgs: any) => executeCommand("init", cliArgs)
   )
-  .command('info', 'Inspect state of the Forta Agent', 
+  .command('info', 'Inspect state of the Forta Bot', 
     (yargs: Argv) => {
       yargs.option('agentId', {
-        description: 'Agent id to retrieve logs for. Default value is this agent',
+        description: 'Bot id to retrieve information for. Default value is this agent',
         type: 'string'
       })
     },

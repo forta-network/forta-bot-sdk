@@ -1,9 +1,13 @@
 import { AxiosInstance } from "axios";
 import { assertExists } from "..";
 
-export type GetFromIpfs = (metadataHash: string) => Promise<IpfsMetadata>
+export type GetFromIpfs = (metadataHash: string) => Promise<IpfsData>
 
-export interface IpfsMetadata {
+export interface IpfsData {
+    manifest: IpfsManifestData
+}
+
+export interface IpfsManifestData {
     name: string,
     from: string,
     agentId: string,
@@ -25,23 +29,9 @@ export default function provideGetFromIpfs(
         const { data } = await ipfsHttpClient.get(`/ipfs/${metadataHash}`);
 
         if(data && data.manifest) {
-            return data.manifest;
+            return data;
         }
 
         throw Error(`No data found for ipfs hash ${metadataHash}`)
-    }
-}
-
-export const formatIpfsData = (data: IpfsMetadata, isBotEnabled: boolean) => {
-    return {
-        name: data.name,
-        agentId: data.agentIdHash,
-        status: isBotEnabled ? "Enabled" : "Disabled",
-        version: data.version,
-        owner: data.from,
-        image: data.imageReference,
-        published_from: data.publishedFrom,
-        timestamp: data.timestamp,
-        documentation: ` https://ipfs.io/ipfs/${data.documentation}`
     }
 }

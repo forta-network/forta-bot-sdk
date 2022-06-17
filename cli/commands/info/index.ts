@@ -5,10 +5,9 @@ import AgentRegistry,
   getTopicHashFromEventName, 
   isRelevantSmartContractEvent, 
   StateChangeContractEvent } from "../../contracts/agent.registry";
-import { assertExists, assertIsNonEmptyString, getBlockChainNetworkConfig } from "../../utils";
-import { formatIpfsData, GetFromIpfs, IpfsMetadata } from "../../utils/ipfs/get.from.ipfs";
+import { assertExists, assertIsNonEmptyString } from "../../utils";
+import { GetFromIpfs, IpfsManifestData } from "../../utils/ipfs/get.from.ipfs";
 import { providers } from "ethers";
-import { GetTransactionReceipt } from "../../utils/get.transaction.receipt";
 import { EventFilter, GetLogsFromPolyscan, PolyscanLog } from "../../utils/polyscan/get.logs.from.polyscan";
 import { chain } from "lodash";
 
@@ -44,10 +43,7 @@ export default function provideInfo(
         
         const ipfsMetaHash = agent.metadata;
 
-        const ipfsData = await getFromIpfs(ipfsMetaHash)
-        printIpfsMetaData(ipfsData,currentState)
-
-        console.log(`Recent Activity: \n`);
+        const ipfsData = (await getFromIpfs(ipfsMetaHash)).manifest
 
 
         const eventTopicFilters = AGENT_REGISTRY_EVENT_FRAGMENTS
@@ -72,7 +68,10 @@ export default function provideInfo(
 
         filteredLogs.sort((logOne, logTwo) => logOne.timeStamp < logTwo.timeStamp ? 1 : -1)
 
-        
+        printIpfsMetaData(ipfsData,currentState)
+
+        console.log(`Recent Activity: \n`);
+
         for (let log of filteredLogs) {
             const eventName = getEventNameFromTopicHash(log.topics[0]);
             console.log(` ${formatDate(new Date(log.timeStamp * 1000))} ${formatEventName(eventName)} by ${ipfsData.from} (https://polygonscan.com/tx/${log.transactionHash})\n \n`)
@@ -80,7 +79,21 @@ export default function provideInfo(
     }
 }
 
-const printIpfsMetaData = (ipfsData: IpfsMetadata, botStatus: boolean) => {
+export const formatIpfsData = (data: IpfsManifestData, isBotEnabled: boolean) => {
+    return {
+        name: data.name,
+        agentId: data.agentIdHash,
+        status: isBotEnabled ? "Enabled" : "Disabled",
+        version: data.version,
+        owner: data.from,
+        image: data.imageReference,
+        publishedFrom: data.publishedFrom,
+        timestamp: data.timestamp,
+        documentation: ` https://ipfs.io/ipfs/${data.documentation}`
+    }
+}
+
+const printIpfsMetaData = (ipfsData: IpfsManifestData, botStatus: boolean) => {
     const formattedData = formatIpfsData(ipfsData, botStatus)
     console.log("\n")
     Object.entries(formattedData).forEach(([key, value]) => console.log(`${key}: ${value}`))
