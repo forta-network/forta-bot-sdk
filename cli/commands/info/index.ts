@@ -108,7 +108,7 @@ const formatEventName = (eventName: string): string => {
     return eventName.replace("Agent", "Bot ");
 }
 
-const formatDate = (date: Date): string => {
+export const formatDate = (date: Date): string => {
     const timeFormatter = new Intl.DateTimeFormat('default', {hour: 'numeric', minute: '2-digit', second: '2-digit', timeZoneName: 'short', hour12: false})
     const monthFormatter = new Intl.DateTimeFormat('default', {month: 'short', year: "numeric"})
     const dayFormatter = new Intl.DateTimeFormat('default', {day: '2-digit' })
