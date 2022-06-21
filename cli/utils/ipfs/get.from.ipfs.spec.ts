@@ -8,7 +8,7 @@ const mockIpfsData = {
        "agentId":"Compound Liquidatable Positions Monitor",
        "agentIdHash":"0x3c61101f1d349661298a58ba59a58fbce5a3626c5c7af10b091796969e0d6c59",
        "version":"0.0.1",
-       "timestamp":"Fri, 20 May 2022 15:54:56 GMT",
+       "timestamp":"20 May 2022 11:54:56 EDT",
        "imageReference":"bafybeib5kmox5r2wpre3tgkfgfr76tm4qascagmqvod2wcojxrqmgyxfp4@sha256:2fcfede6f821f4f14e745598fd71b2201471517acd345f7b8f0cd424d35b441a",
        "documentation":"QmQXZvBdZ4eMtCefNXYMRwQ7UJbgW74EqrMv9wS9hoSXV7",
        "repository":"https://github.com/arbitraryexecution/compound-monitoring/tree/main/liquidation-monitor",
