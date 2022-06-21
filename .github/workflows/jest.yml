@@ -8,11 +8,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12"
+          node-version: "14"
       
-      - name: Install dev dependencies
-        run: npm install --only=dev
-
       - name: Install Dependencies
         run: npm install 
 
