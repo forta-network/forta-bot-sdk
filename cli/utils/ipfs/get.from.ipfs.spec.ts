@@ -1,4 +1,4 @@
-import { formatIpfsData } from "../../commands/info";
+import { formatDate, formatIpfsData } from "../../commands/info";
 import provideGetFromIpfs, { GetFromIpfs, IpfsData, IpfsManifestData } from "./get.from.ipfs";
 
 const mockIpfsData = {
@@ -51,7 +51,7 @@ describe("getFromIpfs", () => {
             owner: dataManifest.from,
             image: dataManifest.imageReference,
             publishedFrom: dataManifest.publishedFrom,
-            timestamp: dataManifest.timestamp,
+            timestamp: formatDate(new Date(dataManifest.timestamp)),
             documentation: ` https://ipfs.io/ipfs/${dataManifest.documentation}`
         }
 
