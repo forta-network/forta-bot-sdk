@@ -36,7 +36,7 @@ describe("getTransactionReceipt", () => {
     expect(mockCache.setKey).toHaveBeenCalledTimes(0)
   })
 
-  it("invokes eth_getTransactionReceipt jsonrpc method and returns receipt", async () => {
+  it("invokes eth_getTransactionReceipt jsonrpc method on ethers provider and returns receipt", async () => {
     const mockTxHash = "0x123"
     const mockReceipt = { hash: mockTxHash, blockNumber: 123 }
     mockEthersProvider.send.mockReturnValueOnce(mockReceipt)

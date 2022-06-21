@@ -13,6 +13,7 @@ export type JsonRpcTransactionReceipt = Omit<Receipt, 'status' | 'blockNumber' |
   status: string,
   blockNumber: string,
   transactionIndex: string,
+  from: string,
   logs: JsonRpcLog[]
 }
 
@@ -32,10 +33,8 @@ export default function provideGetTransactionReceipt(
     if (cachedReceipt) return cachedReceipt
 
     // fetch the receipt
-    const receipt = await ethersProvider.send(
-      'eth_getTransactionReceipt',
-      [txHash]
-    )
+    const receipt =  await ethersProvider.send('eth_getTransactionReceipt',[txHash])
+
     cache.setKey(txHash.toLowerCase(), receipt)
     return receipt
   }
