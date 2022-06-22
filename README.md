@@ -10,7 +10,7 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 - Added two new cli commands: `info` and `logs`
 - Validate chainId of jsonRpcUrl when running bot
-- Generate unique bot id when running bot
+- Generate unique bot id when initializing bot
 - Adjust block polling time based on chainId when running bot locally
 
 ### [0.1.6](https://github.com/forta-network/forta-bot-sdk/commit/5db757c602887fbd2855c7cdcf72f051308e878b)
