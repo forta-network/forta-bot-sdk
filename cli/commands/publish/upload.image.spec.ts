@@ -10,7 +10,7 @@ describe("uploadImage", () => {
   const mockImageRepositoryUsername = "username"
   const mockImageRepositoryPassword = "pw"
   const mockAgentId = "agentId"
-  const mockContainerTag = `${mockAgentId}-intermediate`
+  const mockImageTag = `${mockAgentId}-intermediate`
   const mockImageDigest = "77af4d6b9913e693e8d0b4b294fa62ade6054e6b2f1ffb617ac955dd63fb0182"
   const mockImageDigestLine = `sha256:${mockImageDigest}`
   const mockImageIpfsCid = "bafybeiggh632bloor6td2xintgpvk674jowua2tyomlzekdwrxfqpdzl5e"
@@ -50,13 +50,13 @@ describe("uploadImage", () => {
     mockShell.exec.mockReturnValueOnce(buildResult)
 
     try {
-      await uploadImage()
+      await uploadImage({imageTagSuffix: "suffix"})
     } catch (e) {
       expect(e.message).toBe(`error building agent image: ${buildResult.stderr}`)
     }
 
     expect(mockShell.exec).toHaveBeenCalledTimes(2)
-    expect(mockShell.exec).toHaveBeenNthCalledWith(2, `docker buildx build --platform linux/amd64 --tag ${mockContainerTag} .`)
+    expect(mockShell.exec).toHaveBeenNthCalledWith(2, `docker buildx build --platform linux/amd64 --tag ${mockImageTag}-suffix .`)
   })
 
   it("throws error if unable to tag image", async () => {
@@ -74,7 +74,7 @@ describe("uploadImage", () => {
     }
 
     expect(mockShell.exec).toHaveBeenCalledTimes(3)
-    expect(mockShell.exec).toHaveBeenNthCalledWith(3, `docker tag ${mockContainerTag} ${mockImageRepositoryUrl}/${mockContainerTag}`)
+    expect(mockShell.exec).toHaveBeenNthCalledWith(3, `docker tag ${mockImageTag} ${mockImageRepositoryUrl}/${mockImageTag}`)
   })
 
   it("throws error if unable to push image", async () => {
@@ -94,7 +94,7 @@ describe("uploadImage", () => {
     }
 
     expect(mockShell.exec).toHaveBeenCalledTimes(4)
-    expect(mockShell.exec).toHaveBeenNthCalledWith(4, `docker push ${mockImageRepositoryUrl}/${mockContainerTag}`)
+    expect(mockShell.exec).toHaveBeenNthCalledWith(4, `docker push ${mockImageRepositoryUrl}/${mockImageTag}`)
   })
 
   it("throws error if unable to pull image tags", async () => {

@@ -2,7 +2,7 @@ import shelljs from "shelljs"
 import { assertExists, assertIsNonEmptyString, assertShellResult } from "../../utils"
 
 // uploads agent image to repository and returns image reference
-export type UploadImage = () => Promise<string>
+export type UploadImage = (runtimeArgs?: any) => Promise<string>
 
 export default function provideUploadImage(
   shell: typeof shelljs,
@@ -17,7 +17,9 @@ export default function provideUploadImage(
   assertIsNonEmptyString(agentName, 'agentName')
   assertIsNonEmptyString(contextPath, 'contextPath')
 
-  return async function uploadImage() {
+  return async function uploadImage(runtimeArgs: any = {}) {
+    let { imageTagSuffix } = runtimeArgs
+
     // change directory to context path
     shell.cd(contextPath)
 
@@ -29,16 +31,16 @@ export default function provideUploadImage(
 
     // build the agent image
     console.log('building agent image...')
-    const containerTag = `${agentName}-intermediate`
-    let buildCommand = `docker buildx build --platform linux/amd64 --tag ${containerTag} .`
+    const imageTag = `${agentName}-intermediate${imageTagSuffix ? `-${imageTagSuffix}` : ''}`
+    let buildCommand = `docker buildx build --platform linux/amd64 --tag ${imageTag} .`
     const buildResult = shell.exec(buildCommand)
     assertShellResult(buildResult, 'error building agent image')
 
     // push agent image to repository
     console.log('pushing agent image to repository...')
-    const tagResult = shell.exec(`docker tag ${containerTag} ${imageRepositoryUrl}/${containerTag}`)
+    const tagResult = shell.exec(`docker tag ${imageTag} ${imageRepositoryUrl}/${imageTag}`)
     assertShellResult(tagResult, 'error tagging agent image')
-    const pushResult = shell.exec(`docker push ${imageRepositoryUrl}/${containerTag}`)
+    const pushResult = shell.exec(`docker push ${imageRepositoryUrl}/${imageTag}`)
     assertShellResult(pushResult, 'error pushing agent image')
 
     // extract image sha256 digest from pushResult
