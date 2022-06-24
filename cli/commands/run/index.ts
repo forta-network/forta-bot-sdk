@@ -29,9 +29,7 @@ export default function provideRun(
 
     const network = await ethersProvider.getNetwork();
 
-    if(!network) throw Error(`No network detected at rpc url: ${jsonRpcUrl}`);
-
-    if(!chainIds.includes(network.chainId)) throw Error(`Detected chainId mismatch between ${jsonRpcUrl} [chainId: ${network.chainId}] and package.json [chainIds: ${chainIds}].`)
+    if(!network || !chainIds.includes(network.chainId)) console.warn(`Warning: Detected chainId mismatch between ${jsonRpcUrl} [chainId: ${network.chainId}] and package.json [chainIds: ${chainIds}]. \n`)
 
     // we manually inject the run functions here (instead of through the provide function above) so that
     // we get RUNTIME errors if certain configuration is missing for that run function e.g. jsonRpcUrl
