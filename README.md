@@ -6,7 +6,13 @@ Visit [forta.org](https://forta.org/) to learn more about Forta. See the develop
 
 ## Changelog
 
-### 0.1.7
+### 0.1.8
+
+- Updated chainId validation of `run` command to print out warning instead of throwing error
+- Added `info` and `logs` commands as npm scripts of starter projects
+- Updated `uploadImage` function to accept image tag suffix
+
+### [0.1.7](https://github.com/forta-network/forta-bot-sdk/commit/e06a0198d4515e0354503754cc0e7b157fe72d27)
 
 - Added two new cli commands: `info` and `logs`
 - Validate chainId of jsonRpcUrl when running bot
