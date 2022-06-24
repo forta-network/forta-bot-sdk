@@ -14,6 +14,8 @@
     "range": "forta-agent run --range",
     "file": "forta-agent run --file",
     "publish": "forta-agent publish",
+    "info": "forta-agent info",
+    "logs": "forta-agent logs",
     "push": "forta-agent push",
     "disable": "forta-agent disable",
     "enable": "forta-agent enable",
