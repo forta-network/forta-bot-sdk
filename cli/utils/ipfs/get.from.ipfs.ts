@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import { assertExists } from "..";
+import { assertExists, assertIsNonEmptyString } from "..";
 
 export type GetFromIpfs = (metadataHash: string) => Promise<IpfsData>
 
@@ -21,17 +21,28 @@ export interface IpfsManifestData {
 }
 
 export default function provideGetFromIpfs(
-    ipfsHttpClient: AxiosInstance
+    ipfsHttpClient: AxiosInstance,
+    agentId: string
 ): GetFromIpfs {
     assertExists(ipfsHttpClient, 'ipfsHttpClient')
+    assertIsNonEmptyString(agentId, 'agentId')
 
     return async function getIpfsByHash(metadataHash: string) {
-        const { data } = await ipfsHttpClient.get(`/ipfs/${metadataHash}`);
+        try {
+            const { data } = await ipfsHttpClient({url: `/ipfs/${metadataHash}`, baseURL: "https://ipfs.forta.network"});
 
-        if(data && data.manifest) {
-            return data;
+            if(data && data.manifest) {
+                return data;
+            }
+
+            throw Error(`No data found for ipfs hash ${metadataHash}`)
+
+        } catch(e) {
+            if((e.message as string).includes('status code 403')) {
+                console.log(`Unable to find ipfs data for bot id: ${agentId}. Please verify your bot has been deployed at https://explorer.forta.network/ `)
+            } else {
+                throw e
+            }
         }
-
-        throw Error(`No data found for ipfs hash ${metadataHash}`)
     }
 }
