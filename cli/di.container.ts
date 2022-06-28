@@ -260,7 +260,7 @@ export default function configureContainer(args: any = {}) {
       }
       return axios.create(options)
     }).singleton(),
-    fortaIpfsHttpClient: asFunction((ipfsGatewayUrl: string, ipfsGatewayAuth: string) => {
+    fortaIpfsHttpClient: asFunction(() => {
       const options: AxiosRequestConfig = { baseURL: "https://ipfs.forta.network" }
       return axios.create(options)
     }).singleton()
