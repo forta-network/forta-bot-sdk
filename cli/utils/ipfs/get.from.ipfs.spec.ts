@@ -76,7 +76,10 @@ describe("getFromIpfs", () => {
         try {
             //@ts-ignore
             mockIpfsClient.mockImplementation(() => {
-                throw new Error('Error status code 403');
+                const error = new Error('Error status code 403');
+                //@ts-ignore
+                error.response = { status: 403 };
+                throw error;
               });
             await getFromIpfs(metaHash)
         } catch(e) {

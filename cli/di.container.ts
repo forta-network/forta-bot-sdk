@@ -259,6 +259,10 @@ export default function configureContainer(args: any = {}) {
         }
       }
       return axios.create(options)
+    }).singleton(),
+    fortaIpfsHttpClient: asFunction((ipfsGatewayUrl: string, ipfsGatewayAuth: string) => {
+      const options: AxiosRequestConfig = { baseURL: "https://ipfs.forta.network" }
+      return axios.create(options)
     }).singleton()
   };
   container.register(bindings);
