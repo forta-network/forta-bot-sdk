@@ -2,6 +2,10 @@ import { Alert } from '../alert'
 
 export const FORTA_GRAPHQL_URL = "https://api.forta.network/graphql";
 
+interface AlertCursor {
+    alertId: string,
+    blockNumber: number
+}
 export interface AlertQueryOptions {
     botIds: string[], // filter results by bot ids
     addresses?: string[], // filter results based on addresses involved in alerts
@@ -9,6 +13,7 @@ export interface AlertQueryOptions {
     chainId?: number,
     createdSince?: Date,
     first?: number, // indicates max number of results,
+    startingCursor?: AlertCursor, // query results after the specified cursor
     projectId?: string, 
     scanNodeConfirmations?: { // filter results by number of scan nodes confirming the alert 
         gte: number,
@@ -30,13 +35,19 @@ export interface AlertQueryOptions {
 export interface AlertsResponse {
     alerts: Alert[],
     pageInfo: {
-        hasNextPage: boolean
+        hasNextPage: boolean,
+        endCursor?: {
+            alertId: string,
+            blockNumber: number
+        }
     }
 }
 
-export interface RawGraphqlResponse {
+export interface RawGraphqlAlertResponse {
     data: {
-        data: any,
+        data: {
+            alerts: AlertsResponse
+        },
         errors: any
     }
 }
@@ -48,6 +59,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
             query fetchAlerts(
                 $bots: [String]!, 
                 $addresses: [String], 
+                $after: AlertEndCursorInput,
                 $alertId: String, 
                 $chainId: NonNegativeInt,
                 $first: NonNegativeInt,
@@ -63,6 +75,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                     alerts(input:{
                         bots: $bots,
                         addresses: $addresses,
+                        after: $after,
                         alertId: $alertId,
                         chainId: $chainId,
                         projectId: $projectId,
@@ -102,6 +115,10 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                         }
                         pageInfo {
                             hasNextPage
+                            endCursor {
+                                alertId
+                                blockNumber
+                            }
                         }
                     }
             }
@@ -109,6 +126,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
         "variables": {
             bots: options.botIds,
             addresses: options.addresses,
+            after: options.startingCursor,
             alertId: options.alertId,
             chainId: options.chainId,
             first: options.first,

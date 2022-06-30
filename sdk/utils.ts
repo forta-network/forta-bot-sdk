@@ -10,7 +10,7 @@ import { Log, Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
 import { ethers } from '.'
-import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlResponse } from './graphql/forta'
+import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlAlertResponse } from './graphql/forta'
 import axios from 'axios'
 
 export const getEthersProvider = () => {
@@ -146,10 +146,10 @@ export const isPrivateFindings = () => {
   return IS_PRIVATE_FINDINGS
 }
 
-export const getFortaAlerts = async (query: AlertQueryOptions): Promise<AlertsResponse> => {
-  const response: RawGraphqlResponse = await axios.post(FORTA_GRAPHQL_URL, getQueryFromAlertOptions(query), {headers: {"content-type": "application/json"}});
+export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsResponse> => {
+  const response: RawGraphqlAlertResponse = await axios.post(FORTA_GRAPHQL_URL, getQueryFromAlertOptions(query), {headers: {"content-type": "application/json"}});
 
   if(response.data && response.data.errors) throw Error(response.data.errors)
 
-  return response.data.data
+  return response.data.data.alerts
 }

@@ -16,7 +16,7 @@ import {
   setPrivateFindings,
   isPrivateFindings,
   getTransactionReceipt,
-  getFortaAlerts
+  getAlerts
 } from "./utils"
 import awilixConfigureContainer from '../cli/di.container';
 
@@ -100,5 +100,5 @@ export {
   isPrivateFindings,
   configureContainer,
   getTransactionReceipt,
-  getFortaAlerts
+  getAlerts
  }
