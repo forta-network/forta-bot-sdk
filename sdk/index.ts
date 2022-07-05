@@ -15,7 +15,8 @@ import {
   keccak256,
   setPrivateFindings,
   isPrivateFindings,
-  getTransactionReceipt
+  getTransactionReceipt,
+  getAlerts
 } from "./utils"
 import awilixConfigureContainer from '../cli/di.container';
 
@@ -98,5 +99,6 @@ export {
   setPrivateFindings,
   isPrivateFindings,
   configureContainer,
-  getTransactionReceipt
+  getTransactionReceipt,
+  getAlerts
  }
