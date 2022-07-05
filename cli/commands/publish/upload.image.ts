@@ -32,7 +32,7 @@ export default function provideUploadImage(
     // build the agent image
     console.log('building agent image...')
     const imageTag = `${agentName}-intermediate${imageTagSuffix ? `-${imageTagSuffix}` : ''}`
-    let buildCommand = `docker buildx build --platform linux/amd64 --tag ${imageTag} .`
+    let buildCommand = `docker buildx build --load --platform linux/amd64 --tag ${imageTag} .`
     const buildResult = shell.exec(buildCommand)
     assertShellResult(buildResult, 'error building agent image')
 

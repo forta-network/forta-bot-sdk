@@ -56,7 +56,7 @@ describe("uploadImage", () => {
     }
 
     expect(mockShell.exec).toHaveBeenCalledTimes(2)
-    expect(mockShell.exec).toHaveBeenNthCalledWith(2, `docker buildx build --platform linux/amd64 --tag ${mockImageTag}-suffix .`)
+    expect(mockShell.exec).toHaveBeenNthCalledWith(2, `docker buildx build --load --platform linux/amd64 --tag ${mockImageTag}-suffix .`)
   })
 
   it("throws error if unable to tag image", async () => {
