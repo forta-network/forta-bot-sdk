@@ -1,5 +1,4 @@
-from forta_agent.alerts import Alert
-
+from .alert import Alert
 
 class AlertCursor:
     def __init__(self, dict):
@@ -24,44 +23,45 @@ class AlertQueryOptions:
         self.blockDateRange = dict.get('block_date_range')
         self.blockNumberRange = dict.get('block_number_range')
 
-    query = """
-    query exampleQuery($input: AlertsInput) {
-      alerts(input: $input) {
-        alerts {
-          name
-          protocol
-          findingType
-          source {
-            transactionHash
-            block {
-              number
-              chainId
-              timestamp
-              hash
-            }
-            bot {
-              id
-            }
-          }
-          severity
-          metadata
-          alertId
-          addresses
-          description
-          hash
-        }
-        pageInfo {
-          hasNextPage
-          endCursor {
-            blockNumber
-            alertId
-          }
-        }
-      }
-    }
-    """
-
     def get_query(self):
+        query = """
+          query exampleQuery($input: AlertsInput) {
+            alerts(input: $input) {
+              alerts {
+                  alertId
+                  addresses
+                  contracts {
+                      address
+                      name
+                      projectId
+                  }
+                  createdAt
+                  description
+                  findingType
+                  name
+                  projects {
+                      id
+                  }
+                  protocol
+                  scanNodeCount
+                  severity
+                  source {
+                      transactionHash
+                      bot {
+                          id
+                      }
+                  }
+              }
+              pageInfo {
+                hasNextPage
+                endCursor {
+                  blockNumber
+                  alertId
+                }
+              }
+            }
+          }
+          """
         query_variables = vars(self)
         return dict(query=query, variables=query_variables)
 

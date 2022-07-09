@@ -1,7 +1,7 @@
 class Alert:
     def __init__(self, dict):
         self.address = dict.get('addresses')
-        self.alert_id = dict.get('alert_id')
+        self.alert_id = dict.get('alertId')
         self.contracts = dict.get('contracts')
         self.created_at = dict.get('created_at')
         self.description = dict.get('description')
@@ -16,7 +16,7 @@ class Alert:
 
 class Source:
     def __init__(self, dict):
-        self.transaction_hash = dict.get('transaction_hash')
+        self.transaction_hash = dict.get('transactionHash')
         self.block = dict.get('block')
         self.bot = dict.get('bot')
 
