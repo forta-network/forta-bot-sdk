@@ -25,7 +25,7 @@ class AlertQueryOptions:
 
     def get_query(self):
         query = """
-          query exampleQuery($input: AlertsInput) {
+          query($input: AlertsInput) {
             alerts(input: $input) {
               alerts {
                   alertId
@@ -63,7 +63,8 @@ class AlertQueryOptions:
           }
           """
         query_variables = vars(self)
-        return dict(query=query, variables=query_variables)
+        filtered_query_variables = {k:v for k,v in query_variables.items() if v is not None}
+        return dict(query=query, variables={"input": filtered_query_variables})
 
 
 class AlertsResponse:
