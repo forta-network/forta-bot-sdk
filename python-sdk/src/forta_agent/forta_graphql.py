@@ -2,8 +2,8 @@ from .alert import Alert
 
 class AlertCursor:
     def __init__(self, dict):
-        self.alert_id = dict.get('alert_id')
-        self.block_number = dict.get('block_number')
+        self.alert_id = dict.get('alertId')
+        self.block_number = dict.get('blockNumber')
 
 
 class AlertQueryOptions:
@@ -43,6 +43,7 @@ class AlertQueryOptions:
                       id
                   }
                   protocol
+                  metadata
                   scanNodeCount
                   severity
                   source {
@@ -70,11 +71,9 @@ class AlertQueryOptions:
 class AlertsResponse:
     def __init__(self, dict):
         self.alerts = list(map(lambda t: Alert(t), dict.get('alerts', [])))
-        self.page_info = dict.get('page_info')
+        self.page_info = PageInfo(dict.get('pageInfo'))
 
-
-class RawGraphqlAlertResponse:
-    def __init__(self, dict):
-        self.data = dict.get('data')
-
-
+class PageInfo:
+    def __init__(self,dict):
+        self.has_next_page = dict.get('hasNextPage')
+        self.end_cursor = AlertCursor(dict.get('endCursor'))

@@ -4,6 +4,8 @@ from jsonc_parser.parser import JsoncParser
 import sha3
 import requests
 
+from forta_agent.forta_graphql import AlertsResponse
+
 
 def get_web3_provider():
     from . import web3Provider
@@ -94,7 +96,7 @@ def get_alerts(dict):
         data = response.json().get('data')
 
         if data:
-            return data.get('alerts')
+            return AlertsResponse(data.get('alerts'))
         return data
 
     return response

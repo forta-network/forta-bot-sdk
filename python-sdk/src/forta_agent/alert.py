@@ -2,14 +2,14 @@ class Alert:
     def __init__(self, dict):
         self.address = dict.get('addresses')
         self.alert_id = dict.get('alertId')
-        self.contracts = dict.get('contracts')
-        self.created_at = dict.get('created_at')
+        self.contracts = list(map(lambda t: Contract(t), dict.get('contracts', [])))
+        self.created_at = dict.get('createdAt')
         self.description = dict.get('description')
-        self.finding_type = dict.get('finding_type')
+        self.finding_type = dict.get('findingType')
         self.name = dict.get('name')
         self.protocol = dict.get('protocol')
         self.severity = dict.get('severity')
-        self.source = map(lambda t: Source(t), dict.get('source'))
+        self.source = Source(dict.get('source'))
         self.metadata = dict.get('metadata')
         self.projects = list(map(lambda t: Projects(t), dict.get('projects', [])))
 
@@ -19,6 +19,13 @@ class Source:
         self.transaction_hash = dict.get('transactionHash')
         self.block = dict.get('block')
         self.bot = dict.get('bot')
+
+
+class Contract:
+    def __init__(self, dict):
+        self.address = dict.get('address')
+        self.name = dict.get('name')
+        self.projectId = dict.get('projectId')
 
 
 class Projects:
