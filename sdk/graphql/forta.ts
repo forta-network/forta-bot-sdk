@@ -11,7 +11,7 @@ export interface AlertQueryOptions {
     addresses?: string[], // filter results based on addresses involved in alerts
     alertId?: string,
     chainId?: number,
-    createdSince?: Date,
+    createdSince?: number,
     first?: number, // indicates max number of results,
     startingCursor?: AlertCursor, // query results after the specified cursor
     projectId?: string, 
@@ -99,6 +99,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                             createdAt
                             description
                             findingType
+                            metadata
                             name
                             projects {
                                 id
@@ -135,7 +136,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
             severities: options.severities,
             transactionHash: options.transactionHash,
             blockSortDirection: options.blockSortDirection,
-            createdSince: options.createdSince?.getDate(),
+            createdSince: options.createdSince,
             blockDateRange: options.blockDateRange ? 
                 { startDate: options.blockDateRange.startDate.toISOString().split('T')[0], endDate: options.blockDateRange.endDate.toISOString().split('T')[0]} :
                 undefined,
