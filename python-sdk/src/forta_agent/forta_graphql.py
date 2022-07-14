@@ -71,9 +71,9 @@ class AlertQueryOptions:
 class AlertsResponse:
     def __init__(self, dict):
         self.alerts = list(map(lambda t: Alert(t), dict.get('alerts', []))) if dict.get('alerts') is not None else []
-        self.page_info = PageInfo(dict.get('pageInfo'))
+        self.page_info = PageInfo(dict.get('pageInfo')) if dict.get('pageInfo') is not None else None
 
 class PageInfo:
     def __init__(self,dict):
         self.has_next_page = dict.get('hasNextPage')
-        self.end_cursor = AlertCursor(dict.get('endCursor'))
+        self.end_cursor = AlertCursor(dict.get('endCursor')) if dict.get('endCursor') is not None else None

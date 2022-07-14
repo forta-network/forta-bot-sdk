@@ -9,7 +9,7 @@ class Alert:
         self.name = dict.get('name')
         self.protocol = dict.get('protocol')
         self.severity = dict.get('severity')
-        self.source = Source(dict.get('source'))
+        self.source = Source(dict.get('source')) if dict.get('source') is not None else None
         self.metadata = dict.get('metadata')
         self.projects = list(map(lambda t: Projects(t), dict.get('projects', []))) if dict.get('projects') is not None else []
 
