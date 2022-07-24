@@ -30,6 +30,7 @@ class AlertQueryOptions:
               alerts {
                   alertId
                   addresses
+                  hash
                   contracts {
                       address
                       name
