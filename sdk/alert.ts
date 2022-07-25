@@ -1,6 +1,7 @@
 export interface Alert {
     addresses?: string[],
     alertId?: string,
+    hash?: string,
     contracts?: {
         address: string,
         name: string,

@@ -7,6 +7,7 @@ class Alert:
         self.description = dict.get('description')
         self.finding_type = dict.get('findingType')
         self.name = dict.get('name')
+        self.hash = dict.get('hash')
         self.protocol = dict.get('protocol')
         self.severity = dict.get('severity')
         self.source = Source(dict.get('source')) if dict.get('source') is not None else None
