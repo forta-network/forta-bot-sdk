@@ -10,7 +10,15 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.8
+### 0.1.9
+
+- Use forta ipfs node for `info` command
+- Added new method `getAlerts` to Typescript sdk to that fetches alerts using forta's alert graphql api
+- Added new method `get_alerts` to Python sdk to that fetches alerts using forta's alert graphql api
+- Fixing docker build issue
+
+
+### [0.1.8](https://github.com/forta-network/forta-bot-sdk/commit/9740a8ad0acdcd112d8bd6ba72f191e0b67602cd)
 
 - Updated chainId validation of `run` command to print out warning instead of throwing error
 - Added `info` and `logs` commands as npm scripts of starter projects
