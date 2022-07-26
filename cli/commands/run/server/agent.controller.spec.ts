@@ -11,7 +11,6 @@ describe("AgentController", () => {
   const mockCallback = jest.fn()
   const mockFinding = { some: 'finding' }
   const systemTime = new Date()
-  const consoleSpy = jest.spyOn(console, 'log');
 
   const generateBlockRequest = () => ({
     request: {
@@ -125,7 +124,6 @@ describe("AgentController", () => {
     mockGetAgentHandlers.mockReset()
     mockHandleBlock.mockReset()
     mockHandleTransaction.mockReset()
-    consoleSpy.mockReset()
   }
 
   beforeEach(() => resetMocks())
@@ -272,7 +270,6 @@ describe("AgentController", () => {
           private: false
         })
 
-        expect(consoleSpy).toBeCalledTimes(2)
     })
   })
 
@@ -420,7 +417,6 @@ describe("AgentController", () => {
         await agentController.initializeAgentHandlers()
         await agentController.EvaluateTx(mockTxRequest, mockCallback)
 
-        expect(consoleSpy).toBeCalledTimes(2)
         expect(mockCallback).toHaveBeenCalledWith(null, {
           status: "ERROR",
           findings: [],
@@ -440,7 +436,6 @@ describe("AgentController", () => {
       await agentController.initializeAgentHandlers()
       await agentController.EvaluateTx(mockTxRequest, mockCallback)
 
-      expect(consoleSpy).toBeCalledTimes(2)
       expect(mockCallback).toHaveBeenCalledWith(null, {
         status: "ERROR",
         findings: [],
