@@ -73,8 +73,9 @@ describe("runHandlersOnTransaction", () => {
   })
 
   it("throws an error if more than 10 findings when executing transaction handler", async () => {
+    const findings = getFindingsArray(11, 4)
+
     try {
-      const findings = getFindingsArray(11)
       const mockHandleTransaction = jest.fn().mockReturnValue(findings)
       mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
 
@@ -94,15 +95,42 @@ describe("runHandlersOnTransaction", () => {
 
       fail()
     } catch(err) {
-      expect(err.message).toBe('Found more than 10 findings when executing transaction handler.')
+      expect(err.message).toBe(`Cannot return more than 10 findings per request (received ${findings.length})`)
+    }
+  })
+
+  it("throws an error if more than 50kB of findings found when executing transaction handler", async () => {
+    const findings = getFindingsArray(1, 51000)
+    
+    try {
+      const mockHandleTransaction = jest.fn().mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
+
+      mockGetNetworkId.mockReturnValueOnce(1)
+      const mockLog = { some: 'log' }
+      const mockReceipt = { blockNumber: 123, transactionHash: mockTxHash, logs: [mockLog] }
+      mockGetTransactionReceipt.mockReturnValueOnce(mockReceipt)
+      const mockTransaction = { hash: mockTxHash }
+      const mockBlock = { hash: '0xabc', transactions: [mockTransaction] }
+      mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
+      const mockTrace = { some: 'trace' }
+      mockGetTraceData.mockReturnValueOnce([mockTrace])
+      const mockTxEvent = {}
+      mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
+
+      await runHandlersOnTransaction(mockTxHash)
+
+      fail()
+    } catch(err) {
+      expect(err.message).toBe(`Cannot return more than 50kB of findings per request (received ${findings.length})`)
     }
   })
 
 })
 
-const getFindingsArray = (arraySize: number) => {
+const getFindingsArray = (arraySize: number, sizeInBytes: number) => {
   const finding: Finding = Finding.from( {
-    name: "test",
+    name: "t".repeat(sizeInBytes),
     description: "test description",
     alertId: "1234",
     severity: FindingSeverity.Medium,

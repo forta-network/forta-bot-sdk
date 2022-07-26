@@ -83,8 +83,8 @@ describe("runHandlersOnBlock", () => {
   })
 
   it("throws an error if more than 10 findings when handling a block", async () => {
+    const findings = getFindingsArray(11, 10)
     try {
-      const findings = getFindingsArray(11)
 
       const mockHandleBlock = jest.fn().mockReturnValue(findings)
       mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock })
@@ -100,13 +100,14 @@ describe("runHandlersOnBlock", () => {
 
       fail()
     } catch(err) {
-      expect(err.message).toBe('Found more than 10 findings when executing block handler.')
+      expect(err.message).toBe(`Cannot return more than 10 findings per request (received ${findings.length})`)
     }
   })
 
   it("throws an error if more than 10 findings when handling a transaction", async () => {
+    const findings = getFindingsArray(11, 10)
+    
     try {
-      const findings = getFindingsArray(11)
       const mockHandleBlock = jest.fn().mockReturnValue([])
       const mockHandleTransaction = jest.fn().mockReturnValue(findings)
       mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
@@ -128,14 +129,68 @@ describe("runHandlersOnBlock", () => {
 
       fail()
     }catch(err) {
-      expect(err.message).toBe('Found more than 10 findings when executing transaction handler.')
+      expect(err.message).toBe(`Cannot return more than 10 findings per request (received ${findings.length})`)
+    }
+  })
+
+  it("throws an error if more than 50kB of findings found when handling a block", async () => {
+    const findings = getFindingsArray(1, 51000)
+    try {
+
+      const mockHandleBlock = jest.fn().mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock })
+
+      const mockNetworkId = 1
+      mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
+      const mockTransaction = { hash: mockTxHash }
+      const mockBlock = { hash: mockBlockHash, number: 7, transactions: [mockTransaction] }
+      mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
+      mockCreateBlockEvent.mockReturnValueOnce({})
+
+      await runHandlersOnBlock(mockBlockHash)
+
+      fail()
+    } catch(err) {
+      expect(err.message).toBe(`Cannot return more than 50kB of findings per request (received ${findings.length})`)
+    }
+  })
+
+  it("throws an error if more than 10 findings when handling a transaction", async () => {
+
+    const findings = getFindingsArray(1, 51000)
+
+    try {
+      const mockHandleBlock = jest.fn().mockReturnValue([])
+      const mockHandleTransaction = jest.fn().mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
+      const mockNetworkId = 1
+      mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
+      const mockTransaction = { hash: mockTxHash }
+      const mockBlock = { hash: mockBlockHash, number: 7, transactions: [mockTransaction] }
+      mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
+      const mockBlockEvent = {}
+      mockCreateBlockEvent.mockReturnValueOnce(mockBlockEvent)
+      const mockTrace = { transactionHash: mockTxHash, some: 'trace' }
+      mockGetTraceData.mockReturnValueOnce([mockTrace])
+      const mockLog = { transactionHash: mockTxHash, some: 'log' }
+      mockGetLogsForBlock.mockReturnValueOnce([mockLog])
+      const mockTxEvent = {}
+      mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
+
+      await runHandlersOnBlock(mockBlockHash)
+
+      fail()
+    }catch(err) {
+      expect(err.message).toBe(`Cannot return more than 50kB of findings per request (received ${findings.length})`)
     }
   })
 })
 
-const getFindingsArray = (arraySize: number) => {
+
+
+const getFindingsArray = (arraySize: number, sizeInBytes: number) => {
   const finding: Finding = Finding.from( {
-    name: "test",
+    name: "t".repeat(sizeInBytes),
     description: "test description",
     alertId: "1234",
     severity: FindingSeverity.Medium,

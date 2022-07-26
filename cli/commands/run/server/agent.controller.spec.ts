@@ -430,5 +430,25 @@ describe("AgentController", () => {
           private: false
         })
     })
+
+    it("throws an error if more than 50kB of findings fetched when handling a transaction", async () => {
+      const findings = (new Array(1)).fill({ some: 'f'.repeat(51000) })
+      mockHandleTransaction.mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
+      agentController = new AgentController(mockGetAgentHandlers)
+
+      await agentController.initializeAgentHandlers()
+      await agentController.EvaluateTx(mockTxRequest, mockCallback)
+
+      expect(consoleSpy).toBeCalledTimes(2)
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "ERROR",
+        findings: [],
+        metadata: {
+          timestamp: systemTime.toISOString(),
+        },
+        private: false
+      })
+  })
   })
 })

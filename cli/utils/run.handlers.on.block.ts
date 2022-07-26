@@ -1,7 +1,7 @@
 import { Trace } from "../../sdk";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetTraceData } from "./get.trace.data";
-import { assertExists, CreateBlockEvent, CreateTransactionEvent } from ".";
+import { assertExists, assertFindings, CreateBlockEvent, CreateTransactionEvent } from ".";
 import { GetNetworkId } from "./get.network.id";
 import { GetBlockWithTransactions } from "./get.block.with.transactions";
 import { JsonRpcLog } from "./get.transaction.receipt";
@@ -43,7 +43,7 @@ export function provideRunHandlersOnBlock(
       const blockEvent = createBlockEvent(block, networkId)
       const findings = await handleBlock(blockEvent)
 
-      if(findings.length > 10) throw Error("Found more than 10 findings when executing block handler.")
+      assertFindings(findings)
       
       console.log(`${findings.length} findings for block ${block.hash} ${findings}`)
     }
@@ -80,7 +80,7 @@ export function provideRunHandlersOnBlock(
       const txEvent = createTransactionEvent(transaction, block, networkId, traceMap[txHash], logMap[txHash])
       const findings = await handleTransaction(txEvent)
 
-      if(findings.length > 10) throw Error("Found more than 10 findings when executing transaction handler.")
+      assertFindings(findings)
 
       console.log(`${findings.length} findings for transaction ${transaction.hash} ${findings}`)
     }

@@ -3,7 +3,7 @@ const {
   TransactionEvent,
   isPrivateFindings,
 } = require("../../../../sdk");
-const { assertExists, formatAddress } = require("../../../utils");
+const { assertExists, formatAddress, assertFindings } = require("../../../utils");
 
 module.exports = class AgentController {
   constructor(getAgentHandlers) {
@@ -27,7 +27,7 @@ module.exports = class AgentController {
 
         const returnedFindings = await this.handleBlock(blockEvent);
         
-        if(returnedFindings.length > 10) throw Error("Found more than 10 findings when executing block handler.")
+        assertFindings(returnedFindings)
 
         findings.push(...returnedFindings);
       } catch (e) {
@@ -63,7 +63,7 @@ module.exports = class AgentController {
 
         const returnedFindings = await this.handleTransaction(txEvent);
 
-        if(returnedFindings.length > 10) throw Error("Found more than 10 findings when executing transaction handler.")
+        assertFindings(returnedFindings)
 
         findings.push(...returnedFindings);
       } catch (e) {
