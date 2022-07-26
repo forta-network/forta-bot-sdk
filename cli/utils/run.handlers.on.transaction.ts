@@ -39,6 +39,9 @@ export function provideRunHandlersOnTransaction(
     const transaction = block.transactions.find(tx => tx.hash.toLowerCase() === txHash)!
     const txEvent = createTransactionEvent(transaction, block, networkId, traces, receipt.logs)
     const findings = await handleTransaction(txEvent)
+    
+    if(findings.length > 10) throw Error("Found more than 10 findings when executing transaction handler.")
+
     console.log(`${findings.length} findings for transaction ${txHash} ${findings}`)
   }
 }

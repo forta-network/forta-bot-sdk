@@ -11,6 +11,7 @@ describe("AgentController", () => {
   const mockCallback = jest.fn()
   const mockFinding = { some: 'finding' }
   const systemTime = new Date()
+  const consoleSpy = jest.spyOn(console, 'log');
 
   const generateBlockRequest = () => ({
     request: {
@@ -124,6 +125,7 @@ describe("AgentController", () => {
     mockGetAgentHandlers.mockReset()
     mockHandleBlock.mockReset()
     mockHandleTransaction.mockReset()
+    consoleSpy.mockReset()
   }
 
   beforeEach(() => resetMocks())
@@ -250,6 +252,27 @@ describe("AgentController", () => {
         transactionsRoot: grpcBlock.transactionsRoot,
         uncles: grpcBlock.uncles
       })
+    })
+
+    it("throws an error if more than 10 findings when handling a block", async () => {
+        const findings = (new Array(11)).fill(mockFinding)
+        mockHandleBlock.mockReturnValue(findings)
+        mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
+        agentController = new AgentController(mockGetAgentHandlers)
+
+        await agentController.initializeAgentHandlers()
+        await agentController.EvaluateBlock(mockBlockRequest, mockCallback)
+
+        expect(mockCallback).toHaveBeenCalledWith(null, {
+          status: "ERROR",
+          findings: [],
+          metadata: {
+            timestamp: systemTime.toISOString(),
+          },
+          private: false
+        })
+
+        expect(consoleSpy).toBeCalledTimes(2)
     })
   })
 
@@ -386,6 +409,26 @@ describe("AgentController", () => {
         timestamp: parseInt(grpcBlock.blockTimestamp),
       })
       expect(txEvent.contractAddress).toStrictEqual(formatAddress(mockTxRequest.request.event.contractAddress))
+    })
+  
+    it("throws an error if more than 10 findings when handling a transaction", async () => {
+        const findings = (new Array(21)).fill(mockFinding)
+        mockHandleTransaction.mockReturnValue(findings)
+        mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
+        agentController = new AgentController(mockGetAgentHandlers)
+
+        await agentController.initializeAgentHandlers()
+        await agentController.EvaluateTx(mockTxRequest, mockCallback)
+
+        expect(consoleSpy).toBeCalledTimes(2)
+        expect(mockCallback).toHaveBeenCalledWith(null, {
+          status: "ERROR",
+          findings: [],
+          metadata: {
+            timestamp: systemTime.toISOString(),
+          },
+          private: false
+        })
     })
   })
 })

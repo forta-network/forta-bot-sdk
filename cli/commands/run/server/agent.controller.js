@@ -24,7 +24,12 @@ module.exports = class AgentController {
     if (this.handleBlock) {
       try {
         const blockEvent = this.createBlockEventFromGrpcRequest(call.request);
-        findings.push(...(await this.handleBlock(blockEvent)));
+
+        const returnedFindings = await this.handleBlock(blockEvent);
+        
+        if(returnedFindings.length > 10) throw Error("Found more than 10 findings when executing block handler.")
+
+        findings.push(...returnedFindings);
       } catch (e) {
         console.log(
           `${new Date().toISOString()}    evaluateBlock ${
@@ -55,7 +60,12 @@ module.exports = class AgentController {
         const txEvent = this.createTransactionEventFromGrpcRequest(
           call.request
         );
-        findings.push(...(await this.handleTransaction(txEvent)));
+
+        const returnedFindings = await this.handleTransaction(txEvent);
+
+        if(returnedFindings.length > 10) throw Error("Found more than 10 findings when executing transaction handler.")
+
+        findings.push(...returnedFindings);
       } catch (e) {
         console.log(
           `${new Date().toISOString()}    evaluateTx ${

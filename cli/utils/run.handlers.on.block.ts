@@ -42,6 +42,9 @@ export function provideRunHandlersOnBlock(
     if (handleBlock) {
       const blockEvent = createBlockEvent(block, networkId)
       const findings = await handleBlock(blockEvent)
+
+      if(findings.length > 10) throw Error("Found more than 10 findings when executing block handler.")
+      
       console.log(`${findings.length} findings for block ${block.hash} ${findings}`)
     }
 
@@ -76,6 +79,9 @@ export function provideRunHandlersOnBlock(
       const txHash = transaction.hash.toLowerCase()
       const txEvent = createTransactionEvent(transaction, block, networkId, traceMap[txHash], logMap[txHash])
       const findings = await handleTransaction(txEvent)
+
+      if(findings.length > 10) throw Error("Found more than 10 findings when executing transaction handler.")
+
       console.log(`${findings.length} findings for transaction ${transaction.hash} ${findings}`)
     }
   }

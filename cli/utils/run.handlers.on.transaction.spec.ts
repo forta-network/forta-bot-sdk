@@ -1,3 +1,4 @@
+import { Finding, FindingSeverity, FindingType } from "../../sdk"
 import { provideRunHandlersOnTransaction, RunHandlersOnTransaction } from "./run.handlers.on.transaction"
 
 describe("runHandlersOnTransaction", () => {
@@ -16,6 +17,15 @@ describe("runHandlersOnTransaction", () => {
     )
   })
 
+  beforeEach(() => {
+    mockGetAgentHandlers.mockReset()
+    mockGetNetworkId.mockReset()
+    mockGetTransactionReceipt.mockReset()
+    mockGetBlockWithTransactions.mockReset()
+    mockGetTraceData.mockReset()
+    mockCreateTransactionEvent.mockReset()
+  })
+
   it("throws error if no transaction handler found", async () => {
     mockGetAgentHandlers.mockReturnValueOnce({ })
 
@@ -29,7 +39,6 @@ describe("runHandlersOnTransaction", () => {
   })
 
   it("invokes transaction handler with transaction event", async () => {
-    mockGetAgentHandlers.mockReset()
     const mockHandleTransaction = jest.fn().mockReturnValue([])
     mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
     const mockNetworkId = 1
@@ -62,4 +71,43 @@ describe("runHandlersOnTransaction", () => {
     expect(mockHandleTransaction).toHaveBeenCalledTimes(1)
     expect(mockHandleTransaction).toHaveBeenCalledWith(mockTxEvent)
   })
+
+  it("throws an error if more than 10 findings when executing transaction handler", async () => {
+    try {
+      const findings = getFindingsArray(11)
+      const mockHandleTransaction = jest.fn().mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
+
+      mockGetNetworkId.mockReturnValueOnce(1)
+      const mockLog = { some: 'log' }
+      const mockReceipt = { blockNumber: 123, transactionHash: mockTxHash, logs: [mockLog] }
+      mockGetTransactionReceipt.mockReturnValueOnce(mockReceipt)
+      const mockTransaction = { hash: mockTxHash }
+      const mockBlock = { hash: '0xabc', transactions: [mockTransaction] }
+      mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
+      const mockTrace = { some: 'trace' }
+      mockGetTraceData.mockReturnValueOnce([mockTrace])
+      const mockTxEvent = {}
+      mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
+
+      await runHandlersOnTransaction(mockTxHash)
+
+      fail()
+    } catch(err) {
+      expect(err.message).toBe('Found more than 10 findings when executing transaction handler.')
+    }
+  })
+
 })
+
+const getFindingsArray = (arraySize: number) => {
+  const finding: Finding = Finding.from( {
+    name: "test",
+    description: "test description",
+    alertId: "1234",
+    severity: FindingSeverity.Medium,
+    type: FindingType.Exploit
+  })
+
+  return (new Array(arraySize)).fill(finding)
+}
