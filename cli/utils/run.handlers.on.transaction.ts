@@ -1,4 +1,4 @@
-import { assertExists, CreateTransactionEvent } from ".";
+import { assertExists, assertFindings, CreateTransactionEvent } from ".";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetBlockWithTransactions } from "./get.block.with.transactions";
 import { GetNetworkId } from "./get.network.id";
@@ -39,6 +39,9 @@ export function provideRunHandlersOnTransaction(
     const transaction = block.transactions.find(tx => tx.hash.toLowerCase() === txHash)!
     const txEvent = createTransactionEvent(transaction, block, networkId, traces, receipt.logs)
     const findings = await handleTransaction(txEvent)
+    
+    assertFindings(findings)
+
     console.log(`${findings.length} findings for transaction ${txHash} ${findings}`)
   }
 }

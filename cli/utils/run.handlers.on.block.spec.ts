@@ -1,3 +1,4 @@
+import { Finding, FindingSeverity, FindingType } from "../../sdk"
 import { provideRunHandlersOnBlock, RunHandlersOnBlock } from "./run.handlers.on.block"
 
 describe("runHandlersOnBlock", () => {
@@ -19,6 +20,16 @@ describe("runHandlersOnBlock", () => {
     )
   })
 
+  beforeEach(() => {
+    mockGetAgentHandlers.mockReset()
+    mockGetNetworkId.mockReset()
+    mockGetBlockWithTransactions.mockReset()
+    mockGetTraceData.mockReset()
+    mockGetLogsForBlock.mockReset()
+    mockCreateBlockEvent.mockReset()
+    mockCreateTransactionEvent.mockReset()
+  })
+
   it("throws an error if no handlers found", async () => {
     mockGetAgentHandlers.mockReturnValueOnce({ })
 
@@ -32,7 +43,6 @@ describe("runHandlersOnBlock", () => {
   })
 
   it("invokes block handlers with block event and transaction handlers with transaction event for each transaction in block", async () => {
-    mockGetAgentHandlers.mockReset()
     const mockHandleBlock = jest.fn().mockReturnValue([])
     const mockHandleTransaction = jest.fn().mockReturnValue([])
     mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
@@ -71,4 +81,122 @@ describe("runHandlersOnBlock", () => {
     expect(mockHandleTransaction).toHaveBeenCalledTimes(1)
     expect(mockHandleTransaction).toHaveBeenCalledWith(mockTxEvent)
   })
+
+  it("throws an error if more than 10 findings when handling a block", async () => {
+    const findings = getFindingsArray(11, 10)
+    try {
+
+      const mockHandleBlock = jest.fn().mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock })
+
+      const mockNetworkId = 1
+      mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
+      const mockTransaction = { hash: mockTxHash }
+      const mockBlock = { hash: mockBlockHash, number: 7, transactions: [mockTransaction] }
+      mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
+      mockCreateBlockEvent.mockReturnValueOnce({})
+
+      await runHandlersOnBlock(mockBlockHash)
+
+      fail()
+    } catch(err) {
+      expect(err.message).toBe(`Cannot return more than 10 findings per request (received ${findings.length})`)
+    }
+  })
+
+  it("throws an error if more than 10 findings when handling a transaction", async () => {
+    const findings = getFindingsArray(11, 10)
+    
+    try {
+      const mockHandleBlock = jest.fn().mockReturnValue([])
+      const mockHandleTransaction = jest.fn().mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
+      const mockNetworkId = 1
+      mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
+      const mockTransaction = { hash: mockTxHash }
+      const mockBlock = { hash: mockBlockHash, number: 7, transactions: [mockTransaction] }
+      mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
+      const mockBlockEvent = {}
+      mockCreateBlockEvent.mockReturnValueOnce(mockBlockEvent)
+      const mockTrace = { transactionHash: mockTxHash, some: 'trace' }
+      mockGetTraceData.mockReturnValueOnce([mockTrace])
+      const mockLog = { transactionHash: mockTxHash, some: 'log' }
+      mockGetLogsForBlock.mockReturnValueOnce([mockLog])
+      const mockTxEvent = {}
+      mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
+
+      await runHandlersOnBlock(mockBlockHash)
+
+      fail()
+    }catch(err) {
+      expect(err.message).toBe(`Cannot return more than 10 findings per request (received ${findings.length})`)
+    }
+  })
+
+  it("throws an error if more than 50kB of findings found when handling a block", async () => {
+    const findings = getFindingsArray(1, 1024 * 50)
+    const byteLength = Buffer.byteLength(JSON.stringify(findings));
+    try {
+
+      const mockHandleBlock = jest.fn().mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock })
+
+      const mockNetworkId = 1
+      mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
+      const mockTransaction = { hash: mockTxHash }
+      const mockBlock = { hash: mockBlockHash, number: 7, transactions: [mockTransaction] }
+      mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
+      mockCreateBlockEvent.mockReturnValueOnce({})
+
+      await runHandlersOnBlock(mockBlockHash)
+
+      fail()
+    } catch(err) {
+      expect(err.message).toBe(`Cannot return more than 50kB of findings per request (received ${byteLength} bytes)`)
+    }
+  })
+
+  it("throws an error if more than 50kB of findings found handling a transaction", async () => {
+
+    const findings = getFindingsArray(1, 1024 * 50)
+    const byteLength = Buffer.byteLength(JSON.stringify(findings));
+    try {
+      const mockHandleBlock = jest.fn().mockReturnValue([])
+      const mockHandleTransaction = jest.fn().mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
+      const mockNetworkId = 1
+      mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
+      const mockTransaction = { hash: mockTxHash }
+      const mockBlock = { hash: mockBlockHash, number: 7, transactions: [mockTransaction] }
+      mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
+      const mockBlockEvent = {}
+      mockCreateBlockEvent.mockReturnValueOnce(mockBlockEvent)
+      const mockTrace = { transactionHash: mockTxHash, some: 'trace' }
+      mockGetTraceData.mockReturnValueOnce([mockTrace])
+      const mockLog = { transactionHash: mockTxHash, some: 'log' }
+      mockGetLogsForBlock.mockReturnValueOnce([mockLog])
+      const mockTxEvent = {}
+      mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
+
+      await runHandlersOnBlock(mockBlockHash)
+
+      fail()
+    }catch(err) {
+      expect(err.message).toBe(`Cannot return more than 50kB of findings per request (received ${byteLength} bytes)`)
+    }
+  })
 })
+
+
+
+const getFindingsArray = (arraySize: number, sizeInBytes: number) => {
+  const finding: Finding = Finding.from( {
+    name: "t".repeat(sizeInBytes),
+    description: "test description",
+    alertId: "1234",
+    severity: FindingSeverity.Medium,
+    type: FindingType.Exploit
+  })
+
+  return (new Array(arraySize)).fill(finding)
+}

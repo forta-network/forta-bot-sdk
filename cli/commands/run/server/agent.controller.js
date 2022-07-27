@@ -3,7 +3,7 @@ const {
   TransactionEvent,
   isPrivateFindings,
 } = require("../../../../sdk");
-const { assertExists, formatAddress } = require("../../../utils");
+const { assertExists, formatAddress, assertFindings } = require("../../../utils");
 
 module.exports = class AgentController {
   constructor(getAgentHandlers) {
@@ -24,7 +24,12 @@ module.exports = class AgentController {
     if (this.handleBlock) {
       try {
         const blockEvent = this.createBlockEventFromGrpcRequest(call.request);
-        findings.push(...(await this.handleBlock(blockEvent)));
+
+        const returnedFindings = await this.handleBlock(blockEvent);
+        
+        assertFindings(returnedFindings)
+
+        findings.push(...returnedFindings);
       } catch (e) {
         console.log(
           `${new Date().toISOString()}    evaluateBlock ${
@@ -55,7 +60,12 @@ module.exports = class AgentController {
         const txEvent = this.createTransactionEventFromGrpcRequest(
           call.request
         );
-        findings.push(...(await this.handleTransaction(txEvent)));
+
+        const returnedFindings = await this.handleTransaction(txEvent);
+
+        assertFindings(returnedFindings)
+
+        findings.push(...returnedFindings);
       } catch (e) {
         console.log(
           `${new Date().toISOString()}    evaluateTx ${

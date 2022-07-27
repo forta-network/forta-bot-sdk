@@ -6,7 +6,7 @@ import { Keccak } from 'sha3'
 import { ShellString } from 'shelljs'
 import { getContractAddress } from '@ethersproject/address'
 
-import { BlockEvent, EventType, Log, TransactionEvent } from "../../sdk"
+import { BlockEvent, EventType, Finding, Log, TransactionEvent } from "../../sdk"
 import { Trace } from '../../sdk/trace'
 import { JsonRpcBlock, JsonRpcTransaction } from './get.block.with.transactions'
 import { JsonRpcLog } from './get.transaction.receipt'
@@ -41,6 +41,14 @@ export const assertShellResult = (result: ShellString, errMsg: string) => {
   if (result.code !== 0) {
     throw new Error(`${errMsg}: ${result.stderr}`)
   }
+}
+
+export const assertFindings = (findings: Finding[]) => {
+  const byteLength = Buffer.byteLength(JSON.stringify(findings));
+  const kilobyte = 1024;
+
+  if(byteLength > kilobyte * 50) throw Error(`Cannot return more than 50kB of findings per request (received ${byteLength} bytes)`)
+  if(findings.length > 10) throw Error(`Cannot return more than 10 findings per request (received ${findings.length})`)
 }
 
 export const isValidTimeRange = (earliestTimestamp: Date, latestTimestamp: Date): boolean => {
