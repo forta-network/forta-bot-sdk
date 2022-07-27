@@ -135,6 +135,7 @@ describe("runHandlersOnBlock", () => {
 
   it("throws an error if more than 50kB of findings found when handling a block", async () => {
     const findings = getFindingsArray(1, 51000)
+    const byteLength = Buffer.byteLength(JSON.stringify(findings));
     try {
 
       const mockHandleBlock = jest.fn().mockReturnValue(findings)
@@ -151,14 +152,14 @@ describe("runHandlersOnBlock", () => {
 
       fail()
     } catch(err) {
-      expect(err.message).toBe(`Cannot return more than 50kB of findings per request (received ${findings.length})`)
+      expect(err.message).toBe(`Cannot return more than 50kB of findings per request (received ${byteLength} bytes)`)
     }
   })
 
-  it("throws an error if more than 10 findings when handling a transaction", async () => {
+  it("throws an error if more than 50kB of findings found handling a transaction", async () => {
 
     const findings = getFindingsArray(1, 51000)
-
+    const byteLength = Buffer.byteLength(JSON.stringify(findings));
     try {
       const mockHandleBlock = jest.fn().mockReturnValue([])
       const mockHandleTransaction = jest.fn().mockReturnValue(findings)
@@ -181,7 +182,7 @@ describe("runHandlersOnBlock", () => {
 
       fail()
     }catch(err) {
-      expect(err.message).toBe(`Cannot return more than 50kB of findings per request (received ${findings.length})`)
+      expect(err.message).toBe(`Cannot return more than 50kB of findings per request (received ${byteLength} bytes)`)
     }
   })
 })

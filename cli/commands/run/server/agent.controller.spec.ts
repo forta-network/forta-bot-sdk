@@ -271,6 +271,25 @@ describe("AgentController", () => {
         })
 
     })
+
+    it("throws an error if more than 50kB of findings fetched when handling a block", async () => {
+      const findings = (new Array(1)).fill({ some: 'f'.repeat(51000) })
+      mockHandleBlock.mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
+      agentController = new AgentController(mockGetAgentHandlers)
+
+      await agentController.initializeAgentHandlers()
+      await agentController.EvaluateBlock(mockBlockRequest, mockCallback)
+
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "ERROR",
+        findings: [],
+        metadata: {
+          timestamp: systemTime.toISOString(),
+        },
+        private: false
+      })
+    })
   })
 
   describe("EvaluateTx", () => {
@@ -444,6 +463,6 @@ describe("AgentController", () => {
         },
         private: false
       })
-  })
+    })
   })
 })

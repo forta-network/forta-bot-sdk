@@ -44,9 +44,9 @@ export const assertShellResult = (result: ShellString, errMsg: string) => {
 }
 
 export const assertFindings = (findings: Finding[]) => {
-  const serializedFindings = JSON.stringify(findings).length;
+  const byteLength = Buffer.byteLength(JSON.stringify(findings));
 
-  if(serializedFindings > 50000) throw Error(`Cannot return more than 50kB of findings per request (received ${findings.length})`)
+  if(byteLength > 50000) throw Error(`Cannot return more than 50kB of findings per request (received ${byteLength} bytes)`)
   if(findings.length > 10) throw Error(`Cannot return more than 10 findings per request (received ${findings.length})`)
 }
 
