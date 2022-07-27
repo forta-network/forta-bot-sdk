@@ -91,6 +91,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                         alerts {
                             alertId
                             addresses
+                            hash
                             contracts {
                                 address
                                 name
