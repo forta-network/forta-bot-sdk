@@ -134,7 +134,7 @@ describe("runHandlersOnBlock", () => {
   })
 
   it("throws an error if more than 50kB of findings found when handling a block", async () => {
-    const findings = getFindingsArray(1, 51000)
+    const findings = getFindingsArray(1, 1024 * 50)
     const byteLength = Buffer.byteLength(JSON.stringify(findings));
     try {
 
@@ -158,7 +158,7 @@ describe("runHandlersOnBlock", () => {
 
   it("throws an error if more than 50kB of findings found handling a transaction", async () => {
 
-    const findings = getFindingsArray(1, 51000)
+    const findings = getFindingsArray(1, 1024 * 50)
     const byteLength = Buffer.byteLength(JSON.stringify(findings));
     try {
       const mockHandleBlock = jest.fn().mockReturnValue([])

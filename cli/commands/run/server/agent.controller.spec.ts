@@ -273,7 +273,7 @@ describe("AgentController", () => {
     })
 
     it("throws an error if more than 50kB of findings fetched when handling a block", async () => {
-      const findings = (new Array(1)).fill({ some: 'f'.repeat(51000) })
+      const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 50) })
       mockHandleBlock.mockReturnValue(findings)
       mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
       agentController = new AgentController(mockGetAgentHandlers)
@@ -447,7 +447,7 @@ describe("AgentController", () => {
     })
 
     it("throws an error if more than 50kB of findings fetched when handling a transaction", async () => {
-      const findings = (new Array(1)).fill({ some: 'f'.repeat(51000) })
+      const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 50) })
       mockHandleTransaction.mockReturnValue(findings)
       mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
       agentController = new AgentController(mockGetAgentHandlers)
