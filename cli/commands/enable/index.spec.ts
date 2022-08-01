@@ -77,7 +77,7 @@ describe("enable", () => {
     expect(fromWallet.getAddress()).toEqual(new Wallet(mockPrivateKey).getAddress())
     expect(agentId).toEqual(mockAgentId)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
-    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully enabled agent id ${mockAgentId}`, 'publish.log')
+    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully enabled bot id ${mockAgentId}`, 'publish.log')
     jest.useRealTimers()
   })
 })
