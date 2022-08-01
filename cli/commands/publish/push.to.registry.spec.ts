@@ -42,7 +42,7 @@ describe("pushToRegistry", () => {
     try {
       await pushToRegistry(mockManifestRef, mockFromWallet as any)
     } catch (e) {
-      expect(e.message).toBe(`insufficient balance to deploy agent for ${mockFromWallet.address}`)
+      expect(e.message).toBe(`insufficient balance to deploy bot for ${mockFromWallet.address}`)
       expect(mockFromWallet.connect).toHaveBeenCalledTimes(1)
       expect(mockFromWallet.connect).toHaveBeenCalledWith(mockEthersProvider)
     }
@@ -56,7 +56,7 @@ describe("pushToRegistry", () => {
     try {
       await pushToRegistry(mockManifestRef, mockFromWallet as any)
     } catch (e) {
-      expect(e.message).toBe(`agent can only be updated by owner (${mockOwner})`)
+      expect(e.message).toBe(`bot can only be updated by owner (${mockOwner})`)
     }
   })
 
@@ -79,7 +79,7 @@ describe("pushToRegistry", () => {
     expect(chainIds).toEqual(mockChainIds)
     expect(mockAgentRegistry.updateAgent).toHaveBeenCalledTimes(0)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
-    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully added agent id ${mockAgentId} with manifest ${mockManifestRef}`, 'publish.log')
+    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully added bot id ${mockAgentId} with manifest ${mockManifestRef}`, 'publish.log')
     jest.useRealTimers()
   })
 
@@ -102,7 +102,7 @@ describe("pushToRegistry", () => {
     expect(chainIds).toEqual(mockChainIds)
     expect(mockAgentRegistry.createAgent).toHaveBeenCalledTimes(0)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
-    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully updated agent id ${mockAgentId} with manifest ${mockManifestRef}`, 'publish.log')
+    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully updated bot id ${mockAgentId} with manifest ${mockManifestRef}`, 'publish.log')
     jest.useRealTimers()
   })
 })

@@ -26,7 +26,7 @@ describe("getAgentHandlers", () => {
     try {
       await getAgentHandlers()
     } catch (e) {
-      expect(e.message).toEqual(`issue getting agent handlers: ${mockErrMsg}`)
+      expect(e.message).toEqual(`issue getting bot handlers: ${mockErrMsg}`)
     }
 
     expect(mockDynamicImport).toHaveBeenCalledTimes(1)

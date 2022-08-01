@@ -35,7 +35,7 @@ describe("enable", () => {
     try {
       await enable()
     } catch (e) {
-      expect(e.message).toBe(`agent id ${mockAgentId} does not exist`)
+      expect(e.message).toBe(`bot id ${mockAgentId} does not exist`)
     }
 
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)

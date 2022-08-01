@@ -35,7 +35,7 @@ describe("disable", () => {
     try {
       await disable()
     } catch (e) {
-      expect(e.message).toBe(`agent id ${mockAgentId} does not exist`)
+      expect(e.message).toBe(`bot id ${mockAgentId} does not exist`)
     }
 
     expect(mockAgentRegistry.agentExists).toHaveBeenCalledTimes(1)
@@ -77,7 +77,7 @@ describe("disable", () => {
     expect(fromWallet.getAddress()).toEqual(new Wallet(mockPrivateKey).getAddress())
     expect(agentId).toEqual(mockAgentId)
     expect(mockAppendToFile).toHaveBeenCalledTimes(1)
-    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully disabled agent id ${mockAgentId}`, 'publish.log')
+    expect(mockAppendToFile).toHaveBeenCalledWith(`${systemTime.toUTCString()}: successfully disabled bot id ${mockAgentId}`, 'publish.log')
     jest.useRealTimers()
   })
 })
