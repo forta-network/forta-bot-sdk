@@ -84,7 +84,15 @@ export default function configureContainer(args: any = {}) {
     cache: asFunction((fortaKeystore: string) => flatCache.load('cli-cache', fortaKeystore)).singleton(),
     sleep: asValue((durationMs: number) => new Promise((resolve) => setTimeout(resolve, durationMs))),
 
-    args: asValue(args),
+    args: asFunction(() => {
+      // A lot of our code assumes agentId is present. The cli supports --botId and --agentId but 
+      // the code only expects agentId 
+      if(args.botId) {
+        args.agentId = args.botId
+      }
+      return args
+    }).singleton(),
+
     contextPath: asValue(args.contextPath || process.cwd()),// the directory containing the agent's package.json
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     getFortaConfig: asFunction(provideGetFortaConfig),
@@ -127,7 +135,8 @@ export default function configureContainer(args: any = {}) {
     agentName: asFunction((packageJson: any) => packageJson.name).singleton(),
     description: asFunction((packageJson: any) => packageJson.description).singleton(),
     agentId: asFunction((fortaConfig: FortaConfig, agentName: string) => {
-      return fortaConfig.agentId || keccak256(agentName)
+      // Support both agentId and botId in config file
+      return fortaConfig.botId || fortaConfig.agentId || keccak256(agentName)
     }).singleton(),
     chainIds: asFunction((packageJson: any) => {
       const { chainIds } = packageJson

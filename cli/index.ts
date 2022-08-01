@@ -17,7 +17,7 @@ async function executeCommand(cliCommandName: CommandName, cliArgs: any) {
 }
 
 yargs
-  .command('init', 'Initialize a Forta Agent project', 
+  .command('init', 'Initialize a Forta Bot project', 
     (yargs: Argv) => {
       yargs.option('typescript', {
         description: 'Initialize as Typescript project',
@@ -29,14 +29,20 @@ yargs
   )
   .command('info', 'Inspect state of the Forta Bot', 
     (yargs: Argv) => {
-      yargs.option('agentId', {
-        description: 'Bot id to retrieve information for. Default value is this agent',
+      yargs.option('botId', {
+        description: 'Bot id to retrieve information for. Default value is this bot. If this option is used do not provide a agentId',
         type: 'string'
+      }).option('agentId', {
+        description: 'Bot id to retrieve information for. Default value is this bot. If this option is used do not provide a botId',
+        type: 'string'
+      }).check(argv => {
+        if (argv.botId && argv.agentId) return "Detected both botId and agentId were input. Please use only one of these options"
+        return true;
       })
     },
     (cliArgs: any) => executeCommand("info", cliArgs)
   )
-  .command('run', 'Run the Forta Agent with latest blockchain data',
+  .command('run', 'Run the Forta Bot with latest blockchain data',
     (yargs: Argv) => {
       yargs.option('tx', {
         description: 'Run with the specified transaction hash',
@@ -62,7 +68,7 @@ yargs
     },
     (cliArgs: any) => executeCommand("run", cliArgs)
   )
-  .command('publish', 'Publish the Forta Agent to the network',
+  .command('publish', 'Publish the Forta Bot to the network',
     (yargs: Argv) => {
       yargs.option('config', {
         description: 'Specify a config file (default: forta.config.json)',
@@ -71,7 +77,7 @@ yargs
     },
     (cliArgs: any) => executeCommand("publish", cliArgs)
   )
-  .command('push', 'Push the Forta Agent image to the repository',
+  .command('push', 'Push the Forta Bot image to the repository',
     (yargs: Argv) => {
       yargs.option('config', {
         description: 'Specify a config file (default: forta.config.json)',
@@ -80,11 +86,11 @@ yargs
     },
     (cliArgs: any) => executeCommand("push", cliArgs)
   )
-  .command('disable', 'Disables the Forta Agent',
+  .command('disable', 'Disables the Forta Bot',
     (yargs: Argv) => {},
     (cliArgs: any) => executeCommand("disable", cliArgs)
   )
-  .command('enable', 'Enables the Forta Agent',
+  .command('enable', 'Enables the Forta Bot',
     (yargs: Argv) => {},
     (cliArgs: any) => executeCommand("enable", cliArgs)
   )
@@ -92,7 +98,7 @@ yargs
     (yargs: Argv) => {},
     (cliArgs: any) => executeCommand("keyfile", cliArgs)
   )
-  .command('logs', 'Retrieve logs on Forta Agent',
+  .command('logs', 'Retrieve logs on Forta Bot',
     (yargs: Argv) => {
       yargs
       .option('after', {
@@ -105,10 +111,15 @@ yargs
       .option('scannerId', {
         description: 'Only returns logs for specified scannerId',
         type: 'string'
-      })
-      .option('agentId', {
-        description: 'Agent id to retrieve logs for. Default value is this agent',
+      }).option('botId', {
+        description: 'Bot id to retrieve information for. Default value is this bot. If this option is used do not provide a agentId',
         type: 'string'
+      }).option('agentId', {
+        description: 'Bot id to retrieve information for. Default value is this bot. If this option is used do not provide a botId',
+        type: 'string'
+      }).check(argv => {
+        if (argv.botId && argv.agentId) return "Detected both botId and agentId were input. Please use only one of these options"
+        return true;
       })
     },
     (cliArgs: any) => executeCommand("logs", cliArgs)
