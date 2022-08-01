@@ -51,7 +51,7 @@ export default function provideUploadManifest(
     if (!filesystem.statSync(documentation).size) {
       throw new Error(`documentation file ${documentation} cannot be empty`)
     }
-    console.log('pushing agent documentation to IPFS...')
+    console.log('pushing bot documentation to IPFS...')
     const documentationFile = filesystem.readFileSync(documentation, 'utf8')
     const documentationReference = await addToIpfs(documentationFile)
 
@@ -76,7 +76,7 @@ export default function provideUploadManifest(
     const signature = ethers.utils.joinSignature(signingKey.signDigest(keccak256(JSON.stringify(manifest))))
 
     // upload signed manifest to ipfs
-    console.log('pushing agent manifest to IPFS...')
+    console.log('pushing bot manifest to IPFS...')
     const manifestReference = await addToIpfs(JSON.stringify({ manifest, signature }))
 
     return manifestReference

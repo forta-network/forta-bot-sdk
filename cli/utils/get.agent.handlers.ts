@@ -35,15 +35,15 @@ export function provideGetAgentHandlers(
         agentHandlers = (await dynamicImport(agentPath)).default
       }
     } catch (e) {
-      throw new Error(`issue getting agent handlers: ${e.message}`)
+      throw new Error(`issue getting bot handlers: ${e.message}`)
     }
     
     if (agentHandlers.initialize) {
       try {
-        console.log('initializing agent...')
+        console.log('initializing bot...')
         await agentHandlers.initialize()
       } catch (e) {
-        throw new Error(`error initializing agent: ${e.message}`)
+        throw new Error(`error initializing bot: ${e.message}`)
       }
     }
 

@@ -82,7 +82,7 @@ export default function provideInfo(
 export const formatIpfsData = (data: IpfsManifestData, isBotEnabled: boolean) => {
     return {
         name: data.name,
-        agentId: data.agentIdHash,
+        botId: data.agentIdHash,
         status: isBotEnabled ? "Enabled" : "Disabled",
         version: data.version,
         owner: data.from,

@@ -27,23 +27,23 @@ export default function providePushToRegistry(
     const agentExists = agent.created
     // verify wallet has some balance to pay transaction fee
     if (fromWalletBalance.eq(0)) {
-      throw new Error(`insufficient balance to deploy agent for ${fromWallet.address}`)
+      throw new Error(`insufficient balance to deploy bot for ${fromWallet.address}`)
     }
 
     if (!agentExists) {
-      console.log('adding agent to registry...')
+      console.log('adding bot to registry...')
       await agentRegistry.createAgent(fromWallet, agentId, manifestReference, chainIds)
     } else {
       // verify that the agent is being updated from the same address that created it
       if (fromWallet.address.toLowerCase() !== agent.owner.toLowerCase()) {
-        throw new Error(`agent can only be updated by owner (${agent.owner})`)
+        throw new Error(`bot can only be updated by owner (${agent.owner})`)
       }
 
       console.log('updating agent in registry...')
       await agentRegistry.updateAgent(fromWallet, agentId, manifestReference, chainIds)
     }
 
-    const logMessage = `successfully ${agentExists ? 'updated' : 'added'} agent id ${agentId} with manifest ${manifestReference}`
+    const logMessage = `successfully ${agentExists ? 'updated' : 'added'} bot id ${agentId} with manifest ${manifestReference}`
     console.log(logMessage)
     appendToFile(`${new Date().toUTCString()}: ${logMessage}`, 'publish.log')
   }

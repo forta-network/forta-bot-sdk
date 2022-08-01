@@ -18,7 +18,7 @@ export default function provideRunProdServer(
   assertExists(agentController, 'agentController')
 
   return async function runProdServer() {
-    console.log(`starting Forta Agent server...`)
+    console.log(`starting Forta Bot server...`)
     const packageDefinition = loadSync(join(__dirname, PROTO_PATH), {
       keepCase: true,
       longs: String,

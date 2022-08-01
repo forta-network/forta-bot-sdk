@@ -19,22 +19,22 @@ export default function provideEnable(
   return async function enable() {
     const agentExists = await agentRegistry.agentExists(agentId)
     if (!agentExists) {
-      throw new Error(`agent id ${agentId} does not exist`)
+      throw new Error(`bot id ${agentId} does not exist`)
     }
 
     const isAgentEnabled = await agentRegistry.isEnabled(agentId)
     if (isAgentEnabled) {
-      console.log(`agent id ${agentId} is already enabled`)
+      console.log(`bot id ${agentId} is already enabled`)
       return
     }
 
     const { privateKey } = await getCredentials()
 
-    console.log('enabling agent...')
+    console.log('enabling bot...')
     const fromWallet = new Wallet(privateKey)
     await agentRegistry.enableAgent(fromWallet, agentId)
 
-    const logMessage = `successfully enabled agent id ${agentId}`
+    const logMessage = `successfully enabled bot id ${agentId}`
     console.log(logMessage)
     appendToFile(`${new Date().toUTCString()}: ${logMessage}`, 'publish.log')
   }

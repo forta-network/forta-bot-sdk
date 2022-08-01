@@ -19,12 +19,12 @@ export default function provideDisable(
   return async function disable() {
     const agentExists = await agentRegistry.agentExists(agentId)
     if (!agentExists) {
-      throw new Error(`agent id ${agentId} does not exist`)
+      throw new Error(`bot id ${agentId} does not exist`)
     }
 
     const isAgentEnabled = await agentRegistry.isEnabled(agentId)
     if (!isAgentEnabled) {
-      console.log(`agent id ${agentId} is already disabled`)
+      console.log(`bot id ${agentId} is already disabled`)
       return
     }
 
@@ -34,7 +34,7 @@ export default function provideDisable(
     const fromWallet = new Wallet(privateKey)
     await agentRegistry.disableAgent(fromWallet, agentId)
 
-    const logMessage = `successfully disabled agent id ${agentId}`
+    const logMessage = `successfully disabled bot id ${agentId}`
     console.log(logMessage)
     appendToFile(`${new Date().toUTCString()}: ${logMessage}`, 'publish.log')
   }
