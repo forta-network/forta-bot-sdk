@@ -2,11 +2,11 @@
   "name": "forta-agent",
   "version": "0.1.9",
   "license": "MIT",
-  "description": "Forta Agent SDK and CLI tool",
+  "description": "Forta Bot SDK and CLI tool",
   "homepage": "https://forta.org/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/forta-protocol/forta-agent-sdk"
+    "url": "https://github.com/forta-protocol/forta-bot-sdk"
   },
   "main": "dist/sdk/index.js",
   "types": "dist/sdk/index.d.ts",
@@ -14,6 +14,7 @@
     "/dist"
   ],
   "bin": {
+    "forta-bot": "./dist/cli/index.js",
     "forta-agent": "./dist/cli/index.js"
   },
   "scripts": {
