@@ -3,38 +3,38 @@ import { CommandHandler } from "../.."
 import { assertExists, assertIsNonEmptyString } from "../../utils"
 import { AppendToFile } from "../../utils/append.to.file"
 import { GetCredentials } from "../../utils/get.credentials"
-import AgentRegistry from "../../contracts/agent.registry"
+import BotRegistry from "../../contracts/agent.registry"
 
 export default function provideDisable(
   appendToFile: AppendToFile,
   getCredentials: GetCredentials,
-  agentRegistry: AgentRegistry,
-  agentId: string,
+  botRegistry: BotRegistry,
+  botId: string,
 ): CommandHandler {
   assertExists(appendToFile, 'appendToFile')
   assertExists(getCredentials, 'getCredentials')
-  assertExists(agentRegistry, 'agentRegistry')
-  assertIsNonEmptyString(agentId, 'agentId')
+  assertExists(botRegistry, 'botRegistry')
+  assertIsNonEmptyString(botId, 'botId')
 
   return async function disable() {
-    const agentExists = await agentRegistry.agentExists(agentId)
-    if (!agentExists) {
-      throw new Error(`agent id ${agentId} does not exist`)
+    const botExists = await botRegistry.agentExists(botId)
+    if (!botExists) {
+      throw new Error(`bot id ${botId} does not exist`)
     }
 
-    const isAgentEnabled = await agentRegistry.isEnabled(agentId)
-    if (!isAgentEnabled) {
-      console.log(`agent id ${agentId} is already disabled`)
+    const isBotEnabled = await botRegistry.isEnabled(botId)
+    if (!isBotEnabled) {
+      console.log(`bot id ${botId} is already disabled`)
       return
     }
 
     const { privateKey } = await getCredentials()
 
-    console.log('disabling agent...')
+    console.log('disabling bot...')
     const fromWallet = new Wallet(privateKey)
-    await agentRegistry.disableAgent(fromWallet, agentId)
+    await botRegistry.disableAgent(fromWallet, botId)
 
-    const logMessage = `successfully disabled agent id ${agentId}`
+    const logMessage = `successfully disabled bot id ${botId}`
     console.log(logMessage)
     appendToFile(`${new Date().toUTCString()}: ${logMessage}`, 'publish.log')
   }

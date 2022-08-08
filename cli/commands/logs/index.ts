@@ -1,28 +1,28 @@
 import { CommandHandler } from "../..";
 import { assertExists, assertIsISOString, assertIsNonEmptyString, isValidTimeRange } from "../../utils";
-import { FortaAgentLogResponse, GetAgentLogs } from '../../utils/get.agent.logs';
+import { FortaBotLogResponse, GetBotLogs } from '../../utils/get.agent.logs';
 
 
 export default function provideLogs(
-  agentId: string,
-  getAgentLogs: GetAgentLogs,
+  botId: string,
+  getBotLogs: GetBotLogs,
   args: any,
 ): CommandHandler {
   assertExists(args, 'args')
-  assertIsNonEmptyString(agentId, "agentId"); // agentId retrieved from forta.config.json or hashing the package.json name
+  assertIsNonEmptyString(botId, "botId"); // botId retrieved from forta.config.json or hashing the package.json name
 
 
   return async function logs() {
 
-    const cliAgentId = args.agentId;
+    const cliBotId = args.botId;
 
     let latestTimestamp = args.before
     let earliestTimestamp = args.after;
 
-    const finalAgentId = cliAgentId ? cliAgentId : agentId;
+    const finalBotId = cliBotId ? cliBotId : botId;
 
     if(!latestTimestamp && !earliestTimestamp) {
-      const logs = await getAgentLogs(finalAgentId);
+      const logs = await getBotLogs(finalBotId);
       processLogs(logs);
     } else {
       assertIsISOString(latestTimestamp, "\'before\'")
@@ -36,7 +36,7 @@ export default function provideLogs(
       let curMinute: Date | undefined = earliestDateTime;
 
       while(curMinute) {
-        const logs = await getAgentLogs(finalAgentId, curMinute)
+        const logs = await getBotLogs(finalBotId, curMinute)
         processLogs(logs);
 
         curMinute = getNextMinute(curMinute, latestDateTime)
@@ -45,14 +45,14 @@ export default function provideLogs(
   }
 }
 
-const processLogs = (logs: FortaAgentLogResponse[], scannerId?: string) => {
+const processLogs = (logs: FortaBotLogResponse[], scannerId?: string) => {
   if(logs?.length > 0) {
     logs.filter(log => !scannerId || log.scanner === scannerId) // Filter logs by scannerId if provided
     logs.forEach(log => printLogToConsole(log))
   }
 }
 
-export const printLogToConsole = (log: FortaAgentLogResponse) => {
+export const printLogToConsole = (log: FortaBotLogResponse) => {
   console.log(`${log.scanner} - ${log.timestamp}`);
   console.log('----------------------------------------------------------------- \n');
   console.log(log.logs);

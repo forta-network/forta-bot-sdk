@@ -53,7 +53,7 @@ export default function provideInit(
 
     const isTypescript = !!args.typescript
     const isPython = !!args.python
-    console.log(`Initializing ${isPython ? "Python" : isTypescript ? "Typescript" : "Javascript"} Forta Agent...`)
+    console.log(`Initializing ${isPython ? "Python" : isTypescript ? "Typescript" : "Javascript"} Forta Bot...`)
     const starterProjectPath = `${join(__dirname, '..', '..', '..', 'starter-project')}`
     // copy files from starter-project to current directory
     const copyProjectResult = shell.cp('-r', [`${starterProjectPath}/*`, `${starterProjectPath}/.*`], '.')

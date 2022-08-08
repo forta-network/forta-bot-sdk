@@ -1,16 +1,16 @@
-import { GetAgentHandlers, provideGetAgentHandlers } from "./get.agent.handlers"
+import { GetBotHandlers, provideGetBotHandlers } from "./get.agent.handlers"
 
-describe("getAgentHandlers", () => {
-  let getAgentHandlers: GetAgentHandlers
-  const mockAgentPath = "/src/agent"
-  const mockPythonAgentPath = "/src/agent.py"
-  const mockGetPythonAgentHandlers = jest.fn()
+describe("getBotHandlers", () => {
+  let getBotHandlers: GetBotHandlers
+  const mockBotPath = "/src/agent"
+  const mockPythonBotPath = "/src/agent.py"
+  const mockGetPythonBotHandlers = jest.fn()
   const mockDynamicImport = jest.fn()
   const mockHandleBlock = jest.fn()
   const mockHandleTransaction = jest.fn()
 
   const resetMocks = () => {
-    mockGetPythonAgentHandlers.mockReset()
+    mockGetPythonBotHandlers.mockReset()
     mockDynamicImport.mockReset()
   }
 
@@ -21,12 +21,12 @@ describe("getAgentHandlers", () => {
   it("throws error if unable to load agent", async () => {
     const mockErrMsg = 'some error'
     mockDynamicImport.mockRejectedValueOnce(new Error(mockErrMsg))
-    getAgentHandlers = provideGetAgentHandlers(mockAgentPath, mockGetPythonAgentHandlers, mockDynamicImport)
+    getBotHandlers = provideGetBotHandlers(mockBotPath, mockGetPythonBotHandlers, mockDynamicImport)
 
     try {
-      await getAgentHandlers()
+      await getBotHandlers()
     } catch (e) {
-      expect(e.message).toEqual(`issue getting agent handlers: ${mockErrMsg}`)
+      expect(e.message).toEqual(`issue getting bot handlers: ${mockErrMsg}`)
     }
 
     expect(mockDynamicImport).toHaveBeenCalledTimes(1)
@@ -37,39 +37,39 @@ describe("getAgentHandlers", () => {
       handleBlock: mockHandleBlock,
       handleTransaction: mockHandleTransaction
     }})
-    getAgentHandlers = provideGetAgentHandlers(mockAgentPath, mockGetPythonAgentHandlers, mockDynamicImport)
+    getBotHandlers = provideGetBotHandlers(mockBotPath, mockGetPythonBotHandlers, mockDynamicImport)
 
-    const { handleBlock, handleTransaction } = await getAgentHandlers()
+    const { handleBlock, handleTransaction } = await getBotHandlers()
 
     expect(handleBlock).toBe(mockHandleBlock)
     expect(handleTransaction).toBe(mockHandleTransaction)
     expect(mockDynamicImport).toHaveBeenCalledTimes(1)
-    expect(mockDynamicImport).toHaveBeenCalledWith(mockAgentPath)
-    expect(mockGetPythonAgentHandlers).toHaveBeenCalledTimes(0)
+    expect(mockDynamicImport).toHaveBeenCalledWith(mockBotPath)
+    expect(mockGetPythonBotHandlers).toHaveBeenCalledTimes(0)
   })
 
   it("should not import handlers again if already imported", async () => {
-    const { handleBlock, handleTransaction } = await getAgentHandlers()
+    const { handleBlock, handleTransaction } = await getBotHandlers()
 
     expect(handleBlock).toBe(mockHandleBlock)
     expect(handleTransaction).toBe(mockHandleTransaction)
     expect(mockDynamicImport).toHaveBeenCalledTimes(0)
-    expect(mockGetPythonAgentHandlers).toHaveBeenCalledTimes(0)
+    expect(mockGetPythonBotHandlers).toHaveBeenCalledTimes(0)
   })
 
   it("imports python agent and returns its block and transaction handlers", async () => {
-    mockGetPythonAgentHandlers.mockReturnValueOnce({
+    mockGetPythonBotHandlers.mockReturnValueOnce({
       handleBlock: mockHandleBlock,
       handleTransaction: mockHandleTransaction
     })
-    getAgentHandlers = provideGetAgentHandlers(mockPythonAgentPath, mockGetPythonAgentHandlers, mockDynamicImport)
+    getBotHandlers = provideGetBotHandlers(mockPythonBotPath, mockGetPythonBotHandlers, mockDynamicImport)
 
-    const { handleBlock, handleTransaction } = await getAgentHandlers()
+    const { handleBlock, handleTransaction } = await getBotHandlers()
 
     expect(handleBlock).toBe(mockHandleBlock)
     expect(handleTransaction).toBe(mockHandleTransaction)
-    expect(mockGetPythonAgentHandlers).toHaveBeenCalledTimes(1)
-    expect(mockGetPythonAgentHandlers).toHaveBeenCalledWith(mockPythonAgentPath)
+    expect(mockGetPythonBotHandlers).toHaveBeenCalledTimes(1)
+    expect(mockGetPythonBotHandlers).toHaveBeenCalledWith(mockPythonBotPath)
     expect(mockDynamicImport).toHaveBeenCalledTimes(0)
   })
 })

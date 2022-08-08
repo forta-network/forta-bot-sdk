@@ -2,16 +2,16 @@ import { provideRunFile, RunFile } from "./run.file"
 
 describe("runFile", () => {
   let runFile: RunFile
-  const mockGetAgentHandlers = jest.fn()
+  const mockGetBotHandlers = jest.fn()
   const mockGetJsonFile = jest.fn()
   const mockFilePath = "some/file/path"
 
   beforeAll(() => {
-    runFile = provideRunFile(mockGetAgentHandlers, mockGetJsonFile)
+    runFile = provideRunFile(mockGetBotHandlers, mockGetJsonFile)
   })
 
   it("throws error if no handlers found", async () => {
-    mockGetAgentHandlers.mockReturnValueOnce({})
+    mockGetBotHandlers.mockReturnValueOnce({})
 
     try {
       await runFile(mockFilePath)
@@ -19,14 +19,14 @@ describe("runFile", () => {
       expect(e.message).toEqual('no block/transaction handler found')
     }
 
-    expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
+    expect(mockGetBotHandlers).toHaveBeenCalledTimes(1)
   })
 
   it("runs handlers against each event provided in file", async () => {
-    mockGetAgentHandlers.mockReset()
+    mockGetBotHandlers.mockReset()
     const mockHandleBlock = jest.fn().mockReturnValue([])
     const mockHandleTransaction = jest.fn().mockReturnValue([])
-    mockGetAgentHandlers.mockReturnValueOnce({
+    mockGetBotHandlers.mockReturnValueOnce({
       handleBlock: mockHandleBlock,
       handleTransaction: mockHandleTransaction
     })
@@ -41,7 +41,7 @@ describe("runFile", () => {
 
     await runFile(mockFilePath)
 
-    expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
+    expect(mockGetBotHandlers).toHaveBeenCalledTimes(1)
     expect(mockGetJsonFile).toHaveBeenCalledTimes(1)
     expect(mockGetJsonFile).toHaveBeenCalledWith(mockFilePath)
     expect(mockHandleBlock).toHaveBeenCalledTimes(2)

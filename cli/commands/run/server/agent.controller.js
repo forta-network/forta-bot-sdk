@@ -5,10 +5,10 @@ const {
 } = require("../../../../sdk");
 const { assertExists, formatAddress, assertFindings } = require("../../../utils");
 
-module.exports = class AgentController {
-  constructor(getAgentHandlers) {
-    assertExists(getAgentHandlers, "getAgentHandlers");
-    this.getAgentHandlers = getAgentHandlers;
+module.exports = class BotController {
+  constructor(getBotHandlers) {
+    assertExists(getBotHandlers, "getBotHandlers");
+    this.getBotHandlers = getBotHandlers;
     this.initializeAgentHandlers();
   }
 
@@ -89,8 +89,8 @@ module.exports = class AgentController {
 
   async initializeAgentHandlers() {
     try {
-      // getAgentHandlers will also call any initialize handler
-      const agentHandlers = await this.getAgentHandlers();
+      // getBotHandlers will also call any initialize handler
+      const agentHandlers = await this.getBotHandlers();
       this.handleBlock = agentHandlers.handleBlock;
       this.handleTransaction = agentHandlers.handleTransaction;
     } catch (e) {

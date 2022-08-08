@@ -7,7 +7,7 @@ import { BlockEvent, Finding, HandleBlock, HandleTransaction, TransactionEvent }
 import { assertIsNonEmptyString } from '.'
 
 // imports python agent handlers from file wrapped in javascript
-export type GetPythonAgentHandlers = (pythonAgentPath: string) => Promise<{ handleTransaction?: HandleTransaction, handleBlock? : HandleBlock }>
+export type GetPythonBotHandlers = (pythonBotPath: string) => Promise<{ handleTransaction?: HandleTransaction, handleBlock? : HandleBlock }>
 
 const INITIALIZE_MARKER = "!*initialize*!"
 const FINDING_MARKER = "!*forta_finding*!:"
@@ -15,17 +15,17 @@ const INITIALIZE_METHOD_NAME = "initialize"
 const HANDLE_TRANSACTION_METHOD_NAME = 'handle_transaction'
 const HANDLE_BLOCK_METHOD_NAME = 'handle_block'
 
-export function provideGetPythonAgentHandlers(
+export function provideGetPythonBotHandlers(
   contextPath: string
-): GetPythonAgentHandlers {
+): GetPythonBotHandlers {
   assertIsNonEmptyString(contextPath, 'contextPath')
 
-  return async function getPythonAgentHandlers(pythonAgentPath: string) {
-    // determine whether this agent has block/transaction handlers
-    const { hasInitializeHandler, hasBlockHandler, hasTransactionHandler } = hasHandlers(pythonAgentPath)
-    if (!hasBlockHandler && !hasTransactionHandler) throw new Error(`no handlers found in ${pythonAgentPath}`)
+  return async function getPythonBotHandlers(pythonBotPath: string) {
+    // determine whether this bot has block/transaction handlers
+    const { hasInitializeHandler, hasBlockHandler, hasTransactionHandler } = hasHandlers(pythonBotPath)
+    if (!hasBlockHandler && !hasTransactionHandler) throw new Error(`no handlers found in ${pythonBotPath}`)
 
-    const pythonHandler = getPythonHandler(pythonAgentPath, contextPath)
+    const pythonHandler = getPythonHandler(pythonBotPath, contextPath)
     return {
       initialize: hasInitializeHandler ? pythonHandler : undefined,
       handleBlock: hasBlockHandler ? pythonHandler : undefined,
@@ -34,8 +34,8 @@ export function provideGetPythonAgentHandlers(
   }
 }
 
-function hasHandlers(agentPath: string) {
-  const lineReader = new ReadLines(agentPath)
+function hasHandlers(botPath: string) {
+  const lineReader = new ReadLines(botPath)
   let hasTransactionHandler = false
   let hasBlockHandler = false
   let hasInitializeHandler = false
@@ -53,9 +53,9 @@ function hasHandlers(agentPath: string) {
   return { hasTransactionHandler, hasBlockHandler, hasInitializeHandler }
 }
 
-function getPythonHandler(agentPath: string, contextPath: string) {
+function getPythonHandler(botPath: string, contextPath: string) {
   // determine what the python module to import will be
-  const agentModule = agentPath.replace(`${contextPath}${path.sep}`, '').replace('.py', '').replace(path.sep, '.')
+  const botModule = botPath.replace(`${contextPath}${path.sep}`, '').replace('.py', '').replace(path.sep, '.')
   
   // write a wrapper script to invoke the agent handlers
   // WARNING! BE CAREFUL OF INDENTATION HERE
@@ -64,24 +64,24 @@ import sys
 sys.path.append('${contextPath}')
 import json
 from forta_agent import BlockEvent, TransactionEvent
-import ${agentModule}
+import ${botModule}
 
 while True:
   try:
     msgJson = json.loads(input())
     msgType = msgJson['msgType']
     if msgType == '${INITIALIZE_METHOD_NAME}':
-      ${agentModule}.${INITIALIZE_METHOD_NAME}()
+      ${botModule}.${INITIALIZE_METHOD_NAME}()
       print(f'${INITIALIZE_MARKER}')
     elif msgType == '${HANDLE_TRANSACTION_METHOD_NAME}':
       hash = msgJson['hash']
       event = TransactionEvent(msgJson)
-      findings = ${agentModule}.${HANDLE_TRANSACTION_METHOD_NAME}(event)
+      findings = ${botModule}.${HANDLE_TRANSACTION_METHOD_NAME}(event)
       print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
     elif msgType == '${HANDLE_BLOCK_METHOD_NAME}':
       hash = msgJson['hash']
       event = BlockEvent(msgJson)
-      findings = ${agentModule}.${HANDLE_BLOCK_METHOD_NAME}(event)
+      findings = ${botModule}.${HANDLE_BLOCK_METHOD_NAME}(event)
       print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
   except Exception as e:
     print(e, file=sys.stderr)

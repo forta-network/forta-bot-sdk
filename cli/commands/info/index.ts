@@ -1,5 +1,5 @@
 import { CommandHandler } from "../..";
-import AgentRegistry, 
+import BotRegistry, 
 { AGENT_REGISTRY_EVENT_FRAGMENTS, 
   getEventNameFromTopicHash, 
   getTopicHashFromEventName, 
@@ -13,31 +13,31 @@ import { chain } from "lodash";
 
 
 export default function provideInfo(
-    agentId: string,
+    botId: string,
     args: any,
-    ethersAgentRegistryProvider: providers.JsonRpcProvider,
-    agentRegistry: AgentRegistry,
-    agentRegistryContractAddress: string,
+    ethersBotRegistryProvider: providers.JsonRpcProvider,
+    botRegistry: BotRegistry,
+    botRegistryContractAddress: string,
     getFromIpfs: GetFromIpfs,
     getLogsFromPolyscan: GetLogsFromPolyscan
 ): CommandHandler {
     assertExists(args, 'args')
-    assertExists(ethersAgentRegistryProvider, 'ethersAgentRegistryProvider')
-    assertExists(agentRegistry, 'agentRegistry')
-    assertExists(agentRegistryContractAddress, 'agentRegistryContractAddress')
+    assertExists(ethersBotRegistryProvider, 'ethersBotRegistryProvider')
+    assertExists(botRegistry, 'botRegistry')
+    assertExists(botRegistryContractAddress, 'botRegistryContractAddress')
     assertExists(getFromIpfs, 'getFromIpfs')
     assertExists(getLogsFromPolyscan, 'getLogsFromPolyscan')
 
     return async function info() {
-        const finalAgentId = args.agentId ? args.agentId : agentId;
+        const finalBotId = args.botId ? args.botId : botId;
 
-        assertIsNonEmptyString(finalAgentId, 'agentId');
+        assertIsNonEmptyString(finalBotId, 'botId');
 
         console.log(`Fetching bot info...`);
 
         const [agent, currentState] = await Promise.all([ 
-             await agentRegistry.getAgent(finalAgentId), 
-             await agentRegistry.isEnabled(finalAgentId) as boolean,
+             await botRegistry.getAgent(finalBotId), 
+             await botRegistry.isEnabled(finalBotId) as boolean,
         ]);
 
         
@@ -60,7 +60,7 @@ export default function provideInfo(
         const logs: PolyscanLog[] = [];
 
         await Promise.all(eventTopicFilters.map(async filter => {
-            const eventLogs = await getLogsFromPolyscan(agentRegistryContractAddress, filter, finalAgentId);
+            const eventLogs = await getLogsFromPolyscan(botRegistryContractAddress, filter, finalBotId);
             logs.push(...eventLogs)
         }))
 
@@ -82,7 +82,7 @@ export default function provideInfo(
 export const formatIpfsData = (data: IpfsManifestData, isBotEnabled: boolean) => {
     return {
         name: data.name,
-        agentId: data.agentIdHash,
+        botId: data.agentIdHash,
         status: isBotEnabled ? "Enabled" : "Disabled",
         version: data.version,
         owner: data.from,

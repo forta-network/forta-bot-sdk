@@ -1,3 +1,3 @@
-# Forta Agent Python SDK
+# Forta Bot Python SDK
 
 See the developer documentation at [docs.forta.network](https://docs.forta.network)

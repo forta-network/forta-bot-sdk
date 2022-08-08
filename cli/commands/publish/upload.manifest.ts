@@ -24,9 +24,9 @@ type Manifest = {
 export default function provideUploadManifest(
   filesystem: typeof fs,
   addToIpfs: AddToIpfs,
-  agentName: string,
+  botName: string,
   description: string,
-  agentId: string,
+  botId: string,
   version: string,
   documentation: string,
   repository: string,
@@ -35,9 +35,9 @@ export default function provideUploadManifest(
 ): UploadManifest {
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
-  assertIsNonEmptyString(agentName, 'agentName')
+  assertIsNonEmptyString(botName, 'botName')
   assertIsNonEmptyString(description, 'description')
-  assertIsNonEmptyString(agentId, 'agentId')
+  assertIsNonEmptyString(botId, 'botId')
   assertIsNonEmptyString(version, 'version')
   assertIsNonEmptyString(documentation, 'documentation')
   assertIsNonEmptyString(cliVersion, 'cliVersion')
@@ -51,17 +51,17 @@ export default function provideUploadManifest(
     if (!filesystem.statSync(documentation).size) {
       throw new Error(`documentation file ${documentation} cannot be empty`)
     }
-    console.log('pushing agent documentation to IPFS...')
+    console.log('pushing bot documentation to IPFS...')
     const documentationFile = filesystem.readFileSync(documentation, 'utf8')
     const documentationReference = await addToIpfs(documentationFile)
 
     // create agent manifest
     const manifest: Manifest = {
       from: new Wallet(privateKey).address,
-      name: agentName,
+      name: botName,
       description,
-      agentId: agentName,
-      agentIdHash: agentId,
+      agentId: botName,
+      agentIdHash: botId,
       version,
       timestamp: new Date().toUTCString(),
       imageReference,
@@ -76,7 +76,7 @@ export default function provideUploadManifest(
     const signature = ethers.utils.joinSignature(signingKey.signDigest(keccak256(JSON.stringify(manifest))))
 
     // upload signed manifest to ipfs
-    console.log('pushing agent manifest to IPFS...')
+    console.log('pushing bot manifest to IPFS...')
     const manifestReference = await addToIpfs(JSON.stringify({ manifest, signature }))
 
     return manifestReference

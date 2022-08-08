@@ -39,11 +39,11 @@ export default function provideInitConfig(
       console.log(`Found existing global ${configFilename} in ${fortaKeystore}`);
     }
 
-    // Save random agentId in initial project forta config
-    const agentId = keccak256(uuidv4())
-    console.log(`Saving agentId: ${agentId} in project ${configFilename}`);
+    // Save random botId in initial project forta config
+    const botId = keccak256(uuidv4())
+    console.log(`Saving botId: ${botId} in project ${configFilename}`);
 
-    const data: FortaConfig = { agentId };
+    const data: FortaConfig = { botId };
     filesystem.writeFileSync(localFilePath, jsonc.stringify(data))
   };
 }

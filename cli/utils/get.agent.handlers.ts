@@ -1,52 +1,52 @@
 import { HandleBlock, HandleTransaction, Initialize } from "../../sdk"
 import { assertExists, assertIsNonEmptyString } from "."
-import { GetPythonAgentHandlers } from './get.python.agent.handlers'
+import { GetPythonBotHandlers } from './get.python.agent.handlers'
 
-type AgentHandlers = { 
+type BotHandlers = { 
   initialize?: Initialize,
   handleTransaction?: HandleTransaction,
   handleBlock?: HandleBlock
 }
 
-// imports agent handlers from project
-export type GetAgentHandlers = () => Promise<AgentHandlers>
+// imports bot handlers from project
+export type GetBotHandlers = () => Promise<BotHandlers>
 
-export function provideGetAgentHandlers(
-  agentPath: string,
-  getPythonAgentHandlers: GetPythonAgentHandlers,
+export function provideGetBotHandlers(
+  botPath: string,
+  getPythonBotHandlers: GetPythonBotHandlers,
   dynamicImport: (path: string) => Promise<any>
-): GetAgentHandlers {
-  assertIsNonEmptyString(agentPath, 'agentPath')
-  assertExists(getPythonAgentHandlers, 'getPythonAgentHandlers')
+): GetBotHandlers {
+  assertIsNonEmptyString(botPath, 'botPath')
+  assertExists(getPythonBotHandlers, 'getPythonBotHandlers')
   assertExists(dynamicImport, 'dynamicImport')
 
-  let agentHandlers: AgentHandlers
+  let botHandlers: BotHandlers
 
-  return async function getAgentHandlers() {
-    // only get the agent handlers once
-    if (agentHandlers) {
-      return agentHandlers
+  return async function getBotHandlers() {
+    // only get the bot handlers once
+    if (botHandlers) {
+      return botHandlers
     }
 
     try {
-      if (agentPath.endsWith(".py")) {
-        agentHandlers = await getPythonAgentHandlers(agentPath)
+      if (botPath.endsWith(".py")) {
+        botHandlers = await getPythonBotHandlers(botPath)
       } else {
-        agentHandlers = (await dynamicImport(agentPath)).default
+        botHandlers = (await dynamicImport(botPath)).default
       }
     } catch (e) {
-      throw new Error(`issue getting agent handlers: ${e.message}`)
+      throw new Error(`issue getting bot handlers: ${e.message}`)
     }
     
-    if (agentHandlers.initialize) {
+    if (botHandlers.initialize) {
       try {
-        console.log('initializing agent...')
-        await agentHandlers.initialize()
+        console.log('initializing bot...')
+        await botHandlers.initialize()
       } catch (e) {
-        throw new Error(`error initializing agent: ${e.message}`)
+        throw new Error(`error initializing bot: ${e.message}`)
       }
     }
 
-    return agentHandlers
+    return botHandlers
   }
 }

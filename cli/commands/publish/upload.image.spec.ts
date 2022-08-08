@@ -52,7 +52,7 @@ describe("uploadImage", () => {
     try {
       await uploadImage({imageTagSuffix: "suffix"})
     } catch (e) {
-      expect(e.message).toBe(`error building agent image: ${buildResult.stderr}`)
+      expect(e.message).toBe(`error building bot image: ${buildResult.stderr}`)
     }
 
     expect(mockShell.exec).toHaveBeenCalledTimes(2)
@@ -70,7 +70,7 @@ describe("uploadImage", () => {
     try {
       await uploadImage()
     } catch (e) {
-      expect(e.message).toBe(`error tagging agent image: ${tagResult.stderr}`)
+      expect(e.message).toBe(`error tagging bot image: ${tagResult.stderr}`)
     }
 
     expect(mockShell.exec).toHaveBeenCalledTimes(3)
@@ -90,7 +90,7 @@ describe("uploadImage", () => {
     try {
       await uploadImage()
     } catch (e) {
-      expect(e.message).toBe(`error pushing agent image: ${pushResult.stderr}`)
+      expect(e.message).toBe(`error pushing bot image: ${pushResult.stderr}`)
     }
 
     expect(mockShell.exec).toHaveBeenCalledTimes(4)
@@ -112,7 +112,7 @@ describe("uploadImage", () => {
     try {
       await uploadImage()
     } catch (e) {
-      expect(e.message).toBe(`error pulling tagged agent images: ${pullResult.stderr}`)
+      expect(e.message).toBe(`error pulling tagged bot images: ${pullResult.stderr}`)
     }
 
     expect(mockShell.exec).toHaveBeenCalledTimes(5)

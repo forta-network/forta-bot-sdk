@@ -51,7 +51,7 @@ describe("getFromIpfs", () => {
 
         const correctFormat = {
             name: dataManifest.name,
-            agentId: dataManifest.agentIdHash,
+            botId: dataManifest.agentIdHash,
             status: "Enabled",
             version: dataManifest.version,
             owner: dataManifest.from,

@@ -3,7 +3,7 @@ import { provideRunHandlersOnTransaction, RunHandlersOnTransaction } from "./run
 
 describe("runHandlersOnTransaction", () => {
   let runHandlersOnTransaction: RunHandlersOnTransaction
-  const mockGetAgentHandlers = jest.fn()
+  const mockGetBotHandlers = jest.fn()
   const mockGetNetworkId = jest.fn()
   const mockGetTransactionReceipt = jest.fn()
   const mockGetBlockWithTransactions = jest.fn()
@@ -13,12 +13,12 @@ describe("runHandlersOnTransaction", () => {
 
   beforeAll(() => {
     runHandlersOnTransaction = provideRunHandlersOnTransaction(
-      mockGetAgentHandlers, mockGetNetworkId, mockGetTransactionReceipt, mockGetBlockWithTransactions, mockGetTraceData, mockCreateTransactionEvent
+      mockGetBotHandlers, mockGetNetworkId, mockGetTransactionReceipt, mockGetBlockWithTransactions, mockGetTraceData, mockCreateTransactionEvent
     )
   })
 
   beforeEach(() => {
-    mockGetAgentHandlers.mockReset()
+    mockGetBotHandlers.mockReset()
     mockGetNetworkId.mockReset()
     mockGetTransactionReceipt.mockReset()
     mockGetBlockWithTransactions.mockReset()
@@ -27,7 +27,7 @@ describe("runHandlersOnTransaction", () => {
   })
 
   it("throws error if no transaction handler found", async () => {
-    mockGetAgentHandlers.mockReturnValueOnce({ })
+    mockGetBotHandlers.mockReturnValueOnce({ })
 
     try {
       await runHandlersOnTransaction(mockTxHash)
@@ -35,12 +35,12 @@ describe("runHandlersOnTransaction", () => {
       expect(e.message).toEqual('no transaction handler found')
     }
 
-    expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
+    expect(mockGetBotHandlers).toHaveBeenCalledTimes(1)
   })
 
   it("invokes transaction handler with transaction event", async () => {
     const mockHandleTransaction = jest.fn().mockReturnValue([])
-    mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
+    mockGetBotHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
     const mockNetworkId = 1
     mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
     const mockLog = { some: 'log' }
@@ -56,8 +56,8 @@ describe("runHandlersOnTransaction", () => {
 
     await runHandlersOnTransaction(mockTxHash)
 
-    expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
-    expect(mockGetAgentHandlers).toHaveBeenCalledWith()
+    expect(mockGetBotHandlers).toHaveBeenCalledTimes(1)
+    expect(mockGetBotHandlers).toHaveBeenCalledWith()
     expect(mockGetNetworkId).toHaveBeenCalledTimes(1)
     expect(mockGetNetworkId).toHaveBeenCalledWith()
     expect(mockGetTransactionReceipt).toHaveBeenCalledTimes(1)
@@ -77,7 +77,7 @@ describe("runHandlersOnTransaction", () => {
 
     try {
       const mockHandleTransaction = jest.fn().mockReturnValue(findings)
-      mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
+      mockGetBotHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
 
       mockGetNetworkId.mockReturnValueOnce(1)
       const mockLog = { some: 'log' }
@@ -104,7 +104,7 @@ describe("runHandlersOnTransaction", () => {
     const byteLength = Buffer.byteLength(JSON.stringify(findings));
     try {
       const mockHandleTransaction = jest.fn().mockReturnValue(findings)
-      mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
+      mockGetBotHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
 
       mockGetNetworkId.mockReturnValueOnce(1)
       const mockLog = { some: 'log' }

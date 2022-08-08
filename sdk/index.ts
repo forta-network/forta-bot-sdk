@@ -30,6 +30,7 @@ const configureContainer: ConfigureContainer = (args: object = {}) => {
 
 interface FortaConfig {
   agentId?: string
+  botId?: string
   jsonRpcUrl?: string
   ipfsGatewayUrl?: string
   ipfsGatewayAuth?: string

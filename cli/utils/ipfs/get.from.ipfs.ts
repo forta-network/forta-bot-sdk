@@ -22,10 +22,10 @@ export interface IpfsManifestData {
 
 export default function provideGetFromIpfs(
     fortaIpfsHttpClient: AxiosInstance,
-    agentId: string
+    botId: string
 ): GetFromIpfs {
     assertExists(fortaIpfsHttpClient, 'fortaIpfsHttpClient')
-    assertIsNonEmptyString(agentId, 'agentId')
+    assertIsNonEmptyString(botId, 'botId')
 
     return async function getIpfsByHash(metadataHash: string) {
         try {
@@ -39,7 +39,7 @@ export default function provideGetFromIpfs(
 
         } catch(e) {
             if(e.response && e.response.status === 403) {
-                console.log(`Unable to find ipfs data for bot id: ${agentId}. Please verify your bot has been deployed at https://explorer.forta.network/ `)
+                console.log(`Unable to find ipfs data for bot id: ${botId}. Please verify your bot has been deployed at https://explorer.forta.network/ `)
             } else {
                 throw e
             }

@@ -15,7 +15,7 @@ import providePush from './commands/push'
 import provideDisable from './commands/disable'
 import provideEnable from './commands/enable'
 import provideKeyfile from './commands/keyfile'
-import AgentController from "./commands/run/server/agent.controller"
+import BotController from "./commands/run/server/agent.controller"
 import { provideRunTransaction } from "./commands/run/run.transaction"
 import { provideRunBlock } from "./commands/run/run.block"
 import { provideRunBlockRange } from "./commands/run/run.block.range"
@@ -26,14 +26,14 @@ import provideUploadImage from './commands/publish/upload.image'
 import provideUploadManifest from './commands/publish/upload.manifest'
 import providePushToRegistry from './commands/publish/push.to.registry'
 import { createBlockEvent, createTransactionEvent, getJsonFile, keccak256 } from "./utils"
-import AgentRegistry from "./contracts/agent.registry"
-import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
+import BotRegistry from "./contracts/agent.registry"
+import { provideGetBotHandlers } from "./utils/get.agent.handlers"
 import { provideDecryptKeyfile } from "./utils/decrypt.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
 import provideGetCredentials from './utils/get.credentials'
 import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
-import { provideGetPythonAgentHandlers } from './utils/get.python.agent.handlers'
+import { provideGetPythonBotHandlers } from './utils/get.python.agent.handlers'
 import provideAddToIpfs from './utils/add.to.ipfs'
 import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
 import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transaction'
@@ -48,7 +48,7 @@ import provideInitKeystore from './utils/init.keystore'
 import provideInitKeyfile from './utils/init.keyfile'
 import provideInitConfig from './utils/init.config'
 import provideGetLogsForBlock from './utils/get.logs.for.block'
-import { provideGetAgentLogs } from './utils/get.agent.logs'
+import { provideGetBotLogs } from './utils/get.agent.logs'
 import provideLogs from './commands/logs'
 import provideInfo from './commands/info'
 import provideGetFromIpfs from './utils/ipfs/get.from.ipfs'
@@ -85,7 +85,8 @@ export default function configureContainer(args: any = {}) {
     sleep: asValue((durationMs: number) => new Promise((resolve) => setTimeout(resolve, durationMs))),
 
     args: asValue(args),
-    contextPath: asValue(args.contextPath || process.cwd()),// the directory containing the agent's package.json
+
+    contextPath: asValue(args.contextPath || process.cwd()),// the directory containing the bot's package.json
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     getFortaConfig: asFunction(provideGetFortaConfig),
     fortaConfig: asFunction((getFortaConfig: GetFortaConfig) => getFortaConfig()).singleton(),
@@ -124,15 +125,16 @@ export default function configureContainer(args: any = {}) {
         throw new Error(`unable to parse package.json: ${e.message}`)
       }
     }).singleton(),
-    agentName: asFunction((packageJson: any) => packageJson.name).singleton(),
+    botName: asFunction((packageJson: any) => packageJson.name).singleton(),
     description: asFunction((packageJson: any) => packageJson.description).singleton(),
-    agentId: asFunction((fortaConfig: FortaConfig, agentName: string) => {
-      return fortaConfig.agentId || keccak256(agentName)
+    botId: asFunction((fortaConfig: FortaConfig, botName: string) => {
+      // Support both agentId and botId in config file
+      return fortaConfig.botId || fortaConfig.agentId || keccak256(botName)
     }).singleton(),
     chainIds: asFunction((packageJson: any) => {
       const { chainIds } = packageJson
       if (!chainIds || !chainIds.length) {
-        throw new Error("please specify chainIds array in package.json for where this agent should deploy e.g. [1] = Ethereum mainnet")
+        throw new Error("please specify chainIds array in package.json for where this bot should deploy e.g. [1] = Ethereum mainnet")
       }
       return chainIds.sort((a: number, b: number) => a-b)// sort by ascending integers
     }).singleton(),
@@ -153,24 +155,24 @@ export default function configureContainer(args: any = {}) {
     keyfilePassword: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.keyfilePassword
     }).singleton(),
-    agentPath: asFunction((contextPath: string) => {
-      // default js agent
-      let agentPath = join(contextPath, "src", "agent")
-      // check if typescript agent
+    botPath: asFunction((contextPath: string) => {
+      // default js bot
+      let botPath = join(contextPath, "src", "agent")
+      // check if typescript bot
       if (fs.existsSync(join(contextPath, "src", "agent.ts"))) {
-        // point to compiled javascript agent in output folder
+        // point to compiled javascript bot in output folder
         const tsConfigPath = join(contextPath, "tsconfig.json")
         const { compilerOptions } = jsonc.parse(fs.readFileSync(tsConfigPath, 'utf8'))
-        agentPath = join(contextPath, compilerOptions.outDir, "agent")
+        botPath = join(contextPath, compilerOptions.outDir, "agent")
       }
-      // check if python agent
+      // check if python bot
       else if (fs.existsSync(join(contextPath, "src", "agent.py"))) {
-        agentPath = join(contextPath, "src", "agent.py")
+        botPath = join(contextPath, "src", "agent.py")
       }
-      return agentPath
+      return botPath
     }),
-    getAgentHandlers: asFunction(provideGetAgentHandlers).singleton(),
-    getPythonAgentHandlers: asFunction(provideGetPythonAgentHandlers),
+    getBotHandlers: asFunction(provideGetBotHandlers).singleton(),
+    getPythonBotHandlers: asFunction(provideGetPythonBotHandlers),
     runHandlersOnBlock: asFunction(provideRunHandlersOnBlock),
     runHandlersOnTransaction: asFunction(provideRunHandlersOnTransaction),
     getJsonFile: asValue(getJsonFile),
@@ -194,7 +196,7 @@ export default function configureContainer(args: any = {}) {
     getLogsForBlock: asFunction(provideGetLogsForBlock),
 
     getTraceData: asFunction(provideGetTraceData),
-    getAgentLogs: asFunction(provideGetAgentLogs),
+    getBotLogs: asFunction(provideGetBotLogs),
     fortaApiUrl: asValue('https://api.forta.network'),
     polyscanApiUrl: asValue('https://api.polygonscan.com/api'),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
@@ -207,7 +209,7 @@ export default function configureContainer(args: any = {}) {
       return fortaConfig.traceTransactionMethod || "trace_transaction"
     }).singleton(),
 
-    agentController: asClass(AgentController),
+    botController: asClass(BotController),
     port: asValue(process.env.AGENT_GRPC_PORT || "50051"),
 
     imageRepositoryUrl: asFunction((fortaConfig: FortaConfig) => {
@@ -220,11 +222,11 @@ export default function configureContainer(args: any = {}) {
       return fortaConfig.imageRepositoryPassword || "discopass"
     }),
 
-    agentRegistry: asClass(AgentRegistry),
-    agentRegistryContractAddress: asFunction((fortaConfig: FortaConfig) => {
+    botRegistry: asClass(BotRegistry),
+    botRegistryContractAddress: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.agentRegistryContractAddress || "0x61447385B019187daa48e91c55c02AF1F1f3F863"
     }),
-    agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
+    botRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       const url = fortaConfig.agentRegistryJsonRpcUrl || "https://polygon-rpc.com/"
       if (!url.startsWith("http")) {
         throw new Error(`agentRegistryJsonRpcUrl must begin with http(s)`)
@@ -240,7 +242,7 @@ export default function configureContainer(args: any = {}) {
       return jsonRpcUrl
     }),
     ethersProvider: asFunction((jsonRpcUrl: string) =>  new ethers.providers.JsonRpcProvider(jsonRpcUrl)).singleton(),
-    ethersAgentRegistryProvider: asFunction((agentRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(agentRegistryJsonRpcUrl)).singleton(),
+    ethersBotRegistryProvider: asFunction((botRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(botRegistryJsonRpcUrl)).singleton(),
 
     ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.ipfsGatewayUrl || "https://ipfs.forta.network"
