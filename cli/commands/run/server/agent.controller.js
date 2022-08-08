@@ -5,7 +5,7 @@ const {
 } = require("../../../../sdk");
 const { assertExists, formatAddress, assertFindings } = require("../../../utils");
 
-module.exports = class AgentController {
+module.exports = class BotController {
   constructor(getBotHandlers) {
     assertExists(getBotHandlers, "getBotHandlers");
     this.getBotHandlers = getBotHandlers;

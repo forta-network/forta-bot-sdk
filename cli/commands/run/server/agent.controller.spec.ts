@@ -1,10 +1,10 @@
 import { BlockEvent, EventType, Network, TransactionEvent } from "../../../../sdk"
 import { formatAddress } from "../../../utils"
-import AgentController from "./agent.controller"
+import BotController from "./agent.controller"
 
-describe("AgentController", () => {
-  // cheating here by using any so that we can invoke initializeAgentHandlers() for synchronous testing
-  let agentController: any
+describe("BotController", () => {
+  // cheating here by using any so that we can invoke initializeBotHandlers() for synchronous testing
+  let botController: any
   const mockHandleBlock = jest.fn()
   const mockHandleTransaction = jest.fn()
   const mockGetBotHandlers = jest.fn()
@@ -139,7 +139,7 @@ describe("AgentController", () => {
   describe("constructor", () => {
     it("should invoke getBotHandlers", () => {
       mockGetBotHandlers.mockReturnValueOnce({})
-      new AgentController(mockGetBotHandlers)
+      new BotController(mockGetBotHandlers)
   
       expect(mockGetBotHandlers).toHaveBeenCalledTimes(1)
     })
@@ -148,9 +148,9 @@ describe("AgentController", () => {
   describe("Initialize", () => {
     it("invokes callback with success response", async () => {
       mockGetBotHandlers.mockReturnValueOnce({})
-      agentController = new AgentController(mockGetBotHandlers)
+      botController = new BotController(mockGetBotHandlers)
 
-      await agentController.Initialize({}, mockCallback)
+      await botController.Initialize({}, mockCallback)
 
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, { status: "SUCCESS" })
@@ -162,8 +162,8 @@ describe("AgentController", () => {
 
     it("invokes callback with error response if error occurs", async () => {
       mockGetBotHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
-      agentController = new AgentController(mockGetBotHandlers)
-      await agentController.initializeAgentHandlers()
+      botController = new BotController(mockGetBotHandlers)
+      await botController.initializeAgentHandlers()
       const mockRequest = { 
         request: {
           event: {
@@ -172,7 +172,7 @@ describe("AgentController", () => {
         }
       }
 
-      await agentController.EvaluateBlock(mockRequest, mockCallback)// error because request object is not fully populated
+      await botController.EvaluateBlock(mockRequest, mockCallback)// error because request object is not fully populated
 
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
@@ -187,9 +187,9 @@ describe("AgentController", () => {
 
     it("invokes callback with success response and empty findings if no block handlers", async () => {
       mockGetBotHandlers.mockReturnValue({ })
-      agentController = new AgentController(mockGetBotHandlers)
+      botController = new BotController(mockGetBotHandlers)
 
-      await agentController.EvaluateBlock({}, mockCallback)
+      await botController.EvaluateBlock({}, mockCallback)
 
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
@@ -206,10 +206,10 @@ describe("AgentController", () => {
       const mockFinding = { some: 'finding' }
       mockHandleBlock.mockReturnValue([mockFinding])
       mockGetBotHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
-      agentController = new AgentController(mockGetBotHandlers)
-      await agentController.initializeAgentHandlers()
+      botController = new BotController(mockGetBotHandlers)
+      await botController.initializeAgentHandlers()
 
-      await agentController.EvaluateBlock(mockBlockRequest, mockCallback)
+      await botController.EvaluateBlock(mockBlockRequest, mockCallback)
 
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
@@ -256,10 +256,10 @@ describe("AgentController", () => {
         const findings = (new Array(11)).fill(mockFinding)
         mockHandleBlock.mockReturnValue(findings)
         mockGetBotHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
-        agentController = new AgentController(mockGetBotHandlers)
+        botController = new BotController(mockGetBotHandlers)
 
-        await agentController.initializeAgentHandlers()
-        await agentController.EvaluateBlock(mockBlockRequest, mockCallback)
+        await botController.initializeAgentHandlers()
+        await botController.EvaluateBlock(mockBlockRequest, mockCallback)
 
         expect(mockCallback).toHaveBeenCalledWith(null, {
           status: "ERROR",
@@ -276,10 +276,10 @@ describe("AgentController", () => {
       const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 50) })
       mockHandleBlock.mockReturnValue(findings)
       mockGetBotHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
-      agentController = new AgentController(mockGetBotHandlers)
+      botController = new BotController(mockGetBotHandlers)
 
-      await agentController.initializeAgentHandlers()
-      await agentController.EvaluateBlock(mockBlockRequest, mockCallback)
+      await botController.initializeAgentHandlers()
+      await botController.EvaluateBlock(mockBlockRequest, mockCallback)
 
       expect(mockCallback).toHaveBeenCalledWith(null, {
         status: "ERROR",
@@ -297,8 +297,8 @@ describe("AgentController", () => {
 
     it("invokes callback with error response if error occurs", async () => {
       mockGetBotHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
-      agentController = new AgentController(mockGetBotHandlers)
-      await agentController.initializeAgentHandlers()
+      botController = new BotController(mockGetBotHandlers)
+      await botController.initializeAgentHandlers()
       const mockRequest = { 
         request: {
           event: {
@@ -309,7 +309,7 @@ describe("AgentController", () => {
         }
       }
 
-      await agentController.EvaluateTx(mockRequest, mockCallback)// error because request object is not fully populated
+      await botController.EvaluateTx(mockRequest, mockCallback)// error because request object is not fully populated
 
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
@@ -324,9 +324,9 @@ describe("AgentController", () => {
 
     it("invokes callback with success response and empty findings if no transaction handlers", async () => {
       mockGetBotHandlers.mockReturnValue({ })
-      agentController = new AgentController(mockGetBotHandlers)
+      botController = new BotController(mockGetBotHandlers)
 
-      await agentController.EvaluateTx({}, mockCallback)
+      await botController.EvaluateTx({}, mockCallback)
 
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
@@ -342,10 +342,10 @@ describe("AgentController", () => {
     it("invokes callback with success response and findings from transaction handlers", async () => {
       mockHandleTransaction.mockReturnValue([mockFinding])
       mockGetBotHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
-      agentController = new AgentController(mockGetBotHandlers)
-      await agentController.initializeAgentHandlers()
+      botController = new BotController(mockGetBotHandlers)
+      await botController.initializeAgentHandlers()
 
-      await agentController.EvaluateTx(mockTxRequest, mockCallback)
+      await botController.EvaluateTx(mockTxRequest, mockCallback)
 
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
@@ -431,10 +431,10 @@ describe("AgentController", () => {
         const findings = (new Array(21)).fill(mockFinding)
         mockHandleTransaction.mockReturnValue(findings)
         mockGetBotHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
-        agentController = new AgentController(mockGetBotHandlers)
+        botController = new BotController(mockGetBotHandlers)
 
-        await agentController.initializeAgentHandlers()
-        await agentController.EvaluateTx(mockTxRequest, mockCallback)
+        await botController.initializeAgentHandlers()
+        await botController.EvaluateTx(mockTxRequest, mockCallback)
 
         expect(mockCallback).toHaveBeenCalledWith(null, {
           status: "ERROR",
@@ -450,10 +450,10 @@ describe("AgentController", () => {
       const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 50) })
       mockHandleTransaction.mockReturnValue(findings)
       mockGetBotHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
-      agentController = new AgentController(mockGetBotHandlers)
+      botController = new BotController(mockGetBotHandlers)
 
-      await agentController.initializeAgentHandlers()
-      await agentController.EvaluateTx(mockTxRequest, mockCallback)
+      await botController.initializeAgentHandlers()
+      await botController.EvaluateTx(mockTxRequest, mockCallback)
 
       expect(mockCallback).toHaveBeenCalledWith(null, {
         status: "ERROR",

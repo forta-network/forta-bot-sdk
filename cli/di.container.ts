@@ -15,7 +15,7 @@ import providePush from './commands/push'
 import provideDisable from './commands/disable'
 import provideEnable from './commands/enable'
 import provideKeyfile from './commands/keyfile'
-import AgentController from "./commands/run/server/agent.controller"
+import BotController from "./commands/run/server/agent.controller"
 import { provideRunTransaction } from "./commands/run/run.transaction"
 import { provideRunBlock } from "./commands/run/run.block"
 import { provideRunBlockRange } from "./commands/run/run.block.range"
@@ -209,7 +209,7 @@ export default function configureContainer(args: any = {}) {
       return fortaConfig.traceTransactionMethod || "trace_transaction"
     }).singleton(),
 
-    agentController: asClass(AgentController),
+    botController: asClass(BotController),
     port: asValue(process.env.AGENT_GRPC_PORT || "50051"),
 
     imageRepositoryUrl: asFunction((fortaConfig: FortaConfig) => {
