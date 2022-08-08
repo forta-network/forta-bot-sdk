@@ -27,13 +27,13 @@ import provideUploadManifest from './commands/publish/upload.manifest'
 import providePushToRegistry from './commands/publish/push.to.registry'
 import { createBlockEvent, createTransactionEvent, getJsonFile, keccak256 } from "./utils"
 import AgentRegistry from "./contracts/agent.registry"
-import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
+import { provideGetBotHandlers } from "./utils/get.agent.handlers"
 import { provideDecryptKeyfile } from "./utils/decrypt.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
 import provideGetCredentials from './utils/get.credentials'
 import { provideGetTraceData } from './utils/get.trace.data'
 import { FortaConfig } from '../sdk'
-import { provideGetPythonAgentHandlers } from './utils/get.python.agent.handlers'
+import { provideGetPythonBotHandlers } from './utils/get.python.agent.handlers'
 import provideAddToIpfs from './utils/add.to.ipfs'
 import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
 import { provideRunHandlersOnTransaction } from './utils/run.handlers.on.transaction'
@@ -86,7 +86,7 @@ export default function configureContainer(args: any = {}) {
 
     args: asValue(args),
 
-    contextPath: asValue(args.contextPath || process.cwd()),// the directory containing the agent's package.json
+    contextPath: asValue(args.contextPath || process.cwd()),// the directory containing the bot's package.json
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
     getFortaConfig: asFunction(provideGetFortaConfig),
     fortaConfig: asFunction((getFortaConfig: GetFortaConfig) => getFortaConfig()).singleton(),
@@ -134,7 +134,7 @@ export default function configureContainer(args: any = {}) {
     chainIds: asFunction((packageJson: any) => {
       const { chainIds } = packageJson
       if (!chainIds || !chainIds.length) {
-        throw new Error("please specify chainIds array in package.json for where this agent should deploy e.g. [1] = Ethereum mainnet")
+        throw new Error("please specify chainIds array in package.json for where this bot should deploy e.g. [1] = Ethereum mainnet")
       }
       return chainIds.sort((a: number, b: number) => a-b)// sort by ascending integers
     }).singleton(),
@@ -155,24 +155,24 @@ export default function configureContainer(args: any = {}) {
     keyfilePassword: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.keyfilePassword
     }).singleton(),
-    agentPath: asFunction((contextPath: string) => {
+    botPath: asFunction((contextPath: string) => {
       // default js agent
-      let agentPath = join(contextPath, "src", "agent")
+      let botPath = join(contextPath, "src", "agent")
       // check if typescript agent
       if (fs.existsSync(join(contextPath, "src", "agent.ts"))) {
         // point to compiled javascript agent in output folder
         const tsConfigPath = join(contextPath, "tsconfig.json")
         const { compilerOptions } = jsonc.parse(fs.readFileSync(tsConfigPath, 'utf8'))
-        agentPath = join(contextPath, compilerOptions.outDir, "agent")
+        botPath = join(contextPath, compilerOptions.outDir, "agent")
       }
       // check if python agent
       else if (fs.existsSync(join(contextPath, "src", "agent.py"))) {
-        agentPath = join(contextPath, "src", "agent.py")
+        botPath = join(contextPath, "src", "agent.py")
       }
-      return agentPath
+      return botPath
     }),
-    getAgentHandlers: asFunction(provideGetAgentHandlers).singleton(),
-    getPythonAgentHandlers: asFunction(provideGetPythonAgentHandlers),
+    getBotHandlers: asFunction(provideGetBotHandlers).singleton(),
+    getPythonBotHandlers: asFunction(provideGetPythonBotHandlers),
     runHandlersOnBlock: asFunction(provideRunHandlersOnBlock),
     runHandlersOnTransaction: asFunction(provideRunHandlersOnTransaction),
     getJsonFile: asValue(getJsonFile),

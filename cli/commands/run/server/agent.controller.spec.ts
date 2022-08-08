@@ -7,7 +7,7 @@ describe("AgentController", () => {
   let agentController: any
   const mockHandleBlock = jest.fn()
   const mockHandleTransaction = jest.fn()
-  const mockGetAgentHandlers = jest.fn()
+  const mockGetBotHandlers = jest.fn()
   const mockCallback = jest.fn()
   const mockFinding = { some: 'finding' }
   const systemTime = new Date()
@@ -121,7 +121,7 @@ describe("AgentController", () => {
 
   const resetMocks = () => {
     mockCallback.mockReset()
-    mockGetAgentHandlers.mockReset()
+    mockGetBotHandlers.mockReset()
     mockHandleBlock.mockReset()
     mockHandleTransaction.mockReset()
   }
@@ -137,18 +137,18 @@ describe("AgentController", () => {
   })
 
   describe("constructor", () => {
-    it("should invoke getAgentHandlers", () => {
-      mockGetAgentHandlers.mockReturnValueOnce({})
-      new AgentController(mockGetAgentHandlers)
+    it("should invoke getBotHandlers", () => {
+      mockGetBotHandlers.mockReturnValueOnce({})
+      new AgentController(mockGetBotHandlers)
   
-      expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
+      expect(mockGetBotHandlers).toHaveBeenCalledTimes(1)
     })
   })
 
   describe("Initialize", () => {
     it("invokes callback with success response", async () => {
-      mockGetAgentHandlers.mockReturnValueOnce({})
-      agentController = new AgentController(mockGetAgentHandlers)
+      mockGetBotHandlers.mockReturnValueOnce({})
+      agentController = new AgentController(mockGetBotHandlers)
 
       await agentController.Initialize({}, mockCallback)
 
@@ -161,8 +161,8 @@ describe("AgentController", () => {
     const mockBlockRequest = generateBlockRequest()
 
     it("invokes callback with error response if error occurs", async () => {
-      mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
-      agentController = new AgentController(mockGetAgentHandlers)
+      mockGetBotHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
+      agentController = new AgentController(mockGetBotHandlers)
       await agentController.initializeAgentHandlers()
       const mockRequest = { 
         request: {
@@ -186,8 +186,8 @@ describe("AgentController", () => {
     })
 
     it("invokes callback with success response and empty findings if no block handlers", async () => {
-      mockGetAgentHandlers.mockReturnValue({ })
-      agentController = new AgentController(mockGetAgentHandlers)
+      mockGetBotHandlers.mockReturnValue({ })
+      agentController = new AgentController(mockGetBotHandlers)
 
       await agentController.EvaluateBlock({}, mockCallback)
 
@@ -205,8 +205,8 @@ describe("AgentController", () => {
     it("invokes callback with success response and findings from block handlers", async () => {
       const mockFinding = { some: 'finding' }
       mockHandleBlock.mockReturnValue([mockFinding])
-      mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
-      agentController = new AgentController(mockGetAgentHandlers)
+      mockGetBotHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
+      agentController = new AgentController(mockGetBotHandlers)
       await agentController.initializeAgentHandlers()
 
       await agentController.EvaluateBlock(mockBlockRequest, mockCallback)
@@ -255,8 +255,8 @@ describe("AgentController", () => {
     it("throws an error if more than 10 findings when handling a block", async () => {
         const findings = (new Array(11)).fill(mockFinding)
         mockHandleBlock.mockReturnValue(findings)
-        mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
-        agentController = new AgentController(mockGetAgentHandlers)
+        mockGetBotHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
+        agentController = new AgentController(mockGetBotHandlers)
 
         await agentController.initializeAgentHandlers()
         await agentController.EvaluateBlock(mockBlockRequest, mockCallback)
@@ -275,8 +275,8 @@ describe("AgentController", () => {
     it("throws an error if more than 50kB of findings fetched when handling a block", async () => {
       const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 50) })
       mockHandleBlock.mockReturnValue(findings)
-      mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
-      agentController = new AgentController(mockGetAgentHandlers)
+      mockGetBotHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
+      agentController = new AgentController(mockGetBotHandlers)
 
       await agentController.initializeAgentHandlers()
       await agentController.EvaluateBlock(mockBlockRequest, mockCallback)
@@ -296,8 +296,8 @@ describe("AgentController", () => {
     const mockTxRequest = generateTxRequest()
 
     it("invokes callback with error response if error occurs", async () => {
-      mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
-      agentController = new AgentController(mockGetAgentHandlers)
+      mockGetBotHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
+      agentController = new AgentController(mockGetBotHandlers)
       await agentController.initializeAgentHandlers()
       const mockRequest = { 
         request: {
@@ -323,8 +323,8 @@ describe("AgentController", () => {
     })
 
     it("invokes callback with success response and empty findings if no transaction handlers", async () => {
-      mockGetAgentHandlers.mockReturnValue({ })
-      agentController = new AgentController(mockGetAgentHandlers)
+      mockGetBotHandlers.mockReturnValue({ })
+      agentController = new AgentController(mockGetBotHandlers)
 
       await agentController.EvaluateTx({}, mockCallback)
 
@@ -341,8 +341,8 @@ describe("AgentController", () => {
 
     it("invokes callback with success response and findings from transaction handlers", async () => {
       mockHandleTransaction.mockReturnValue([mockFinding])
-      mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
-      agentController = new AgentController(mockGetAgentHandlers)
+      mockGetBotHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
+      agentController = new AgentController(mockGetBotHandlers)
       await agentController.initializeAgentHandlers()
 
       await agentController.EvaluateTx(mockTxRequest, mockCallback)
@@ -430,8 +430,8 @@ describe("AgentController", () => {
     it("throws an error if more than 10 findings when handling a transaction", async () => {
         const findings = (new Array(21)).fill(mockFinding)
         mockHandleTransaction.mockReturnValue(findings)
-        mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
-        agentController = new AgentController(mockGetAgentHandlers)
+        mockGetBotHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
+        agentController = new AgentController(mockGetBotHandlers)
 
         await agentController.initializeAgentHandlers()
         await agentController.EvaluateTx(mockTxRequest, mockCallback)
@@ -449,8 +449,8 @@ describe("AgentController", () => {
     it("throws an error if more than 50kB of findings fetched when handling a transaction", async () => {
       const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 50) })
       mockHandleTransaction.mockReturnValue(findings)
-      mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
-      agentController = new AgentController(mockGetAgentHandlers)
+      mockGetBotHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
+      agentController = new AgentController(mockGetBotHandlers)
 
       await agentController.initializeAgentHandlers()
       await agentController.EvaluateTx(mockTxRequest, mockCallback)

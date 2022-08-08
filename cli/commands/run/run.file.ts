@@ -1,18 +1,18 @@
 import { assertExists, GetJsonFile } from '../../utils';
-import { GetAgentHandlers } from '../../utils/get.agent.handlers';
+import { GetBotHandlers } from '../../utils/get.agent.handlers';
 
 // runs agent handlers against a specified json file with test data
 export type RunFile = (filePath: string) => Promise<void>
 
 export function provideRunFile(
-  getAgentHandlers: GetAgentHandlers,
+  getBotHandlers: GetBotHandlers,
   getJsonFile: GetJsonFile
 ): RunFile {
-  assertExists(getAgentHandlers, 'getAgentHandlers')
+  assertExists(getBotHandlers, 'getBotHandlers')
   assertExists(getJsonFile, 'getJsonFile')
 
   return async function runFile(filePath: string) {
-    const { handleBlock, handleTransaction } = await getAgentHandlers()
+    const { handleBlock, handleTransaction } = await getBotHandlers()
     if (!handleBlock && !handleTransaction) {
       throw new Error("no block/transaction handler found")
     }

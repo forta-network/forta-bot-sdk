@@ -1,5 +1,5 @@
 import { Trace } from "../../sdk";
-import { GetAgentHandlers } from "./get.agent.handlers";
+import { GetBotHandlers } from "./get.agent.handlers";
 import { GetTraceData } from "./get.trace.data";
 import { assertExists, assertFindings, CreateBlockEvent, CreateTransactionEvent } from ".";
 import { GetNetworkId } from "./get.network.id";
@@ -10,7 +10,7 @@ import { GetLogsForBlock } from "./get.logs.for.block";
 export type RunHandlersOnBlock = (blockHashOrNumber: string | number) => Promise<void>
 
 export function provideRunHandlersOnBlock(
-  getAgentHandlers: GetAgentHandlers,
+  getBotHandlers: GetBotHandlers,
   getNetworkId: GetNetworkId,
   getBlockWithTransactions: GetBlockWithTransactions,
   getTraceData: GetTraceData,
@@ -18,7 +18,7 @@ export function provideRunHandlersOnBlock(
   createBlockEvent: CreateBlockEvent,
   createTransactionEvent: CreateTransactionEvent
 ): RunHandlersOnBlock {
-  assertExists(getAgentHandlers, 'getAgentHandlers')
+  assertExists(getBotHandlers, 'getBotHandlers')
   assertExists(getNetworkId, 'getNetworkId')
   assertExists(getBlockWithTransactions, 'getBlockWithTransactions')
   assertExists(getTraceData, 'getTraceData')
@@ -27,7 +27,7 @@ export function provideRunHandlersOnBlock(
   assertExists(createTransactionEvent, 'createTransactionEvent')
 
   return async function runHandlersOnBlock(blockHashOrNumber: string | number) {
-    const { handleBlock, handleTransaction } = await getAgentHandlers()
+    const { handleBlock, handleTransaction } = await getBotHandlers()
     if (!handleBlock && !handleTransaction) {
       throw new Error("no block/transaction handler found")
     }

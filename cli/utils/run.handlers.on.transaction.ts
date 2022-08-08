@@ -1,5 +1,5 @@
 import { assertExists, assertFindings, CreateTransactionEvent } from ".";
-import { GetAgentHandlers } from "./get.agent.handlers";
+import { GetBotHandlers } from "./get.agent.handlers";
 import { GetBlockWithTransactions } from "./get.block.with.transactions";
 import { GetNetworkId } from "./get.network.id";
 import { GetTraceData } from "./get.trace.data";
@@ -8,14 +8,14 @@ import { GetTransactionReceipt } from "./get.transaction.receipt";
 export type RunHandlersOnTransaction = (txHash: string) => Promise<void>
 
 export function provideRunHandlersOnTransaction(
-  getAgentHandlers: GetAgentHandlers,
+  getBotHandlers: GetBotHandlers,
   getNetworkId: GetNetworkId,
   getTransactionReceipt: GetTransactionReceipt,
   getBlockWithTransactions: GetBlockWithTransactions,
   getTraceData: GetTraceData,
   createTransactionEvent: CreateTransactionEvent
 ): RunHandlersOnTransaction {
-  assertExists(getAgentHandlers, 'getAgentHandlers')
+  assertExists(getBotHandlers, 'getBotHandlers')
   assertExists(getNetworkId, 'getNetworkId')
   assertExists(getTransactionReceipt, 'getTransactionReceipt')
   assertExists(getBlockWithTransactions, 'getBlockWithTransactions')
@@ -23,7 +23,7 @@ export function provideRunHandlersOnTransaction(
   assertExists(createTransactionEvent, 'createTransactionEvent')
 
   return async function runHandlersOnTransaction(txHash: string) {
-    const { handleTransaction } = await getAgentHandlers()
+    const { handleTransaction } = await getBotHandlers()
     if (!handleTransaction) {
       throw new Error("no transaction handler found")
     }
