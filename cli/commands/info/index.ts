@@ -13,25 +13,25 @@ import { chain } from "lodash";
 
 
 export default function provideInfo(
-    agentId: string,
+    botId: string,
     args: any,
     ethersAgentRegistryProvider: providers.JsonRpcProvider,
     botRegistry: BotRegistry,
-    agentRegistryContractAddress: string,
+    botRegistryContractAddress: string,
     getFromIpfs: GetFromIpfs,
     getLogsFromPolyscan: GetLogsFromPolyscan
 ): CommandHandler {
     assertExists(args, 'args')
     assertExists(ethersAgentRegistryProvider, 'ethersAgentRegistryProvider')
     assertExists(botRegistry, 'botRegistry')
-    assertExists(agentRegistryContractAddress, 'agentRegistryContractAddress')
+    assertExists(botRegistryContractAddress, 'botRegistryContractAddress')
     assertExists(getFromIpfs, 'getFromIpfs')
     assertExists(getLogsFromPolyscan, 'getLogsFromPolyscan')
 
     return async function info() {
-        const finalBotId = args.agentId ? args.agentId : agentId;
+        const finalBotId = args.botId ? args.botId : botId;
 
-        assertIsNonEmptyString(finalBotId, 'agentId');
+        assertIsNonEmptyString(finalBotId, 'botId');
 
         console.log(`Fetching bot info...`);
 
@@ -60,7 +60,7 @@ export default function provideInfo(
         const logs: PolyscanLog[] = [];
 
         await Promise.all(eventTopicFilters.map(async filter => {
-            const eventLogs = await getLogsFromPolyscan(agentRegistryContractAddress, filter, finalBotId);
+            const eventLogs = await getLogsFromPolyscan(botRegistryContractAddress, filter, finalBotId);
             logs.push(...eventLogs)
         }))
 

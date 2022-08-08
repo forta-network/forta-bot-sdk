@@ -156,16 +156,16 @@ export default function configureContainer(args: any = {}) {
       return fortaConfig.keyfilePassword
     }).singleton(),
     botPath: asFunction((contextPath: string) => {
-      // default js agent
+      // default js bot
       let botPath = join(contextPath, "src", "agent")
-      // check if typescript agent
+      // check if typescript bot
       if (fs.existsSync(join(contextPath, "src", "agent.ts"))) {
-        // point to compiled javascript agent in output folder
+        // point to compiled javascript bot in output folder
         const tsConfigPath = join(contextPath, "tsconfig.json")
         const { compilerOptions } = jsonc.parse(fs.readFileSync(tsConfigPath, 'utf8'))
         botPath = join(contextPath, compilerOptions.outDir, "agent")
       }
-      // check if python agent
+      // check if python bot
       else if (fs.existsSync(join(contextPath, "src", "agent.py"))) {
         botPath = join(contextPath, "src", "agent.py")
       }
@@ -223,7 +223,7 @@ export default function configureContainer(args: any = {}) {
     }),
 
     botRegistry: asClass(BotRegistry),
-    agentRegistryContractAddress: asFunction((fortaConfig: FortaConfig) => {
+    botRegistryContractAddress: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.agentRegistryContractAddress || "0x61447385B019187daa48e91c55c02AF1F1f3F863"
     }),
     agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {

@@ -16,13 +16,13 @@ describe("info", () => {
         agentId: "0x1234456"
     }
 
-    const mockEthersAgentRegistryProvider = {
+    const mockEthersBotRegistryProvider = {
         getBlockNumber: jest.fn(),
         getBlock: jest.fn(),
         getNetwork: jest.fn(),
     }
 
-    const mockAgentRegistry = {
+    const mockBotRegistry = {
         getAgent: jest.fn(),
         isEnabled: jest.fn()
     }
@@ -33,11 +33,11 @@ describe("info", () => {
     const agentRegistryContractAddress = "0x987654";
 
     const resetMocks = () => {
-        mockEthersAgentRegistryProvider.getBlockNumber.mockReset()
-        mockEthersAgentRegistryProvider.getNetwork.mockReset()
-        mockEthersAgentRegistryProvider.getBlock.mockReset()
-        mockAgentRegistry.getAgent.mockReset()
-        mockAgentRegistry.isEnabled.mockReset()
+        mockEthersBotRegistryProvider.getBlockNumber.mockReset()
+        mockEthersBotRegistryProvider.getNetwork.mockReset()
+        mockEthersBotRegistryProvider.getBlock.mockReset()
+        mockBotRegistry.getAgent.mockReset()
+        mockBotRegistry.isEnabled.mockReset()
         getFromIpfs.mockReset()
         getLogsFromPolyscan.mockReset()
     }
@@ -101,20 +101,20 @@ describe("info", () => {
 
     beforeAll(() => {
         console.log(`Topic filters are: ${blockEventTopicFilters.forEach(hash => console.log(`\n ${hash}`))}`)
-        info = provideInfo("", args, mockEthersAgentRegistryProvider as any, mockAgentRegistry as any ,agentRegistryContractAddress,getFromIpfs,getLogsFromPolyscan)
+        info = provideInfo("", args, mockEthersBotRegistryProvider as any, mockBotRegistry as any ,agentRegistryContractAddress,getFromIpfs,getLogsFromPolyscan)
     })
 
     // Helper methods
 
     const defaultMocks = (isBotEnabled: boolean) => {
-        mockAgentRegistry.getAgent.mockReturnValueOnce(mockAgentDescription)
-        mockAgentRegistry.isEnabled.mockReturnValue(isBotEnabled)
+        mockBotRegistry.getAgent.mockReturnValueOnce(mockAgentDescription)
+        mockBotRegistry.isEnabled.mockReturnValue(isBotEnabled)
 
         getFromIpfs.mockReturnValueOnce(mockIpfsManifest)
 
-        mockEthersAgentRegistryProvider.getBlockNumber.mockReturnValue(2000000)
-        mockEthersAgentRegistryProvider.getNetwork.mockReturnValue(testNetwork)
-        mockEthersAgentRegistryProvider.getBlock.mockReturnValueOnce({timestamp: 1654440565}).mockReturnValue({timestamp: 1654430565})
+        mockEthersBotRegistryProvider.getBlockNumber.mockReturnValue(2000000)
+        mockEthersBotRegistryProvider.getNetwork.mockReturnValue(testNetwork)
+        mockEthersBotRegistryProvider.getBlock.mockReturnValueOnce({timestamp: 1654440565}).mockReturnValue({timestamp: 1654430565})
 
         getLogsFromPolyscan.mockReturnValueOnce(mockLogOne).mockReturnValue(mockLogTwo)
 
@@ -124,7 +124,7 @@ describe("info", () => {
     it("fetches the current state of a deployed bot", async () => {
         await info(testDaysToScan)
 
-        expect(mockAgentRegistry.isEnabled).toHaveBeenCalledWith(args.agentId)
+        expect(mockBotRegistry.isEnabled).toHaveBeenCalledWith(args.agentId)
     })
 
     it("fetches the most recent ipfs metadata of a deployed bot", async () => {

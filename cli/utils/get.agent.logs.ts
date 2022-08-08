@@ -1,7 +1,7 @@
 import { AxiosStatic } from "axios";
 import { assertExists, assertIsNonEmptyString } from ".";
 
-export type GetAgentLogs = (agentId: string, minute?: Date) => Promise<FortaAgentLogResponse[]>
+export type GetAgentLogs = (botId: string, minute?: Date) => Promise<FortaAgentLogResponse[]>
 
 export function provideGetAgentLogs(
   axios: AxiosStatic,
@@ -10,8 +10,8 @@ export function provideGetAgentLogs(
   assertExists(axios, 'axios')
   assertIsNonEmptyString(fortaApiUrl, 'fortaApiUrl')
 
-  return async function getAgentLogs(agentId: string, minute?: Date) {
-    const { data } = await axios.get(`${fortaApiUrl}/logs/agents/${agentId}`, {
+  return async function getAgentLogs(botId: string, minute?: Date) {
+    const { data } = await axios.get(`${fortaApiUrl}/logs/agents/${botId}`, {
       headers: {
         "accept": "application/json",
       },

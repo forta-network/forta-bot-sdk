@@ -4,25 +4,25 @@ import { FortaAgentLogResponse, GetAgentLogs } from '../../utils/get.agent.logs'
 
 
 export default function provideLogs(
-  agentId: string,
+  botId: string,
   getAgentLogs: GetAgentLogs,
   args: any,
 ): CommandHandler {
   assertExists(args, 'args')
-  assertIsNonEmptyString(agentId, "agentId"); // agentId retrieved from forta.config.json or hashing the package.json name
+  assertIsNonEmptyString(botId, "botId"); // botId retrieved from forta.config.json or hashing the package.json name
 
 
   return async function logs() {
 
-    const cliAgentId = args.agentId;
+    const cliBotId = args.botId;
 
     let latestTimestamp = args.before
     let earliestTimestamp = args.after;
 
-    const finalAgentId = cliAgentId ? cliAgentId : agentId;
+    const finalBotId = cliBotId ? cliBotId : botId;
 
     if(!latestTimestamp && !earliestTimestamp) {
-      const logs = await getAgentLogs(finalAgentId);
+      const logs = await getAgentLogs(finalBotId);
       processLogs(logs);
     } else {
       assertIsISOString(latestTimestamp, "\'before\'")
@@ -36,7 +36,7 @@ export default function provideLogs(
       let curMinute: Date | undefined = earliestDateTime;
 
       while(curMinute) {
-        const logs = await getAgentLogs(finalAgentId, curMinute)
+        const logs = await getAgentLogs(finalBotId, curMinute)
         processLogs(logs);
 
         curMinute = getNextMinute(curMinute, latestDateTime)

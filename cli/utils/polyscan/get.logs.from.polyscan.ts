@@ -15,7 +15,7 @@ export interface PolyscanLog{
     transactionHash: string
 }
 
-export type GetLogsFromPolyscan = (address: string, eventFilter: EventFilter, agentId: string) => Promise<any>
+export type GetLogsFromPolyscan = (address: string, eventFilter: EventFilter, botId: string) => Promise<any>
 
 
 export default function provideGetLogsFromPolyscan(
@@ -25,15 +25,15 @@ export default function provideGetLogsFromPolyscan(
 
     assertExists(axios,'axios')
 
-    return async function getLogsFromPolyscan(address: string, eventFilter: EventFilter, agentId: string) {
+    return async function getLogsFromPolyscan(address: string, eventFilter: EventFilter, botId: string) {
 
-        const agentIdFilterParams = eventFilter.type !== "Transfer" ? 
+        const botIdFilterParams = eventFilter.type !== "Transfer" ? 
             {
-                topic1: agentId,
+                topic1: botId,
                 topic0_1_opr: "and"
             } :
             {
-                topic3: agentId,
+                topic3: botId,
                 topic0_3_opr: "and"
             }
         let logData: PolyscanLog[] = []
@@ -51,7 +51,7 @@ export default function provideGetLogsFromPolyscan(
                   action: "getLogs",
                   address,
                   topic0: eventFilter.topicHash,
-                  ...agentIdFilterParams
+                  ...botIdFilterParams
                 }
             });
     
