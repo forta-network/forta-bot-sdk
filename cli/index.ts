@@ -30,14 +30,8 @@ yargs
   .command('info', 'Inspect state of the Forta Bot', 
     (yargs: Argv) => {
       yargs.option('botId', {
-        description: 'Bot id to retrieve information for. Default value is this bot. If this option is used do not provide a agentId',
-        type: 'string'
-      }).option('agentId', {
         description: 'Bot id to retrieve information for. Default value is this bot. If this option is used do not provide a botId',
         type: 'string'
-      }).check(argv => {
-        if (argv.botId && argv.agentId) return "Detected both botId and agentId were input. Please use only one of these options"
-        return true;
       })
     },
     (cliArgs: any) => executeCommand("info", cliArgs)
@@ -112,14 +106,8 @@ yargs
         description: 'Only returns logs for specified scannerId',
         type: 'string'
       }).option('botId', {
-        description: 'Bot id to retrieve information for. Default value is this bot. If this option is used do not provide a agentId',
-        type: 'string'
-      }).option('agentId', {
         description: 'Bot id to retrieve information for. Default value is this bot. If this option is used do not provide a botId',
         type: 'string'
-      }).check(argv => {
-        if (argv.botId && argv.agentId) return "Detected both botId and agentId were input. Please use only one of these options"
-        return true;
       })
     },
     (cliArgs: any) => executeCommand("logs", cliArgs)
