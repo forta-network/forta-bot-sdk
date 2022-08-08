@@ -15,14 +15,14 @@ import { chain } from "lodash";
 export default function provideInfo(
     botId: string,
     args: any,
-    ethersAgentRegistryProvider: providers.JsonRpcProvider,
+    ethersBotRegistryProvider: providers.JsonRpcProvider,
     botRegistry: BotRegistry,
     botRegistryContractAddress: string,
     getFromIpfs: GetFromIpfs,
     getLogsFromPolyscan: GetLogsFromPolyscan
 ): CommandHandler {
     assertExists(args, 'args')
-    assertExists(ethersAgentRegistryProvider, 'ethersAgentRegistryProvider')
+    assertExists(ethersBotRegistryProvider, 'ethersBotRegistryProvider')
     assertExists(botRegistry, 'botRegistry')
     assertExists(botRegistryContractAddress, 'botRegistryContractAddress')
     assertExists(getFromIpfs, 'getFromIpfs')

@@ -41,7 +41,7 @@ export const getEventNameFromTopicHash = (topicHash: string): string => {
 export default class BotRegistry {
 
   constructor(
-    private ethersAgentRegistryProvider: providers.JsonRpcProvider,
+    private ethersBotRegistryProvider: providers.JsonRpcProvider,
     private botRegistryContractAddress: string
   ) {}
 
@@ -107,12 +107,12 @@ export default class BotRegistry {
     return new ethers.Contract(
       this.botRegistryContractAddress,
       AgentRegistryAbi,
-      fromWallet ? fromWallet.connect(this.ethersAgentRegistryProvider) : this.ethersAgentRegistryProvider
+      fromWallet ? fromWallet.connect(this.ethersBotRegistryProvider) : this.ethersBotRegistryProvider
     )
   }
 
   private async getTxOptions(gasLimit: ethers.BigNumber, fromWallet: Wallet) {
-    const gasPrice = await fromWallet.connect(this.ethersAgentRegistryProvider).getGasPrice()
+    const gasPrice = await fromWallet.connect(this.ethersBotRegistryProvider).getGasPrice()
     return {
       gasLimit: Math.round(gasLimit.toNumber() * GAS_MULTIPLIER),
       gasPrice: Math.round(gasPrice.toNumber() * GAS_PRICE_MULTIPLIER)

@@ -226,7 +226,7 @@ export default function configureContainer(args: any = {}) {
     botRegistryContractAddress: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.agentRegistryContractAddress || "0x61447385B019187daa48e91c55c02AF1F1f3F863"
     }),
-    agentRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
+    botRegistryJsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       const url = fortaConfig.agentRegistryJsonRpcUrl || "https://polygon-rpc.com/"
       if (!url.startsWith("http")) {
         throw new Error(`agentRegistryJsonRpcUrl must begin with http(s)`)
@@ -242,7 +242,7 @@ export default function configureContainer(args: any = {}) {
       return jsonRpcUrl
     }),
     ethersProvider: asFunction((jsonRpcUrl: string) =>  new ethers.providers.JsonRpcProvider(jsonRpcUrl)).singleton(),
-    ethersAgentRegistryProvider: asFunction((agentRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(agentRegistryJsonRpcUrl)).singleton(),
+    ethersBotRegistryProvider: asFunction((botRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(botRegistryJsonRpcUrl)).singleton(),
 
     ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.ipfsGatewayUrl || "https://ipfs.forta.network"

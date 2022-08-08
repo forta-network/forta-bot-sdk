@@ -11,18 +11,18 @@ export default function providePushToRegistry(
   botRegistry: BotRegistry,
   botId: string,
   chainIds: number[],
-  ethersAgentRegistryProvider: providers.JsonRpcProvider
+  ethersBotRegistryProvider: providers.JsonRpcProvider
 ): PushToRegistry {
   assertExists(appendToFile, 'appendToFile')
   assertExists(botRegistry, 'botRegistry')
   assertIsNonEmptyString(botId, 'botId')
   assertExists(chainIds, 'chainIds')
-  assertExists(ethersAgentRegistryProvider, 'ethersAgentRegistryProvider')
+  assertExists(ethersBotRegistryProvider, 'ethersBotRegistryProvider')
   
   return async function pushToRegistry(manifestReference: string, fromWallet: Wallet) {
     const [agent, fromWalletBalance] = await Promise.all([
       botRegistry.getAgent(botId),
-      fromWallet.connect(ethersAgentRegistryProvider).getBalance()
+      fromWallet.connect(ethersBotRegistryProvider).getBalance()
     ])
     const agentExists = agent.created
     // verify wallet has some balance to pay transaction fee
