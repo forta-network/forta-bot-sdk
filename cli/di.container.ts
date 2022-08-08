@@ -26,7 +26,7 @@ import provideUploadImage from './commands/publish/upload.image'
 import provideUploadManifest from './commands/publish/upload.manifest'
 import providePushToRegistry from './commands/publish/push.to.registry'
 import { createBlockEvent, createTransactionEvent, getJsonFile, keccak256 } from "./utils"
-import AgentRegistry from "./contracts/agent.registry"
+import BotRegistry from "./contracts/agent.registry"
 import { provideGetBotHandlers } from "./utils/get.agent.handlers"
 import { provideDecryptKeyfile } from "./utils/decrypt.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
@@ -222,7 +222,7 @@ export default function configureContainer(args: any = {}) {
       return fortaConfig.imageRepositoryPassword || "discopass"
     }),
 
-    agentRegistry: asClass(AgentRegistry),
+    botRegistry: asClass(BotRegistry),
     agentRegistryContractAddress: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.agentRegistryContractAddress || "0x61447385B019187daa48e91c55c02AF1F1f3F863"
     }),

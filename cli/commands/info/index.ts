@@ -1,5 +1,5 @@
 import { CommandHandler } from "../..";
-import AgentRegistry, 
+import BotRegistry, 
 { AGENT_REGISTRY_EVENT_FRAGMENTS, 
   getEventNameFromTopicHash, 
   getTopicHashFromEventName, 
@@ -16,28 +16,28 @@ export default function provideInfo(
     agentId: string,
     args: any,
     ethersAgentRegistryProvider: providers.JsonRpcProvider,
-    agentRegistry: AgentRegistry,
+    botRegistry: BotRegistry,
     agentRegistryContractAddress: string,
     getFromIpfs: GetFromIpfs,
     getLogsFromPolyscan: GetLogsFromPolyscan
 ): CommandHandler {
     assertExists(args, 'args')
     assertExists(ethersAgentRegistryProvider, 'ethersAgentRegistryProvider')
-    assertExists(agentRegistry, 'agentRegistry')
+    assertExists(botRegistry, 'botRegistry')
     assertExists(agentRegistryContractAddress, 'agentRegistryContractAddress')
     assertExists(getFromIpfs, 'getFromIpfs')
     assertExists(getLogsFromPolyscan, 'getLogsFromPolyscan')
 
     return async function info() {
-        const finalAgentId = args.agentId ? args.agentId : agentId;
+        const finalBotId = args.agentId ? args.agentId : agentId;
 
-        assertIsNonEmptyString(finalAgentId, 'agentId');
+        assertIsNonEmptyString(finalBotId, 'agentId');
 
         console.log(`Fetching bot info...`);
 
         const [agent, currentState] = await Promise.all([ 
-             await agentRegistry.getAgent(finalAgentId), 
-             await agentRegistry.isEnabled(finalAgentId) as boolean,
+             await botRegistry.getAgent(finalBotId), 
+             await botRegistry.isEnabled(finalBotId) as boolean,
         ]);
 
         
@@ -60,7 +60,7 @@ export default function provideInfo(
         const logs: PolyscanLog[] = [];
 
         await Promise.all(eventTopicFilters.map(async filter => {
-            const eventLogs = await getLogsFromPolyscan(agentRegistryContractAddress, filter, finalAgentId);
+            const eventLogs = await getLogsFromPolyscan(agentRegistryContractAddress, filter, finalBotId);
             logs.push(...eventLogs)
         }))
 

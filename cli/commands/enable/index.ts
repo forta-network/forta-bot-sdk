@@ -2,29 +2,29 @@ import { Wallet } from "ethers"
 import { CommandHandler } from "../.."
 import { assertExists, assertIsNonEmptyString } from "../../utils"
 import { AppendToFile } from "../../utils/append.to.file"
-import AgentRegistry from "../../contracts/agent.registry"
+import BotRegistry from "../../contracts/agent.registry"
 import { GetCredentials } from "../../utils/get.credentials"
 
 export default function provideEnable(
   appendToFile: AppendToFile,
   getCredentials: GetCredentials,
-  agentRegistry: AgentRegistry,
-  agentId: string
+  botRegistry: BotRegistry,
+  botId: string
 ): CommandHandler {
   assertExists(appendToFile, 'appendToFile')
   assertExists(getCredentials, 'getCredentials')
-  assertExists(agentRegistry, 'agentRegistry')
-  assertIsNonEmptyString(agentId, 'agentId')
+  assertExists(botRegistry, 'botRegistry')
+  assertIsNonEmptyString(botId, 'botId')
 
   return async function enable() {
-    const agentExists = await agentRegistry.agentExists(agentId)
+    const agentExists = await botRegistry.agentExists(botId)
     if (!agentExists) {
-      throw new Error(`bot id ${agentId} does not exist`)
+      throw new Error(`bot id ${botId} does not exist`)
     }
 
-    const isAgentEnabled = await agentRegistry.isEnabled(agentId)
+    const isAgentEnabled = await botRegistry.isEnabled(botId)
     if (isAgentEnabled) {
-      console.log(`bot id ${agentId} is already enabled`)
+      console.log(`bot id ${botId} is already enabled`)
       return
     }
 
@@ -32,9 +32,9 @@ export default function provideEnable(
 
     console.log('enabling bot...')
     const fromWallet = new Wallet(privateKey)
-    await agentRegistry.enableAgent(fromWallet, agentId)
+    await botRegistry.enableAgent(fromWallet, botId)
 
-    const logMessage = `successfully enabled bot id ${agentId}`
+    const logMessage = `successfully enabled bot id ${botId}`
     console.log(logMessage)
     appendToFile(`${new Date().toUTCString()}: ${logMessage}`, 'publish.log')
   }

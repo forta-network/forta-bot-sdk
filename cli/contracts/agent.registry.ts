@@ -38,7 +38,7 @@ export const getEventNameFromTopicHash = (topicHash: string): string => {
   return name;
 }
 
-export default class AgentRegistry {
+export default class BotRegistry {
 
   constructor(
     private ethersAgentRegistryProvider: providers.JsonRpcProvider,
