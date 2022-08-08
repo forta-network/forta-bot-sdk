@@ -10,9 +10,9 @@ describe("uploadManifest", () => {
     statSync: jest.fn()
   } as any
   const mockAddToIpfs = jest.fn()
-  const mockAgentName = "agentName"
+  const mockBotName = "botName"
   const mockDescription = "some description"
-  const mockAgentId = "0xagentId"
+  const mockBotId = "0xagentId"
   const mockVersion = "0.1"
   const mockDocumentation = "README.md"
   const mockRepository = "github.com/myrepository"
@@ -28,7 +28,7 @@ describe("uploadManifest", () => {
 
   beforeAll(() => {
     uploadManifest = provideUploadManifest(
-      mockFilesystem, mockAddToIpfs, mockAgentName, mockDescription, mockAgentId, mockVersion, mockDocumentation, mockRepository, mockCliVersion, mockChainIds
+      mockFilesystem, mockAddToIpfs, mockBotName, mockDescription, mockBotId, mockVersion, mockDocumentation, mockRepository, mockCliVersion, mockChainIds
     )
   })
 
@@ -74,10 +74,10 @@ describe("uploadManifest", () => {
     mockAddToIpfs.mockReturnValueOnce(mockDocumentationRef)
     const mockManifest = {
       from: new Wallet(mockPrivateKey).address,
-      name: mockAgentName,
+      name: mockBotName,
       description: mockDescription,
-      agentId: mockAgentName,
-      agentIdHash: mockAgentId,
+      agentId: mockBotName,
+      agentIdHash: mockBotId,
       version: mockVersion,
       timestamp: systemTime.toUTCString(),
       imageReference: mockImageRef,

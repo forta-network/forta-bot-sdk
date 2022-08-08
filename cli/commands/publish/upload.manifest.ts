@@ -10,8 +10,8 @@ type Manifest = {
   from: string,
   name: string,
   description: string,
-  agentId: string,
-  agentIdHash: string,
+  botId: string,
+  botIdHash: string,
   version: string,
   timestamp: string,
   imageReference: string,
@@ -24,9 +24,9 @@ type Manifest = {
 export default function provideUploadManifest(
   filesystem: typeof fs,
   addToIpfs: AddToIpfs,
-  agentName: string,
+  botName: string,
   description: string,
-  agentId: string,
+  botId: string,
   version: string,
   documentation: string,
   repository: string,
@@ -35,9 +35,9 @@ export default function provideUploadManifest(
 ): UploadManifest {
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
-  assertIsNonEmptyString(agentName, 'agentName')
+  assertIsNonEmptyString(botName, 'botName')
   assertIsNonEmptyString(description, 'description')
-  assertIsNonEmptyString(agentId, 'agentId')
+  assertIsNonEmptyString(botId, 'botId')
   assertIsNonEmptyString(version, 'version')
   assertIsNonEmptyString(documentation, 'documentation')
   assertIsNonEmptyString(cliVersion, 'cliVersion')
@@ -58,10 +58,10 @@ export default function provideUploadManifest(
     // create agent manifest
     const manifest: Manifest = {
       from: new Wallet(privateKey).address,
-      name: agentName,
+      name: botName,
       description,
-      agentId: agentName,
-      agentIdHash: agentId,
+      botId: botName,
+      botIdHash: botId,
       version,
       timestamp: new Date().toUTCString(),
       imageReference,

@@ -84,14 +84,7 @@ export default function configureContainer(args: any = {}) {
     cache: asFunction((fortaKeystore: string) => flatCache.load('cli-cache', fortaKeystore)).singleton(),
     sleep: asValue((durationMs: number) => new Promise((resolve) => setTimeout(resolve, durationMs))),
 
-    args: asFunction(() => {
-      // A lot of our code assumes agentId is present. The cli supports --botId and --agentId but 
-      // the code only expects agentId 
-      if(args.botId) {
-        args.agentId = args.botId
-      }
-      return args
-    }).singleton(),
+    args: asValue(args),
 
     contextPath: asValue(args.contextPath || process.cwd()),// the directory containing the agent's package.json
     fortaKeystore: asValue(join(os.homedir(), ".forta")),
@@ -132,11 +125,11 @@ export default function configureContainer(args: any = {}) {
         throw new Error(`unable to parse package.json: ${e.message}`)
       }
     }).singleton(),
-    agentName: asFunction((packageJson: any) => packageJson.name).singleton(),
+    botName: asFunction((packageJson: any) => packageJson.name).singleton(),
     description: asFunction((packageJson: any) => packageJson.description).singleton(),
-    agentId: asFunction((fortaConfig: FortaConfig, agentName: string) => {
+    botId: asFunction((fortaConfig: FortaConfig, botName: string) => {
       // Support both agentId and botId in config file
-      return fortaConfig.botId || fortaConfig.agentId || keccak256(agentName)
+      return fortaConfig.botId || fortaConfig.agentId || keccak256(botName)
     }).singleton(),
     chainIds: asFunction((packageJson: any) => {
       const { chainIds } = packageJson
