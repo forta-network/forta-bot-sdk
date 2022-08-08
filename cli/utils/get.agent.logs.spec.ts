@@ -1,4 +1,4 @@
-import { GetAgentLogs, provideGetAgentLogs } from "./get.agent.logs"
+import { GetBotLogs, provideGetBotLogs } from "./get.agent.logs"
 
 const data = [
     {scanner: "0x0", timestamp: "2022-03-20T13:01:00Z", logs: "I am a scanner"},
@@ -8,8 +8,8 @@ const data = [
     {scanner: "0x4", timestamp: "2022-03-20T12:40:00Z", logs: "Scanner"}
 ]
 
-describe("getAgentLogs", () => {
-  let getAgentLogs: GetAgentLogs
+describe("getBotLogs", () => {
+  let getBotLogs: GetBotLogs
   const mockFortaApiUrl = "https://api.test"
   const mockAxios = {
     get: jest.fn()
@@ -25,13 +25,13 @@ describe("getAgentLogs", () => {
   beforeEach(() => resetMocks())
 
   beforeAll(() => {
-    getAgentLogs = provideGetAgentLogs(mockAxios, mockFortaApiUrl)
+    getBotLogs = provideGetBotLogs(mockAxios, mockFortaApiUrl)
   })
 
   it("throws error when fortaApiUrl is provided", async () => {
     try {
-      const getAgentLogs = provideGetAgentLogs(mockAxios, "")
-      await getAgentLogs(mockAgentId, new Date())
+      const getBotLogs = provideGetBotLogs(mockAxios, "")
+      await getBotLogs(mockAgentId, new Date())
     } catch(e) {
       expect(e.message).toBe(`fortaApiUrl must be non-empty string`)
     }
@@ -45,7 +45,7 @@ describe("getAgentLogs", () => {
       { data: mockAgentsLogs.filter(log => new Date(log.timestamp).toISOString() === moment.toISOString())}
     );
 
-    const logs = await getAgentLogs(mockAgentId, moment);
+    const logs = await getBotLogs(mockAgentId, moment);
     expect(mockAxios.get).toHaveBeenCalledTimes(1);
     expect(logs.length).toBe(1);
   })
@@ -57,7 +57,7 @@ describe("getAgentLogs", () => {
         { data: mockAgentsLogs.filter(log => new Date(log.timestamp).toISOString() === moment.toISOString())}
       )
 
-      const logs = await getAgentLogs(mockAgentId, moment);
+      const logs = await getBotLogs(mockAgentId, moment);
       expect(mockAxios.get).toHaveBeenCalledTimes(1)
       expect(logs.length).toBe(0)
   })
@@ -67,7 +67,7 @@ describe("getAgentLogs", () => {
     const errorMessage = "Failed to make network request"
     try {
       mockAxios.get.mockReturnValueOnce({data: {error: {message: errorMessage}}})
-      await getAgentLogs(mockAgentId, moment);
+      await getBotLogs(mockAgentId, moment);
     } catch (e) {
       expect(mockAxios.get).toHaveBeenCalledTimes(1)
       expect(e.message).toBe(errorMessage)

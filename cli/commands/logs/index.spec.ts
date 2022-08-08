@@ -16,30 +16,30 @@ describe("logs", () => {
     resolve: jest.fn()
   } as any
 
-  const mockGetAgentLogs = jest.fn();
+  const mockGetBotLogs = jest.fn();
 
-  const mockAgentsLogs: any[] = data;
+  const mockBotLogs: any[] = data;
   let consoleSpy = jest.spyOn(console, 'log');
 
-  const mockAgentId = "0x15293"
+  const mockBotId = "0x15293"
 
   const resetMocks = () => {
     mockContainer.resolve.mockReset()
-    mockGetAgentLogs.mockReset()
+    mockGetBotLogs.mockReset()
     consoleSpy.mockReset()
   }
 
   beforeEach(() => resetMocks())
 
   beforeAll(() => {
-    logs = provideLogs(mockAgentId, mockGetAgentLogs, {agentId: mockAgentId})
+    logs = provideLogs(mockBotId, mockGetBotLogs, {agentId: mockBotId})
   })
 
   it("throws error if invalid timestamp provided for --after ", async () => {
     const latestTimestamp = "2022-03-20T12:42:40Z"
     const earliestTimestamp = "2022-03-1912:42"
     try {
-      logs = provideLogs(mockAgentId, mockGetAgentLogs, {agentId: mockAgentId, after: earliestTimestamp, before: latestTimestamp})
+      logs = provideLogs(mockBotId, mockGetBotLogs, {agentId: mockBotId, after: earliestTimestamp, before: latestTimestamp})
       await logs()
     } catch(e) {
       expect(e.message).toBe(`Field name \'after\' has invalid value. ${earliestTimestamp} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mmZ`)
@@ -50,7 +50,7 @@ describe("logs", () => {
     const latestTimestamp = "2022-03-20T12:42"
     const earliestTimestamp = "2022-03-19T12:42:40Z"
     try {
-      logs = provideLogs(mockAgentId, mockGetAgentLogs, {agentId: mockAgentId, after: earliestTimestamp, before: latestTimestamp})
+      logs = provideLogs(mockBotId, mockGetBotLogs, {agentId: mockBotId, after: earliestTimestamp, before: latestTimestamp})
       await logs()
     } catch(e) {
       expect(e.message).toBe(`Field name \'before\' has invalid value. ${latestTimestamp} is not a valid ISO timestamp. The ISO format is: YYYY-MM-DDTHH:mmZ`)
@@ -61,7 +61,7 @@ describe("logs", () => {
     const earliestTimestamp = "2022-03-20T12:42:00.000Z"
     const latestTimestamp = "2022-03-19T12:42:00.000Z"
     try {
-      logs = provideLogs(mockAgentId, mockGetAgentLogs, {agentId: mockAgentId, after: earliestTimestamp, before: latestTimestamp})
+      logs = provideLogs(mockBotId, mockGetBotLogs, {agentId: mockBotId, after: earliestTimestamp, before: latestTimestamp})
       await logs()
     } catch(e) {
       expect(e.message).toBe('Provided date range is invalid')
@@ -73,12 +73,12 @@ describe("logs", () => {
     const earliestTimestamp = "2022-03-20T13:00:00.000Z";
     const latestTimestamp = "2022-03-20T13:04:00.000Z";
 
-    mockGetAgentLogs.mockReturnValueOnce([mockAgentsLogs[0]]).mockReturnValue([])
+    mockGetBotLogs.mockReturnValueOnce([mockBotLogs[0]]).mockReturnValue([])
 
-    logs = provideLogs(mockAgentId, mockGetAgentLogs, {agentId: mockAgentId, after: earliestTimestamp, before: latestTimestamp})
+    logs = provideLogs(mockBotId, mockGetBotLogs, {agentId: mockBotId, after: earliestTimestamp, before: latestTimestamp})
     await logs()
 
-    expect(mockGetAgentLogs).toHaveBeenCalledTimes(5);
+    expect(mockGetBotLogs).toHaveBeenCalledTimes(5);
     expect(consoleSpy).toBeCalledTimes(3)
   })
 
@@ -86,16 +86,16 @@ describe("logs", () => {
     const earliestTimestamp = "2022-03-20T12:34:00.000Z";
     const latestTimestamp = "2022-03-20T13:03:00.000Z";
 
-    mockGetAgentLogs.mockReturnValueOnce([mockAgentsLogs[0]])
-    .mockReturnValueOnce([mockAgentsLogs[1]])
-    .mockReturnValueOnce([mockAgentsLogs[2]])
-    .mockReturnValueOnce([mockAgentsLogs[3]])
-    .mockReturnValueOnce([mockAgentsLogs[4]])
+    mockGetBotLogs.mockReturnValueOnce([mockBotLogs[0]])
+    .mockReturnValueOnce([mockBotLogs[1]])
+    .mockReturnValueOnce([mockBotLogs[2]])
+    .mockReturnValueOnce([mockBotLogs[3]])
+    .mockReturnValueOnce([mockBotLogs[4]])
 
-    logs = provideLogs(mockAgentId, mockGetAgentLogs, {agentId: mockAgentId, after: earliestTimestamp, before: latestTimestamp})
+    logs = provideLogs(mockBotId, mockGetBotLogs, {agentId: mockBotId, after: earliestTimestamp, before: latestTimestamp})
     await logs()
 
-    expect(mockGetAgentLogs).toHaveBeenCalledTimes(30); // 1 call for every minute in range
+    expect(mockGetBotLogs).toHaveBeenCalledTimes(30); // 1 call for every minute in range
     expect(consoleSpy).toBeCalledTimes(15)
   })
 })

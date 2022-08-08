@@ -13,7 +13,7 @@ describe("info", () => {
 
     // Mocks 
     const args = {
-        agentId: "0x1234456"
+        botId: "0x1234456"
     }
 
     const mockEthersBotRegistryProvider = {
@@ -124,7 +124,7 @@ describe("info", () => {
     it("fetches the current state of a deployed bot", async () => {
         await info(testDaysToScan)
 
-        expect(mockBotRegistry.isEnabled).toHaveBeenCalledWith(args.agentId)
+        expect(mockBotRegistry.isEnabled).toHaveBeenCalledWith(args.botId)
     })
 
     it("fetches the most recent ipfs metadata of a deployed bot", async () => {
@@ -139,7 +139,7 @@ describe("info", () => {
         expect(getLogsFromPolyscan).toHaveBeenCalledWith(
             agentRegistryContractAddress,
             expect.anything(),
-            args.agentId,
+            args.botId,
         )
     })
 

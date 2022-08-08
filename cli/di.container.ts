@@ -48,7 +48,7 @@ import provideInitKeystore from './utils/init.keystore'
 import provideInitKeyfile from './utils/init.keyfile'
 import provideInitConfig from './utils/init.config'
 import provideGetLogsForBlock from './utils/get.logs.for.block'
-import { provideGetAgentLogs } from './utils/get.agent.logs'
+import { provideGetBotLogs } from './utils/get.agent.logs'
 import provideLogs from './commands/logs'
 import provideInfo from './commands/info'
 import provideGetFromIpfs from './utils/ipfs/get.from.ipfs'
@@ -196,7 +196,7 @@ export default function configureContainer(args: any = {}) {
     getLogsForBlock: asFunction(provideGetLogsForBlock),
 
     getTraceData: asFunction(provideGetTraceData),
-    getAgentLogs: asFunction(provideGetAgentLogs),
+    getBotLogs: asFunction(provideGetBotLogs),
     fortaApiUrl: asValue('https://api.forta.network'),
     polyscanApiUrl: asValue('https://api.polygonscan.com/api'),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
