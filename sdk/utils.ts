@@ -153,3 +153,15 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
 
   return response.data.data.alerts
 }
+
+export const fetchJwtToken = async (claims: {}) => {
+  const hostname = 'forta-jwt-provider'
+  const port = 8515
+  const path = '/create'
+
+  const data = {claims}
+
+  const response = await axios.post(`http://${hostname}:${port}${path}`, data)
+
+  return response
+}
