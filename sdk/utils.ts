@@ -164,7 +164,7 @@ export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{toke
   if(expiresAt) {
     const expInSec = Math.floor(expiresAt.getTime()/1000);
 
-    // This covers the edge case where someone where a Date that causes a number overflow resulting in a null exp
+    // This covers the edge case where a Date that causes a seconds value to have number overflow resulting in a null exp
     const safeExpInSec = expInSec > Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : expInSec;
 
     fullClaims = {
@@ -172,7 +172,7 @@ export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{toke
       ...fullClaims
     }
   }
-  
+
   const data = {
     claims: fullClaims
   }
