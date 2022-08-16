@@ -153,3 +153,41 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
 
   return response.data.data.alerts
 }
+
+export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{token: string} | null> => {
+  const hostname = 'forta-jwt-provider'
+  const port = 8515
+  const path = '/create'
+
+  let fullClaims = {...claims}
+
+  if(expiresAt) {
+    const expInSec = Math.floor(expiresAt.getTime()/1000);
+
+    // This covers the edge case where a Date that causes a seconds value to have number overflow resulting in a null exp
+    const safeExpInSec = expInSec > Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : expInSec;
+
+    fullClaims = {
+      exp: safeExpInSec,
+      ...fullClaims
+    }
+  }
+
+  const data = {
+    claims: fullClaims
+  }
+
+  try {
+    const response = await axios.post(`http://${hostname}:${port}${path}`, data)
+    return response.data
+  } catch(err) {
+    if((err.message as string).includes("ENOTFOUND forta-jwt-provider")) {
+      throw Error("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node") 
+    }
+    throw err
+  }
+}
+
+export const decodeJwtToken = (token: string) => {
+  return JSON.parse(Buffer.from((token as string).split('.')[1], 'base64').toString())
+}

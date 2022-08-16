@@ -16,7 +16,9 @@ import {
   setPrivateFindings,
   isPrivateFindings,
   getTransactionReceipt,
-  getAlerts
+  getAlerts,
+  fetchJwtToken,
+  decodeJwtToken
 } from "./utils"
 import awilixConfigureContainer from '../cli/di.container';
 
@@ -100,5 +102,7 @@ export {
   isPrivateFindings,
   configureContainer,
   getTransactionReceipt,
-  getAlerts
+  getAlerts,
+  fetchJwtToken,
+  decodeJwtToken
  }
