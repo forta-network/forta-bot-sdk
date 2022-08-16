@@ -6,7 +6,7 @@
   "homepage": "https://forta.org/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/forta-protocol/forta-agent-sdk"
+    "url": "https://github.com/forta-network/forta-agent-sdk"
   },
   "main": "dist/sdk/index.js",
   "types": "dist/sdk/index.d.ts",
