@@ -154,12 +154,28 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
   return response.data.data.alerts
 }
 
-export const fetchJwtToken = async (claims: {}): Promise<{token: string} | null> => {
+export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{token: string} | null> => {
   const hostname = 'forta-jwt-provider'
   const port = 8515
   const path = '/create'
 
-  const data = {claims}
+  let fullClaims = {...claims}
+
+  if(expiresAt) {
+    const expInSec = Math.floor(expiresAt.getTime()/1000);
+
+    // This covers the edge case where someone where a Date that causes a number overflow resulting in a null exp
+    const safeExpInSec = expInSec > Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : expInSec;
+
+    fullClaims = {
+      exp: safeExpInSec,
+      ...fullClaims
+    }
+  }
+  
+  const data = {
+    claims: fullClaims
+  }
 
   try {
     const response = await axios.post(`http://${hostname}:${port}${path}`, data)
