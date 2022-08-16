@@ -154,14 +154,24 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
   return response.data.data.alerts
 }
 
-export const fetchJwtToken = async (claims: {}) => {
+export const fetchJwtToken = async (claims: {}): Promise<{token: string} | null> => {
   const hostname = 'forta-jwt-provider'
   const port = 8515
   const path = '/create'
 
   const data = {claims}
 
-  const response = await axios.post(`http://${hostname}:${port}${path}`, data)
+  try {
+    const response = await axios.post(`http://${hostname}:${port}${path}`, data)
+    return response.data
+  } catch(err) {
+    if((err.message as string).includes("ENOTFOUND forta-jwt-provider")) {
+      throw Error("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node") 
+    }
+    throw err
+  }
+}
 
-  return response
+export const decodeJwtToken = (token: string) => {
+  return JSON.parse(Buffer.from((token as string).split('.')[1], 'base64').toString())
 }
