@@ -3,6 +3,8 @@ import os
 from jsonc_parser.parser import JsoncParser
 import sha3
 import requests
+import datetime
+import jwt
 
 from .forta_graphql import AlertsResponse
 
@@ -127,3 +129,28 @@ def keccak256(val):
     hash = sha3.keccak_256()
     hash.update(bytes(val, encoding='utf-8'))
     return f'0x{hash.hexdigest()}'
+
+def fetch_Jwt_token(claims, expiresAt):
+    host_name = 'forta-jwt-provider'
+    port = 8515
+    path = '/create'
+
+    uri = 'http://{host_name}:{port}{path}'.format(host_name=host_name, port=port, path=path)
+
+    if(isinstance(expiresAt, datetime) == False):
+        raise Exception("expireAt must be of type datetime")
+
+    if(expiresAt is not None):
+        exp_in_sec = expiresAt.timestamp()
+        claims["exp"] = exp_in_sec
+
+    try:
+        response = requests.request("POST", uri, json={'claims': claims})
+        print(response)
+        return response
+
+    except Exception as e:
+        print(e)
+
+def decode_Jwt_token(token):
+    return jwt.decode(token)
