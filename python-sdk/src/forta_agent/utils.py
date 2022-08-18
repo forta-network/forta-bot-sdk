@@ -1,10 +1,10 @@
+import base64
 import sys
 import os
 from jsonc_parser.parser import JsoncParser
 import sha3
 import requests
 import datetime
-import jwt
 
 from .forta_graphql import AlertsResponse
 
@@ -130,14 +130,14 @@ def keccak256(val):
     hash.update(bytes(val, encoding='utf-8'))
     return f'0x{hash.hexdigest()}'
 
-def fetch_Jwt_token(claims, expiresAt):
+def fetch_Jwt_token(claims, expiresAt=None) -> str:
     host_name = 'forta-jwt-provider'
     port = 8515
     path = '/create'
 
     uri = 'http://{host_name}:{port}{path}'.format(host_name=host_name, port=port, path=path)
 
-    if(isinstance(expiresAt, datetime) == False):
+    if( (expiresAt != None) and (isinstance(expiresAt, datetime.datetime) == False)):
         raise Exception("expireAt must be of type datetime")
 
     if(expiresAt is not None):
@@ -146,11 +146,23 @@ def fetch_Jwt_token(claims, expiresAt):
 
     try:
         response = requests.request("POST", uri, json={'claims': claims})
-        print(response)
-        return response
 
-    except Exception as e:
-        print(e)
+        if response.status_code == 200:
+            print("Got response: " + response.json())
+            data = response.json()
+            return data.get('token')
+
+        else:
+            raise Exception("Error occured with response fetching jwt token.")
+
+    except requests.exceptions.RequestException as err:
+        if("Name does not resolve" in str(err)):
+            print("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node")
+            raise err
+        else:
+            raise err
+
 
 def decode_Jwt_token(token):
-    return jwt.decode(token)
+    # Adding need 4 byte for pythons b64decode
+    return base64.b64decode(token.split('.')[1] + '==').decode('utf-8')
