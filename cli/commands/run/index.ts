@@ -15,6 +15,7 @@ export default function provideRun(
   ethersProvider: providers.JsonRpcProvider,
   chainIds: number[],
   jsonRpcUrl: string,
+  isProduction: boolean,
   cache: Cache,
   args: any
 ): CommandHandler {
@@ -27,9 +28,11 @@ export default function provideRun(
   return async function run(runtimeArgs: any = {}) {
     args = { ...args, ...runtimeArgs }
 
-    const network = await ethersProvider.getNetwork();
-
-    if(!network || !chainIds.includes(network.chainId)) console.warn(`Warning: Detected chainId mismatch between ${jsonRpcUrl} [chainId: ${network.chainId}] and package.json [chainIds: ${chainIds}]. \n`)
+    // only check network id during local development
+    if (!isProduction) {
+      const network = await ethersProvider.getNetwork();
+      if(!network || !chainIds.includes(network.chainId)) console.warn(`Warning: Detected chainId mismatch between ${jsonRpcUrl} [chainId: ${network.chainId}] and package.json [chainIds: ${chainIds}]. \n`)
+    }
 
     // we manually inject the run functions here (instead of through the provide function above) so that
     // we get RUNTIME errors if certain configuration is missing for that run function e.g. jsonRpcUrl
