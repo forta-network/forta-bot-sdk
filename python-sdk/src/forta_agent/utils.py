@@ -130,7 +130,7 @@ def keccak256(val):
     hash.update(bytes(val, encoding='utf-8'))
     return f'0x{hash.hexdigest()}'
 
-def fetch_Jwt_token(claims, expiresAt=None) -> str:
+def fetch_jwt_token(claims, expiresAt=None) -> str:
     host_name = 'forta-jwt-provider'
     port = 8515
     path = '/create'
@@ -158,11 +158,10 @@ def fetch_Jwt_token(claims, expiresAt=None) -> str:
     except requests.exceptions.RequestException as err:
         if("Name does not resolve" in str(err)):
             print("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node")
-            raise err
         else:
             raise err
 
 
-def decode_Jwt_token(token):
+def decode_jwt_token(token):
     # Adding need 4 byte for pythons b64decode
     return base64.b64decode(token.split('.')[1] + '==').decode('utf-8')

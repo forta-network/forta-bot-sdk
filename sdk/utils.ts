@@ -182,7 +182,7 @@ export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{toke
     return response.data
   } catch(err) {
     if((err.message as string).includes("ENOTFOUND forta-jwt-provider")) {
-      throw Error("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node") 
+      console.warn("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node") 
     }
     throw err
   }
