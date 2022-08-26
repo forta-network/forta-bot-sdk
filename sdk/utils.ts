@@ -155,6 +155,8 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
 }
 
 export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{token: string} | null> => {
+  if (process.env.NODE_ENV !== 'production') return {token: "MOCK_JWT_TOKEN"}
+
   const hostname = 'forta-jwt-provider'
   const port = 8515
   const path = '/create'
@@ -182,7 +184,7 @@ export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{toke
     return response.data
   } catch(err) {
     if((err.message as string).includes("ENOTFOUND forta-jwt-provider")) {
-      console.warn("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node") 
+      throw Error("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node") 
     }
     throw err
   }
