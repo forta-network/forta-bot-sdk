@@ -10,6 +10,7 @@ import { Log, Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
 import { ethers } from '.'
+import { toUtf8Bytes } from "@ethersproject/strings"
 import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlAlertResponse } from './graphql/forta'
 import axios from 'axios'
 
@@ -188,6 +189,66 @@ export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{toke
   }
 }
 
-export const decodeJwtToken = (token: string) => {
-  return JSON.parse(Buffer.from((token as string).split('.')[1], 'base64').toString())
+interface DecodedJwt {
+  header: any,
+  payload: any
+}
+
+export const decodeJwtToken = (token: string): DecodedJwt => {
+
+  const splitJwt = (token).split('.');
+  const header = JSON.parse(Buffer.from(splitJwt[0], 'base64').toString())
+  const payload = JSON.parse(Buffer.from(splitJwt[1], 'base64').toString())
+
+  return {
+    header,
+    payload
+  }
+}
+
+const DISPTACHER_ARE_THEY_LINKED = "function areTheyLinked(uint256 agentId, uint256 scannerId) external view returns(bool)";
+const DISPATCH_CONTRACT = "0xd46832F3f8EA8bDEFe5316696c0364F01b31a573"; // Source: https://docs.forta.network/en/latest/smart-contracts/
+
+export const verifyJwt = async (token: string): Promise<boolean> => {
+  const splitJwt = (token).split('.')
+  const rawHeader = splitJwt[0]
+  const rawPayload = splitJwt[1]
+
+  const header = JSON.parse(Buffer.from(rawHeader, 'base64').toString())
+  const payload = JSON.parse(Buffer.from(rawPayload, 'base64').toString())
+
+  const botId = payload["bot-id"] as string
+  const algorithm = header?.alg;
+
+  if(algorithm !== "ETH") {
+    console.warn(`Unexpected signing method: ${algorithm}`)
+    return false
+  }
+
+  if(!botId) {
+    console.warn(`Invalid claim`)
+    return false
+  }
+
+  const publicKey = payload?.sub as string | undefined // public key should be contract address that signed the JWT
+
+  if(!publicKey) {
+    console.warn(`Invalid claim`)
+    return false
+  }
+
+  const digest = ethers.utils.keccak256(toUtf8Bytes(`${rawHeader}.${rawPayload}`))
+  const signature = `0x${ Buffer.from(splitJwt[2], 'base64').toString('hex')}`
+
+  const signerAddress = ethers.utils.recoverAddress(digest, signature) // Contract address that signed message
+
+  if(signerAddress !== publicKey) {
+    console.warn(`Signature invalid: expected=${publicKey}, got=${signerAddress}`)
+    return false
+  }
+
+  const dispatchContract = new ethers.Contract(DISPATCH_CONTRACT, [DISPTACHER_ARE_THEY_LINKED], getEthersProvider())
+  const areTheyLinked = await dispatchContract.areTheyLinked(botId, signerAddress)
+  
+  return areTheyLinked
 }

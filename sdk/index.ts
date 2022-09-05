@@ -18,7 +18,8 @@ import {
   getTransactionReceipt,
   getAlerts,
   fetchJwtToken,
-  decodeJwtToken
+  decodeJwtToken,
+  verifyJwt
 } from "./utils"
 import awilixConfigureContainer from '../cli/di.container';
 
@@ -104,5 +105,6 @@ export {
   getTransactionReceipt,
   getAlerts,
   fetchJwtToken,
-  decodeJwtToken
+  decodeJwtToken,
+  verifyJwt
  }
