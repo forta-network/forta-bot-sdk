@@ -22,6 +22,10 @@ export const getEthersBatchProvider = () => {
   return new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl())
 }
 
+const getPolygonProvider = () => {
+  return new ethers.providers.JsonRpcProvider('https://polygon-rpc.com')
+}
+
 const getFortaConfig: () => FortaConfig = () => {
   let config = {}
   // try to read from global config
@@ -230,9 +234,9 @@ export const verifyJwt = async (token: string): Promise<boolean> => {
     return false
   }
 
-  const publicKey = payload?.sub as string | undefined // public key should be contract address that signed the JWT
+  const signerAddress = payload?.sub as string | undefined // public key should be contract address that signed the JWT
 
-  if(!publicKey) {
+  if(!signerAddress) {
     console.warn(`Invalid claim`)
     return false
   }
@@ -240,15 +244,15 @@ export const verifyJwt = async (token: string): Promise<boolean> => {
   const digest = ethers.utils.keccak256(toUtf8Bytes(`${rawHeader}.${rawPayload}`))
   const signature = `0x${ Buffer.from(splitJwt[2], 'base64').toString('hex')}`
 
-  const signerAddress = ethers.utils.recoverAddress(digest, signature) // Contract address that signed message
+  const recoveredSignerAddress = ethers.utils.recoverAddress(digest, signature) // Contract address that signed message
 
-  if(signerAddress !== publicKey) {
-    console.warn(`Signature invalid: expected=${publicKey}, got=${signerAddress}`)
+  if(recoveredSignerAddress !== signerAddress) {
+    console.warn(`Signature invalid: expected=${signerAddress}, got=${recoveredSignerAddress}`)
     return false
   }
 
-  const dispatchContract = new ethers.Contract(DISPATCH_CONTRACT, [DISPTACHER_ARE_THEY_LINKED], getEthersProvider())
-  const areTheyLinked = await dispatchContract.areTheyLinked(botId, signerAddress)
+  const dispatchContract = new ethers.Contract(DISPATCH_CONTRACT, [DISPTACHER_ARE_THEY_LINKED], getPolygonProvider())
+  const areTheyLinked = await dispatchContract.areTheyLinked(botId, recoveredSignerAddress)
   
   return areTheyLinked
 }
