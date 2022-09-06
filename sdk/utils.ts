@@ -159,7 +159,7 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
   return response.data.data.alerts
 }
 
-export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{token: string} | null> => {
+export const fetchJwt = async (claims: {}, expiresAt?: Date): Promise<{token: string} | null> => {
   const hostname = 'forta-jwt-provider'
   const port = 8515
   const path = '/create'
@@ -198,7 +198,7 @@ interface DecodedJwt {
   payload: any
 }
 
-export const decodeJwtToken = (token: string): DecodedJwt => {
+export const decodeJwt = (token: string): DecodedJwt => {
 
   const splitJwt = (token).split('.');
   const header = JSON.parse(Buffer.from(splitJwt[0], 'base64').toString())

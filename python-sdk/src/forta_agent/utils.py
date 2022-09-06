@@ -130,7 +130,7 @@ def keccak256(val):
     hash.update(bytes(val, encoding='utf-8'))
     return f'0x{hash.hexdigest()}'
 
-def fetch_Jwt_token(claims, expiresAt=None) -> str:
+def fetch_Jwt(claims, expiresAt=None) -> str:
     host_name = 'forta-jwt-provider'
     port = 8515
     path = '/create'
@@ -163,6 +163,6 @@ def fetch_Jwt_token(claims, expiresAt=None) -> str:
             raise err
 
 
-def decode_Jwt_token(token):
+def decode_Jwt(token):
     # Adding need 4 byte for pythons b64decode
     return base64.b64decode(token.split('.')[1] + '==').decode('utf-8')
