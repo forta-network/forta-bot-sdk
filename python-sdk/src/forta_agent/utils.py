@@ -190,7 +190,7 @@ def verify_jwt(token: str, polygonUrl: str ='https://polygon-rpc.com') -> bool:
         logging.warning('Unexpected signing method: {alg}'.format(alg=alg))
         return False
 
-    currentUnixTime = time.mktime(datetime.utcnow().utctimetuple())
+    currentUnixTime = time.mktime(datetime.datetime.utcnow().utctimetuple())
 
     if expiresAt < currentUnixTime:
         logging.warning('Jwt expired')
@@ -212,6 +212,7 @@ def verify_jwt(token: str, polygonUrl: str ='https://polygon-rpc.com') -> bool:
     areTheyLinked = contract.functions.areTheyLinked(int(botId,0), int(recoveredSignerAddress,0)).call()
     
     return areTheyLinked
+
 class DecodedJwt:
     def __init__(self, dict):
         self.header = dict.get('header')
