@@ -10,6 +10,7 @@ import { Log, Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
 import { ethers } from '.'
+import { toUtf8Bytes } from "@ethersproject/strings"
 import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlAlertResponse } from './graphql/forta'
 import axios from 'axios'
 
@@ -154,7 +155,7 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
   return response.data.data.alerts
 }
 
-export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{token: string} | null> => {
+export const fetchJwt = async (claims: {}, expiresAt?: Date): Promise<{token: string} | null> => {
   const hostname = 'forta-jwt-provider'
   const port = 8515
   const path = '/create'
@@ -188,6 +189,76 @@ export const fetchJwtToken = async (claims: {}, expiresAt?: Date): Promise<{toke
   }
 }
 
-export const decodeJwtToken = (token: string) => {
-  return JSON.parse(Buffer.from((token as string).split('.')[1], 'base64').toString())
+interface DecodedJwt {
+  header: any,
+  payload: any
+}
+
+export const decodeJwt = (token: string): DecodedJwt => {
+
+  const splitJwt = (token).split('.');
+  const header = JSON.parse(Buffer.from(splitJwt[0], 'base64').toString())
+  const payload = JSON.parse(Buffer.from(splitJwt[1], 'base64').toString())
+
+  return {
+    header,
+    payload
+  }
+}
+
+const DISPTACHER_ARE_THEY_LINKED = "function areTheyLinked(uint256 agentId, uint256 scannerId) external view returns(bool)";
+const DISPATCH_CONTRACT = "0xd46832F3f8EA8bDEFe5316696c0364F01b31a573"; // Source: https://docs.forta.network/en/latest/smart-contracts/
+
+export const verifyJwt = async (token: string, polygonRpcUrl: string = "https://polygon-rpc.com"): Promise<boolean> => {
+  const splitJwt = (token).split('.')
+  const rawHeader = splitJwt[0]
+  const rawPayload = splitJwt[1]
+
+  const header = JSON.parse(Buffer.from(rawHeader, 'base64').toString())
+  const payload = JSON.parse(Buffer.from(rawPayload, 'base64').toString())
+
+  const botId = payload["bot-id"] as string
+  const expiresAt = payload["exp"] as number
+  const algorithm = header?.alg;
+
+  if(algorithm !== "ETH") {
+    console.warn(`Unexpected signing method: ${algorithm}`)
+    return false
+  }
+
+  if(!botId) {
+    console.warn(`Invalid claim`)
+    return false
+  }
+
+  const signerAddress = payload?.sub as string | undefined // public key should be contract address that signed the JWT
+
+  if(!signerAddress) {
+    console.warn(`Invalid claim`)
+    return false
+  }
+
+  const currentUnixTime = Math.floor((Date.now() / 1000))
+
+  if(expiresAt < currentUnixTime) {
+    console.warn(`Jwt is expired`)
+    return false
+  }
+
+  const digest = ethers.utils.keccak256(toUtf8Bytes(`${rawHeader}.${rawPayload}`))
+  const signature = `0x${ Buffer.from(splitJwt[2], 'base64').toString('hex')}`
+
+  const recoveredSignerAddress = ethers.utils.recoverAddress(digest, signature) // Contract address that signed message
+
+  if(recoveredSignerAddress !== signerAddress) {
+    console.warn(`Signature invalid: expected=${signerAddress}, got=${recoveredSignerAddress}`)
+    return false
+  }
+
+  const polygonProvider = new ethers.providers.JsonRpcProvider(polygonRpcUrl)
+
+  const dispatchContract = new ethers.Contract(DISPATCH_CONTRACT, [DISPTACHER_ARE_THEY_LINKED], polygonProvider)
+  const areTheyLinked = await dispatchContract.areTheyLinked(botId, recoveredSignerAddress)
+  
+  return areTheyLinked
 }
