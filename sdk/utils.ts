@@ -22,10 +22,6 @@ export const getEthersBatchProvider = () => {
   return new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl())
 }
 
-const getPolygonProvider = () => {
-  return new ethers.providers.JsonRpcProvider('https://polygon-rpc.com')
-}
-
 const getFortaConfig: () => FortaConfig = () => {
   let config = {}
   // try to read from global config
@@ -213,7 +209,7 @@ export const decodeJwt = (token: string): DecodedJwt => {
 const DISPTACHER_ARE_THEY_LINKED = "function areTheyLinked(uint256 agentId, uint256 scannerId) external view returns(bool)";
 const DISPATCH_CONTRACT = "0xd46832F3f8EA8bDEFe5316696c0364F01b31a573"; // Source: https://docs.forta.network/en/latest/smart-contracts/
 
-export const verifyJwt = async (token: string): Promise<boolean> => {
+export const verifyJwt = async (token: string, polygonRpcUrl: string = "https://polygon-rpc.com"): Promise<boolean> => {
   const splitJwt = (token).split('.')
   const rawHeader = splitJwt[0]
   const rawPayload = splitJwt[1]
@@ -222,6 +218,7 @@ export const verifyJwt = async (token: string): Promise<boolean> => {
   const payload = JSON.parse(Buffer.from(rawPayload, 'base64').toString())
 
   const botId = payload["bot-id"] as string
+  const expiresAt = payload["exp"] as number
   const algorithm = header?.alg;
 
   if(algorithm !== "ETH") {
@@ -241,6 +238,13 @@ export const verifyJwt = async (token: string): Promise<boolean> => {
     return false
   }
 
+  const currentUnixTime = Math.floor((Date.now() / 1000))
+
+  if(expiresAt < currentUnixTime) {
+    console.warn(`Jwt is expired`)
+    return false
+  }
+
   const digest = ethers.utils.keccak256(toUtf8Bytes(`${rawHeader}.${rawPayload}`))
   const signature = `0x${ Buffer.from(splitJwt[2], 'base64').toString('hex')}`
 
@@ -251,7 +255,9 @@ export const verifyJwt = async (token: string): Promise<boolean> => {
     return false
   }
 
-  const dispatchContract = new ethers.Contract(DISPATCH_CONTRACT, [DISPTACHER_ARE_THEY_LINKED], getPolygonProvider())
+  const polygonProvider = new ethers.providers.JsonRpcProvider(polygonRpcUrl)
+
+  const dispatchContract = new ethers.Contract(DISPATCH_CONTRACT, [DISPTACHER_ARE_THEY_LINKED], polygonProvider)
   const areTheyLinked = await dispatchContract.areTheyLinked(botId, recoveredSignerAddress)
   
   return areTheyLinked
