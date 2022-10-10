@@ -155,7 +155,6 @@ def fetch_jwt(claims, expiresAt=None) -> str:
         response = requests.request("POST", uri, json={'claims': claims})
 
         if response.status_code == 200:
-            print("Got response: " + response.json())
             data = response.json()
             return data.get('token')
 
