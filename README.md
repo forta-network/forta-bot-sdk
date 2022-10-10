@@ -10,10 +10,13 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.10
+### 0.1.11
+- Bug fix to the `fetch_jwt` method in the Python sdk
+
+### [0.1.10](https://github.com/forta-network/forta-bot-sdk/commit/debe98ba192fe500dd2259d03a511e40054abb04)
 
 - Added new methods `fetchJwt`, `decodeJwt` and `verifyJwt` to Typescript sdk for generating and verifying a jwt token from a scan node
-- Added new method `fetch_Jwt`, `decode_Jwt`, and `verify_jwt` to Python sdk for generating and verifying a jwt token from a scan node
+- Added new method `fetch_jwt`, `decode_jwt`, and `verify_jwt` to Python sdk for generating and verifying a jwt token from a scan node
 - Limit size of findings returned from handleBlock and handleTransaction callbacks
 
 ### [0.1.9](https://github.com/forta-network/forta-bot-sdk/commit/d650c748f78d328c548d382c05e44551aeb62fb3)
