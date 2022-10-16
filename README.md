@@ -10,7 +10,12 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.11
+### 0.1.12
+
+- Remove `sha3` dependency from Python SDK
+
+### [0.1.11](https://github.com/forta-network/forta-bot-sdk/commit/57d625b1f6cafc6a5cdcd19b38d3395aac31ff60)
+
 - Bug fix to the `fetch_jwt` method in the Python sdk
 
 ### [0.1.10](https://github.com/forta-network/forta-bot-sdk/commit/debe98ba192fe500dd2259d03a511e40054abb04)
@@ -25,7 +30,6 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 - Added new method `getAlerts` to Typescript sdk to that fetches alerts using forta's alert graphql api
 - Added new method `get_alerts` to Python sdk to that fetches alerts using forta's alert graphql api
 - Fixing docker build issue
-
 
 ### [0.1.8](https://github.com/forta-network/forta-bot-sdk/commit/9740a8ad0acdcd112d8bd6ba72f191e0b67602cd)
 
