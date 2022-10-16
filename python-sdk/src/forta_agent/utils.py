@@ -2,7 +2,6 @@ import base64
 import sys
 import os
 from jsonc_parser.parser import JsoncParser
-import sha3
 import requests
 import datetime
 import time
@@ -133,9 +132,7 @@ def hex_to_int(strVal):
 
 
 def keccak256(val):
-    hash = sha3.keccak_256()
-    hash.update(bytes(val, encoding='utf-8'))
-    return f'0x{hash.hexdigest()}'
+    return Web3.keccak(text=val).hex()
 
 def fetch_jwt(claims, expiresAt=None) -> str:
     host_name = 'forta-jwt-provider'
