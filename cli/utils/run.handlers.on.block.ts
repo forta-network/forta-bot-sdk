@@ -1,4 +1,4 @@
-import { Trace } from "../../sdk";
+import { Finding, Trace } from "../../sdk";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetTraceData } from "./get.trace.data";
 import { assertExists, assertFindings, CreateBlockEvent, CreateTransactionEvent } from ".";
@@ -7,7 +7,7 @@ import { GetBlockWithTransactions } from "./get.block.with.transactions";
 import { JsonRpcLog } from "./get.transaction.receipt";
 import { GetLogsForBlock } from "./get.logs.for.block";
 
-export type RunHandlersOnBlock = (blockHashOrNumber: string | number) => Promise<void>
+export type RunHandlersOnBlock = (blockHashOrNumber: string | number) => Promise<Finding[]>
 
 export function provideRunHandlersOnBlock(
   getAgentHandlers: GetAgentHandlers,
@@ -38,17 +38,20 @@ export function provideRunHandlersOnBlock(
       getBlockWithTransactions(blockHashOrNumber)
     ]) 
 
+    let blockFindings: Finding[] = []
+    let txFindings: Finding[] = []
+    
     // run block handler
     if (handleBlock) {
       const blockEvent = createBlockEvent(block, networkId)
-      const findings = await handleBlock(blockEvent)
+      blockFindings = await handleBlock(blockEvent)
 
-      assertFindings(findings)
+      assertFindings(blockFindings)
       
-      console.log(`${findings.length} findings for block ${block.hash} ${findings}`)
+      console.log(`${blockFindings.length} findings for block ${block.hash} ${blockFindings}`)
     }
 
-    if (!handleTransaction) return
+    if (!handleTransaction) return blockFindings
     
     const blockNumber = parseInt(block.number)
     const [logs, traces] = await Promise.all([
@@ -78,12 +81,14 @@ export function provideRunHandlersOnBlock(
     for (const transaction of block.transactions) {
       const txHash = transaction.hash.toLowerCase()
       const txEvent = createTransactionEvent(transaction, block, networkId, traceMap[txHash], logMap[txHash])
-      const findings = await handleTransaction(txEvent)
+      txFindings = await handleTransaction(txEvent)
 
-      assertFindings(findings)
+      assertFindings(txFindings)
 
-      console.log(`${findings.length} findings for transaction ${transaction.hash} ${findings}`)
+      console.log(`${txFindings.length} findings for transaction ${transaction.hash} ${txFindings}`)
     }
+
+    return blockFindings.concat(txFindings)
   }
 }
 

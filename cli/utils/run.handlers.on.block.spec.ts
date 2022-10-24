@@ -43,8 +43,10 @@ describe("runHandlersOnBlock", () => {
   })
 
   it("invokes block handlers with block event and transaction handlers with transaction event for each transaction in block", async () => {
-    const mockHandleBlock = jest.fn().mockReturnValue([])
-    const mockHandleTransaction = jest.fn().mockReturnValue([])
+    const blockFindings = getFindingsArray(1, 1)
+    const txFindings = getFindingsArray(1, 1)
+    const mockHandleBlock = jest.fn().mockReturnValue(blockFindings)
+    const mockHandleTransaction = jest.fn().mockReturnValue(txFindings)
     mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
     const mockNetworkId = 1
     mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
@@ -60,8 +62,9 @@ describe("runHandlersOnBlock", () => {
     const mockTxEvent = {}
     mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
 
-    await runHandlersOnBlock(mockBlockHash)
+    const findings = await runHandlersOnBlock(mockBlockHash)
 
+    expect(findings).toStrictEqual(blockFindings.concat(txFindings))
     expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
     expect(mockGetAgentHandlers).toHaveBeenCalledWith()
     expect(mockGetNetworkId).toHaveBeenCalledTimes(1)

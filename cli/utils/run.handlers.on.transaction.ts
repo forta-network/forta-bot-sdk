@@ -1,11 +1,12 @@
 import { assertExists, assertFindings, CreateTransactionEvent } from ".";
+import { Finding } from "../../sdk";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetBlockWithTransactions } from "./get.block.with.transactions";
 import { GetNetworkId } from "./get.network.id";
 import { GetTraceData } from "./get.trace.data";
 import { GetTransactionReceipt } from "./get.transaction.receipt";
 
-export type RunHandlersOnTransaction = (txHash: string) => Promise<void>
+export type RunHandlersOnTransaction = (txHash: string) => Promise<Finding[]>
 
 export function provideRunHandlersOnTransaction(
   getAgentHandlers: GetAgentHandlers,
@@ -43,5 +44,7 @@ export function provideRunHandlersOnTransaction(
     assertFindings(findings)
 
     console.log(`${findings.length} findings for transaction ${txHash} ${findings}`)
+
+    return findings
   }
 }
