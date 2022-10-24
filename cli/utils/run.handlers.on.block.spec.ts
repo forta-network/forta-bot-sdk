@@ -51,7 +51,7 @@ describe("runHandlersOnBlock", () => {
     const mockNetworkId = 1
     mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
     const mockTransaction = { hash: mockTxHash }
-    const mockBlock = { hash: mockBlockHash, number: 7, transactions: [mockTransaction] }
+    const mockBlock = { hash: mockBlockHash, number: 7, transactions: [mockTransaction, mockTransaction] }
     mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
     const mockBlockEvent = {}
     mockCreateBlockEvent.mockReturnValueOnce(mockBlockEvent)
@@ -64,7 +64,7 @@ describe("runHandlersOnBlock", () => {
 
     const findings = await runHandlersOnBlock(mockBlockHash)
 
-    expect(findings).toStrictEqual(blockFindings.concat(txFindings))
+    expect(findings).toStrictEqual(blockFindings.concat(txFindings).concat(txFindings))
     expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
     expect(mockGetAgentHandlers).toHaveBeenCalledWith()
     expect(mockGetNetworkId).toHaveBeenCalledTimes(1)
@@ -79,9 +79,9 @@ describe("runHandlersOnBlock", () => {
     expect(mockGetLogsForBlock).toHaveBeenCalledWith(mockBlock.number)
     expect(mockGetTraceData).toHaveBeenCalledTimes(1)
     expect(mockGetTraceData).toHaveBeenCalledWith(mockBlock.number)
-    expect(mockCreateTransactionEvent).toHaveBeenCalledTimes(1)
+    expect(mockCreateTransactionEvent).toHaveBeenCalledTimes(2)
     expect(mockCreateTransactionEvent).toHaveBeenCalledWith(mockTransaction, mockBlock, mockNetworkId, [mockTrace], [mockLog])
-    expect(mockHandleTransaction).toHaveBeenCalledTimes(1)
+    expect(mockHandleTransaction).toHaveBeenCalledTimes(2)
     expect(mockHandleTransaction).toHaveBeenCalledWith(mockTxEvent)
   })
 

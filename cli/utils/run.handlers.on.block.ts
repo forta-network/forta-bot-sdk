@@ -81,11 +81,12 @@ export function provideRunHandlersOnBlock(
     for (const transaction of block.transactions) {
       const txHash = transaction.hash.toLowerCase()
       const txEvent = createTransactionEvent(transaction, block, networkId, traceMap[txHash], logMap[txHash])
-      txFindings = await handleTransaction(txEvent)
+      const findings = await handleTransaction(txEvent)
+      txFindings.push(...findings)
 
-      assertFindings(txFindings)
+      assertFindings(findings)
 
-      console.log(`${txFindings.length} findings for transaction ${transaction.hash} ${txFindings}`)
+      console.log(`${findings.length} findings for transaction ${transaction.hash} ${findings}`)
     }
 
     return blockFindings.concat(txFindings)
