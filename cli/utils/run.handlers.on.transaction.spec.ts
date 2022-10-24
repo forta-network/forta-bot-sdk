@@ -39,7 +39,8 @@ describe("runHandlersOnTransaction", () => {
   })
 
   it("invokes transaction handler with transaction event", async () => {
-    const mockHandleTransaction = jest.fn().mockReturnValue([])
+    const txFindings = getFindingsArray(1, 1)
+    const mockHandleTransaction = jest.fn().mockReturnValue(txFindings)
     mockGetAgentHandlers.mockReturnValueOnce({ handleTransaction: mockHandleTransaction })
     const mockNetworkId = 1
     mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
@@ -54,8 +55,9 @@ describe("runHandlersOnTransaction", () => {
     const mockTxEvent = {}
     mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
 
-    await runHandlersOnTransaction(mockTxHash)
+    const findings = await runHandlersOnTransaction(mockTxHash)
 
+    expect(findings).toStrictEqual(txFindings)
     expect(mockGetAgentHandlers).toHaveBeenCalledTimes(1)
     expect(mockGetAgentHandlers).toHaveBeenCalledWith()
     expect(mockGetNetworkId).toHaveBeenCalledTimes(1)
