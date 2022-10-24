@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.12
+### 0.1.13
+
+- Return findings from `runHandlersOnBlock` and `runHandlersOnTransaction` methods
+
+### [0.1.12](https://github.com/forta-network/forta-bot-sdk/commit/9e8efd9d218ff848b2de47cd8a1c5030e255b077)
 
 - Remove `sha3` dependency from Python SDK
 
