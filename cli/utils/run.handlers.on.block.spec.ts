@@ -45,9 +45,11 @@ describe("runHandlersOnBlock", () => {
   it("invokes block handlers with block event and transaction handlers with transaction event for each transaction in block", async () => {
     const blockFindings = getFindingsArray(1, 1)
     const txFindings = getFindingsArray(1, 1)
+    const alertFindings = getFindingsArray(1, 1)
     const mockHandleBlock = jest.fn().mockReturnValue(blockFindings)
     const mockHandleTransaction = jest.fn().mockReturnValue(txFindings)
-    mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
+    const mockHandleAlert = jest.fn().mockReturnValue(alertFindings)
+    mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction, handleAlert: mockHandleAlert })
     const mockNetworkId = 1
     mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
     const mockTransaction = { hash: mockTxHash }

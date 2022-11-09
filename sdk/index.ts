@@ -1,7 +1,9 @@
 import { ethers } from "ethers"
 import { Finding, FindingSeverity, FindingType } from "./finding"
 import { BlockEvent } from "./block.event"
+import {AlertEvent} from "./alert.event";
 import { Block } from "./block"
+import { Alert } from "./alert"
 import { TransactionEvent, TxEventBlock, LogDescription } from "./transaction.event"
 import { Log, Receipt } from "./receipt"
 import { Trace, TraceAction, TraceResult } from "./trace"
@@ -52,6 +54,7 @@ interface FortaConfig {
 type Initialize = () => Promise<void>
 type HandleTransaction = (txEvent: TransactionEvent) => Promise<Finding[]>
 type HandleBlock = (blockEvent: BlockEvent) => Promise<Finding[]>
+type HandleAlert = (alertEvent: AlertEvent) => Promise<Finding[]>
 
 enum EventType {
   BLOCK = 0,
@@ -76,12 +79,15 @@ export {
   Initialize,
   HandleTransaction,
   HandleBlock,
+  HandleAlert,
   Finding,
   FindingSeverity,
   FindingType,
   BlockEvent,
   TransactionEvent,
+  AlertEvent,
   TxEventBlock,
+  Alert,
   Block,
   Transaction,
   Receipt,

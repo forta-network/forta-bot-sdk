@@ -2,6 +2,7 @@ const {
   BlockEvent,
   TransactionEvent,
   isPrivateFindings,
+  AlertEvent,
 } = require("../../../../sdk");
 const { assertExists, formatAddress, assertFindings } = require("../../../utils");
 
@@ -87,12 +88,46 @@ module.exports = class AgentController {
     });
   }
 
+  async EvaluateAlert(call, callback) {
+    const findings = [];
+    let status = "SUCCESS";
+
+    if (this.handleAlert) {
+      try {
+        const alertEvent = this.createAlertEventFromGrpcRequest(call.request);
+        const returnedFindings = await this.handleAlert(alertEvent);
+
+        assertFindings(returnedFindings)
+
+        findings.push(...returnedFindings);
+      } catch (e) {
+        console.log(
+            `${new Date().toISOString()}    evaluateAlert ${
+                call.request.hash
+            }`
+        );
+        console.log(e);
+        status = "ERROR";
+      }
+    }
+
+    callback(null, {
+      status,
+      findings,
+      metadata: {
+        timestamp: new Date().toISOString(),
+      },
+      private: isPrivateFindings(),
+    });
+  }
+
   async initializeAgentHandlers() {
     try {
       // getAgentHandlers will also call any initialize handler
       const agentHandlers = await this.getAgentHandlers();
       this.handleBlock = agentHandlers.handleBlock;
       this.handleTransaction = agentHandlers.handleTransaction;
+      this.handleAlert = agentHandlers.handleAlert;
     } catch (e) {
       console.log(e);
     }
@@ -125,6 +160,12 @@ module.exports = class AgentController {
     };
 
     return new BlockEvent(type, parseInt(network.chainId), blok);
+  }
+
+  createAlertEventFromGrpcRequest(request) {
+    const { alert } = request.event;
+
+    return new AlertEvent(alert);
   }
 
   createTransactionEventFromGrpcRequest(request) {

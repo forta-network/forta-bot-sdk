@@ -3,6 +3,7 @@ import {
   Finding,
   HandleBlock,
   HandleTransaction,
+  HandleAlert,
   TransactionEvent,
   FindingSeverity,
   FindingType,
