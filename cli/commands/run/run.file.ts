@@ -12,13 +12,13 @@ export function provideRunFile(
   assertExists(getJsonFile, 'getJsonFile')
 
   return async function runFile(filePath: string) {
-    const { handleBlock, handleTransaction } = await getAgentHandlers()
-    if (!handleBlock && !handleTransaction) {
-      throw new Error("no block/transaction handler found")
+    const { handleBlock, handleTransaction, handleAlert } = await getAgentHandlers()
+    if (!handleBlock && !handleTransaction && !handleAlert) {
+      throw new Error("no block/transaction/alert handler found")
     }
     
     console.log('parsing file data...')
-    const { transactionEvents, blockEvents } = getJsonFile(filePath)
+    const { transactionEvents, blockEvents, alertEvents } = getJsonFile(filePath)
 
     if (handleBlock && blockEvents?.length) {
       console.log('running block events...')
