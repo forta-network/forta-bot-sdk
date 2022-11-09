@@ -9,6 +9,7 @@ import {
   HandleAlert,
   HandleBlock,
   HandleTransaction,
+  AlertEvent,
   TransactionEvent
 } from "../../sdk"
 import { assertIsNonEmptyString } from '.'
@@ -21,6 +22,7 @@ const FINDING_MARKER = "!*forta_finding*!:"
 const INITIALIZE_METHOD_NAME = "initialize"
 const HANDLE_TRANSACTION_METHOD_NAME = 'handle_transaction'
 const HANDLE_BLOCK_METHOD_NAME = 'handle_block'
+const HANDLE_ALERT_METHOD_NAME = 'handle_alert'
 
 export function provideGetPythonAgentHandlers(
   contextPath: string
@@ -29,14 +31,15 @@ export function provideGetPythonAgentHandlers(
 
   return async function getPythonAgentHandlers(pythonAgentPath: string) {
     // determine whether this agent has block/transaction handlers
-    const { hasInitializeHandler, hasBlockHandler, hasTransactionHandler } = hasHandlers(pythonAgentPath)
-    if (!hasBlockHandler && !hasTransactionHandler) throw new Error(`no handlers found in ${pythonAgentPath}`)
+    const { hasInitializeHandler, hasBlockHandler, hasTransactionHandler, hasAlertHandler } = hasHandlers(pythonAgentPath)
+    if (!hasBlockHandler && !hasTransactionHandler && !hasAlertHandler) throw new Error(`no handlers found in ${pythonAgentPath}`)
 
     const pythonHandler = getPythonHandler(pythonAgentPath, contextPath)
     return {
       initialize: hasInitializeHandler ? pythonHandler : undefined,
       handleBlock: hasBlockHandler ? pythonHandler : undefined,
-      handleTransaction: hasTransactionHandler ? pythonHandler : undefined
+      handleTransaction: hasTransactionHandler ? pythonHandler : undefined,
+      handleAlert: hasAlertHandler ? pythonHandler : undefined
     }
   }
 }
@@ -46,6 +49,8 @@ function hasHandlers(agentPath: string) {
   let hasTransactionHandler = false
   let hasBlockHandler = false
   let hasInitializeHandler = false
+  let hasAlertHandler = false
+
   let line
   while (line = lineReader.next()) {
     line = line.toString('ascii')
@@ -55,9 +60,11 @@ function hasHandlers(agentPath: string) {
       hasBlockHandler = true
     } else if (line.startsWith(`def ${INITIALIZE_METHOD_NAME}`)) {
       hasInitializeHandler = true
+    } else if (line.startsWith(`def ${HANDLE_ALERT_METHOD_NAME}`)) {
+      hasAlertHandler = true
     }
   }
-  return { hasTransactionHandler, hasBlockHandler, hasInitializeHandler }
+  return { hasTransactionHandler, hasBlockHandler, hasInitializeHandler, hasAlertHandler }
 }
 
 function getPythonHandler(agentPath: string, contextPath: string) {
@@ -89,6 +96,11 @@ while True:
       hash = msgJson['hash']
       event = BlockEvent(msgJson)
       findings = ${agentModule}.${HANDLE_BLOCK_METHOD_NAME}(event)
+      print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
+    elif msgType == '${HANDLE_ALERT_METHOD_NAME}':
+      hash = msgJson['hash']
+      event = AlertEvent(msgJson)
+      findings = ${agentModule}.${HANDLE_ALERT_METHOD_NAME}(event)
       print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
   except Exception as e:
     print(e, file=sys.stderr)
@@ -132,7 +144,7 @@ while True:
       }
     })
 
-  return function handler(event: TransactionEvent | BlockEvent | undefined) {
+  return function handler(event: TransactionEvent | AlertEvent | BlockEvent | undefined) {
     return new Promise((resolve, reject) => {
       let msgType, hash
       if (!event) {
@@ -141,6 +153,9 @@ while True:
       } else if (event instanceof BlockEvent) {
         msgType = HANDLE_BLOCK_METHOD_NAME
         hash = event.blockHash
+      } else if (event instanceof AlertEvent) {
+        msgType = HANDLE_ALERT_METHOD_NAME
+        hash = event.alert.hash
       } else {
         msgType = HANDLE_TRANSACTION_METHOD_NAME
         hash = event.hash
