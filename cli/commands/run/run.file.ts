@@ -35,5 +35,13 @@ export function provideRunFile(
         console.log(`${findings.length} findings for transaction ${transactionEvent.transaction.hash} ${findings}`)
       }
     }
+
+    if (handleAlert && alertEvents?.length) {
+      console.log('running alert events...')
+      for (const alertEvent of alertEvents) {
+        const findings = await handleAlert(alertEvent)
+        console.log(`${findings.length} findings for alert ${alertEvent.alert.hash} ${findings}`)
+      }
+    }
   }
 }
