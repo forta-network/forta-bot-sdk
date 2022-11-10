@@ -1,5 +1,5 @@
 import { getContractAddress } from '@ethersproject/address'
-import { assertIsISOString, createBlockEvent, createTransactionEvent, formatAddress, isValidTimeRange, keccak256 } from "."
+import { assertIsISOString, createBlockEvent, createTransactionEvent,createAlertEvent, formatAddress, isValidTimeRange, keccak256 } from "."
 import { BlockEvent, EventType, Network, TransactionEvent } from "../../sdk"
 
 describe("keccak256", () => {

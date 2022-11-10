@@ -10,7 +10,8 @@ import { Trace, TraceAction, TraceResult } from "./trace"
 import { Transaction } from "./transaction"
 import { 
   createBlockEvent, 
-  createTransactionEvent, 
+  createTransactionEvent,
+  createAlertEvent,
   getJsonRpcUrl, 
   getEthersProvider, 
   getEthersBatchProvider, 
@@ -101,6 +102,7 @@ export {
   getJsonRpcUrl,
   createTransactionEvent,
   createBlockEvent,
+  createAlertEvent,
   getEthersProvider,
   getEthersBatchProvider,
   ethers,
