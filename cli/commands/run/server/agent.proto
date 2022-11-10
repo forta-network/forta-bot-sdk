@@ -41,6 +41,38 @@ message EvaluateBlockRequest {
   BlockEvent event = 2;
 }
 
+message Label {
+  enum EntityType {
+    UNKNOWN_ENTITY_TYPE = 0;
+    ADDRESS = 1;
+    TRANSACTION = 2;
+    BLOCK = 3;
+    URL = 4;
+  }
+
+  enum LabelType {
+    UNKNOWN_LABEL_TYPE = 0;
+    CUSTOM = 1;
+    PROTOCOL_ATTACK = 2;
+    SCAM = 3;
+    RUG_PULL = 4;
+    BRIDGE = 5;
+    MIXER = 6;
+    DEX = 7;
+    CEX = 8;
+    ATTACKER = 9;
+    VICTIM = 10;
+    EOA = 11;
+    CONTRACT = 12;
+  }
+
+  EntityType entityType = 1;
+  string entity = 2;
+  LabelType labelType = 3;
+  float confidence = 4;
+  string customValue = 5;
+}
+
 message Finding {
   enum Severity {
     UNKNOWN = 0;
@@ -69,6 +101,7 @@ message Finding {
   string everestId = 8;
   bool private = 9;
   repeated string addresses = 10;
+  repeated Label labels = 11;
 }
 
 message EvaluateTxResponse {
