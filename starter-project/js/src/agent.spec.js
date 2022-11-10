@@ -82,7 +82,7 @@ describe("high tether transfer agent", () => {
     it("returns a finding if there is a Forta Transfer Alert", async () => {
       const mockAlertEvent = {
         alert: {
-          name: "FORTA_1"
+          name: "FORTA-1"
         }
       };
 
@@ -99,6 +99,5 @@ describe("high tether transfer agent", () => {
         }),
       ]);
     });
-
   });
 });

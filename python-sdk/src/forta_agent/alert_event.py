@@ -1,11 +1,9 @@
-from .event_type import EventType
-from .network import Network
-from .block import Block
+from .alert import Alert
 
 
 class AlertEvent:
     def __init__(self, dict):
-        self.alert = Block(dict.get('alert', {}))
+        self.alert = Alert(dict.get('alert', {}))
 
     @property
     def alert_hash(self):

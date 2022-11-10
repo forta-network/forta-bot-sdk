@@ -55,7 +55,7 @@ const handleTransaction = async (txEvent) => {
 const handleAlert = async (alertEvent) => {
   const findings = [];
   console.log(JSON.stringify(alertEvent))
-  if (alertEvent.alert.name === "FORTA_1"){
+  if (alertEvent.alert.name === "FORTA-1"){
       // combine some alerts
       findings.push(
           Finding.fromObject({
