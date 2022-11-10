@@ -155,7 +155,7 @@ while True:
         hash = event.blockHash
       } else if (event instanceof AlertEvent) {
         msgType = HANDLE_ALERT_METHOD_NAME
-        hash = event.alert.hash
+        hash = event.alertHash
       } else {
         msgType = HANDLE_TRANSACTION_METHOD_NAME
         hash = event.hash
