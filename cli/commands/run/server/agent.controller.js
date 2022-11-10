@@ -14,8 +14,22 @@ module.exports = class AgentController {
   }
 
   async Initialize(call, callback) {
-    // no-op response
-    callback(null, { status: "SUCCESS" });
+    let initializeResponse = {}
+    let status = "SUCCESS";
+
+    if (this.initialize) {
+      try {
+        initializeResponse = await this.initialize();
+      } catch (e) {
+        console.log(e);
+        status = "ERROR";
+      }
+    }
+
+    callback(null, {
+      status: status,
+      alertConfig: initializeResponse.alertConfig
+    });
   }
 
   async EvaluateBlock(call, callback) {
@@ -125,6 +139,7 @@ module.exports = class AgentController {
     try {
       // getAgentHandlers will also call any initialize handler
       const agentHandlers = await this.getAgentHandlers();
+      this.initialize = agentHandlers.initialize
       this.handleBlock = agentHandlers.handleBlock;
       this.handleTransaction = agentHandlers.handleTransaction;
       this.handleAlert = agentHandlers.handleAlert;

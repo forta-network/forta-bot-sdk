@@ -1,11 +1,12 @@
-import { BlockEvent, EventType, Network, TransactionEvent, AlertEvent } from "../../../../sdk"
-import { formatAddress } from "../../../utils"
+import {AlertEvent, BlockEvent, EventType, Network, TransactionEvent} from "../../../../sdk"
+import {formatAddress} from "../../../utils"
 import AgentController from "./agent.controller"
 
 describe("AgentController", () => {
   // cheating here by using any so that we can invoke initializeAgentHandlers() for synchronous testing
   let agentController: any
   const mockHandleBlock = jest.fn()
+  const mockInitialize = jest.fn()
   const mockHandleTransaction = jest.fn()
   const mockHandleAlert = jest.fn()
   const mockGetAgentHandlers = jest.fn()
@@ -158,14 +159,26 @@ describe("AgentController", () => {
   })
 
   describe("Initialize", () => {
-    it("invokes callback with success response", async () => {
-      mockGetAgentHandlers.mockReturnValueOnce({})
+    it("invokes callback with bot subscription", async () => {
+      mockInitialize.mockReturnValue({
+        status: "SUCCESS",
+        alertConfig: {
+          subscriptions: [{botId: "0x123"}]
+        }
+      })
+      mockGetAgentHandlers.mockReturnValue({initialize: mockInitialize})
       agentController = new AgentController(mockGetAgentHandlers)
 
+      await agentController.initializeAgentHandlers()
       await agentController.Initialize({}, mockCallback)
 
       expect(mockCallback).toHaveBeenCalledTimes(1)
-      expect(mockCallback).toHaveBeenCalledWith(null, { status: "SUCCESS" })
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "SUCCESS",
+        alertConfig: {
+          subscriptions: [{botId: "0x123"}]
+        }
+      })
     })
   })
 
