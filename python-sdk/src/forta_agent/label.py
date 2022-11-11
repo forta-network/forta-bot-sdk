@@ -28,8 +28,6 @@ class Label:
         assert_enum_value_in_dict(dict, 'entity_type', EntityType)
         assert_enum_value_in_dict(dict, 'label_type', LabelType)
         assert_non_empty_string_in_dict(dict, 'entity')
-        assert_non_empty_string_in_dict(dict, 'confidence')
-        assert_non_empty_string_in_dict(dict, 'custom_value')
         self.entity = dict['entity']
         self.confidence = dict['confidence']
         self.customValue = dict['custom_value']
