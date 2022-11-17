@@ -116,7 +116,7 @@ while True:
       resolve(findings)
       delete promiseCallbackMap[hash]
     })
-    .on("stderr", function (err) {
+    .on("pythonError", function (err) {
       console.log(err)
       const hash = Object.keys(promiseCallbackMap)[0]
       if (hash && promiseCallbackMap[hash]) {
