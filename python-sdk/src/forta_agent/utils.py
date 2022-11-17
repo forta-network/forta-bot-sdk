@@ -98,6 +98,7 @@ def get_alerts(dict):
     headers = {"content-type": "application/json"}
     query_options = AlertQueryOptions(dict)
     payload = query_options.get_query()
+
     response = requests.request("POST", forta_api, json=payload, headers=headers)
 
     if response.status_code == 200:
@@ -105,9 +106,9 @@ def get_alerts(dict):
 
         if data:
             return AlertsResponse(data.get('alerts'))
-        return data
-
-    return response
+    else:
+        message = response.text
+        raise Exception(message)
 
 
 def assert_non_empty_string_in_dict(dict, key):
