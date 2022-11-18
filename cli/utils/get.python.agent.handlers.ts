@@ -86,7 +86,7 @@ while True:
     msgType = msgJson['msgType']
     if msgType == '${INITIALIZE_METHOD_NAME}':
       initializeResponse = ${agentModule}.${INITIALIZE_METHOD_NAME}()
-      print(f'${INITIALIZE_MARKER}{json.dumps(initializeResponse)}')
+      print(f'${INITIALIZE_MARKER}{json.dumps(initializeResponse) if initializeResponse is not None else ""}')
     elif msgType == '${HANDLE_TRANSACTION_METHOD_NAME}':
       hash = msgJson['hash']
       event = TransactionEvent(msgJson)
