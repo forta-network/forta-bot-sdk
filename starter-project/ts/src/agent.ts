@@ -1,6 +1,7 @@
 import {
   BlockEvent,
   Finding,
+  Initialize,
   HandleBlock,
   HandleTransaction,
   HandleAlert,
@@ -58,6 +59,10 @@ const handleTransaction: HandleTransaction = async (
   return findings;
 };
 
+// const initialize: Initialize = async () => {
+//   // do some initialization on startup e.g. fetch data
+// }
+
 // const handleBlock: HandleBlock = async (blockEvent: BlockEvent) => {
 //   const findings: Finding[] = [];
 //   // detect some block condition
@@ -71,6 +76,7 @@ const handleTransaction: HandleTransaction = async (
 // }
 
 export default {
+  // initialize,
   handleTransaction,
   // handleBlock,
   // handleAlert

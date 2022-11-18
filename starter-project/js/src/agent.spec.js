@@ -3,14 +3,13 @@ const {
   FindingSeverity,
   Finding,
   createTransactionEvent,
-  createAlertEvent,
   ethers,
 } = require("forta-agent");
 const {
   handleTransaction,
   ERC20_TRANSFER_EVENT,
   TETHER_ADDRESS,
-  TETHER_DECIMALS, handleAlert,
+  TETHER_DECIMALS,
 } = require("./agent");
 
 describe("high tether transfer agent", () => {
@@ -30,8 +29,8 @@ describe("high tether transfer agent", () => {
       expect(findings).toStrictEqual([]);
       expect(mockTxEvent.filterLog).toHaveBeenCalledTimes(1);
       expect(mockTxEvent.filterLog).toHaveBeenCalledWith(
-          ERC20_TRANSFER_EVENT,
-          TETHER_ADDRESS
+        ERC20_TRANSFER_EVENT,
+        TETHER_ADDRESS
       );
     });
 
@@ -48,7 +47,7 @@ describe("high tether transfer agent", () => {
       const findings = await handleTransaction(mockTxEvent);
 
       const normalizedValue = mockTetherTransferEvent.args.value.div(
-          10 ** TETHER_DECIMALS
+        10 ** TETHER_DECIMALS
       );
       expect(findings).toStrictEqual([
         Finding.fromObject({
@@ -65,39 +64,9 @@ describe("high tether transfer agent", () => {
       ]);
       expect(mockTxEvent.filterLog).toHaveBeenCalledTimes(1);
       expect(mockTxEvent.filterLog).toHaveBeenCalledWith(
-          ERC20_TRANSFER_EVENT,
-          TETHER_ADDRESS
+        ERC20_TRANSFER_EVENT,
+        TETHER_ADDRESS
       );
-    });
-  });
-
-  describe("handleAlert", () => {
-    const mockAlertEvent = createAlertEvent({alert: {hash: "0x123", name: "forta_2"}});
-
-    it("returns empty findings if there are no Forta Transfer Alerts", async () => {
-      const findings = await handleAlert(mockAlertEvent);
-
-      expect(findings).toStrictEqual([]);
-    });
-    it("returns a finding if there is a Forta Transfer Alert", async () => {
-      const mockAlertEvent = {
-        alert: {
-          name: "FORTA-1"
-        }
-      };
-
-      const findings = await handleAlert(mockAlertEvent);
-
-
-      expect(findings).toStrictEqual([
-        Finding.fromObject({
-          name: "High Tether Transfer Alert Detected",
-          description: `High amount of USDT transferred`,
-          alertId: "FORTA-2",
-          severity: FindingSeverity.Low,
-          type: FindingType.Info,
-        }),
-      ]);
     });
   });
 });

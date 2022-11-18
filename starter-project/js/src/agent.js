@@ -46,6 +46,10 @@ const handleTransaction = async (txEvent) => {
   return findings;
 };
 
+// const initialize = async () => {
+//   // do some initialization on startup e.g. fetch data
+// }
+
 // const handleBlock = async (blockEvent) => {
 //   const findings = [];
 //   // detect some block condition
@@ -59,6 +63,7 @@ const handleTransaction = async (txEvent) => {
 // };
 
 module.exports = {
+  // initialize,
   handleTransaction,
   // handleBlock,
   // handleAlert,

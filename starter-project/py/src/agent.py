@@ -43,6 +43,9 @@ def handle_transaction(transaction_event):
 
     return findings
 
+# def initialize():
+#     # do some initialization on startup e.g. fetch data
+
 # def handle_block(block_event):
 #     findings = []
 #     # detect some block condition
