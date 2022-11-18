@@ -10,9 +10,12 @@ class AlertQueryOptions:
     def __init__(self, dict):
         self.bots = dict.get('bot_ids')
         self.addresses = dict.get('addresses')
+        self.alertHash = dict.get('alert_hash')
         self.alertId = dict.get('alert_id')
+        self.alertIds = dict.get('alert_ids')
         self.chainId = dict.get('chain_id')
         self.createdSince = dict.get('created_since')
+        self.createdBefore = dict.get('created_before')
         self.first = dict.get('first')
         self.after = dict.get('starting_cursor')
         self.projectId = dict.get('project_id')
@@ -27,40 +30,66 @@ class AlertQueryOptions:
         query = """
           query($input: AlertsInput) {
             alerts(input: $input) {
-              alerts {
-                  alertId
-                  addresses
-                  hash
-                  contracts {
-                      address
-                      name
-                      projectId
-                  }
-                  createdAt
-                  description
-                  findingType
-                  name
-                  projects {
-                      id
-                  }
-                  protocol
-                  metadata
-                  scanNodeCount
-                  severity
-                  source {
-                      transactionHash
-                      bot {
-                          id
-                      }
-                  }
-              }
-              pageInfo {
-                hasNextPage
-                endCursor {
-                  blockNumber
-                  alertId
+                alerts {
+                    alertId
+                    addresses
+                    contracts {
+                        address
+                        name
+                        projectId
+                    }
+                    createdAt
+                    description
+                    hash
+                    metadata
+                    name
+                    projects {
+                        id
+                    }
+                    protocol
+                    scanNodeCount
+                    severity
+                    source {
+                        transactionHash
+                        bot {
+                            chainIds
+                            createdAt
+                            description
+                            developer
+                            docReference
+                            enabled
+                            id
+                            image
+                            name
+                            reference
+                            repository
+                            projects
+                            scanNodes
+                            version
+                        }
+                        block {
+                            number
+                            hash
+                            timestamp
+                            chainId
+                        }
+                        sourceAlert {
+                            hash
+                            botId
+                            timestamp
+                        }
+                    }
+                    alertDocumentType
+                    findingType
+                    relatedAlerts
                 }
-              }
+                pageInfo {
+                    hasNextPage
+                    endCursor {
+                        blockNumber
+                        alertId
+                    }
+                }
             }
           }
           """

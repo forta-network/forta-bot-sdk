@@ -4,7 +4,16 @@ import { join } from 'path'
 import { jsonc } from 'jsonc'
 import _ from 'lodash'
 import { Keccak } from 'sha3'
-import { BlockEvent, EventType, FortaConfig, Network, Trace, TransactionEvent } from '.'
+import {
+  Alert,
+  AlertEvent,
+  BlockEvent,
+  EventType,
+  FortaConfig,
+  Network,
+  Trace,
+  TransactionEvent
+} from '.'
 import { Transaction } from './transaction'
 import { Log, Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
@@ -118,6 +127,15 @@ export const createBlockEvent = ({
   block: Block
 }) => {
   return new BlockEvent(type, network, block)
+}
+
+// utility function for writing AlertEvent tests
+export const createAlertEvent = ({
+  alert
+}: {
+  alert: Alert
+}) => {
+  return new AlertEvent(alert)
 }
 
 export const assertIsNonEmptyString = (str: string, varName: string) => {

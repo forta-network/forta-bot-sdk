@@ -25,7 +25,7 @@ import provideRunServer from "./commands/run/server"
 import provideUploadImage from './commands/publish/upload.image'
 import provideUploadManifest from './commands/publish/upload.manifest'
 import providePushToRegistry from './commands/publish/push.to.registry'
-import { createBlockEvent, createTransactionEvent, getJsonFile, keccak256 } from "./utils"
+import { createBlockEvent, createTransactionEvent, createAlertEvent, getJsonFile, keccak256 } from "./utils"
 import AgentRegistry from "./contracts/agent.registry"
 import { provideGetAgentHandlers } from "./utils/get.agent.handlers"
 import { provideDecryptKeyfile } from "./utils/decrypt.keyfile"
@@ -176,6 +176,7 @@ export default function configureContainer(args: any = {}) {
     getJsonFile: asValue(getJsonFile),
     createBlockEvent: asValue(createBlockEvent),
     createTransactionEvent: asValue(createTransactionEvent),
+    createAlertEvent: asValue(createAlertEvent),
     getKeyfile: asFunction(provideGetKeyfile),
     decryptKeyfile: asFunction(provideDecryptKeyfile),
     createKeyfile: asFunction(provideCreateKeyfile),

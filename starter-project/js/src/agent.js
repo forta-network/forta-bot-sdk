@@ -46,15 +46,27 @@ const handleTransaction = async (txEvent) => {
   return findings;
 };
 
+// const initialize = async () => {
+//   // do some initialization on startup e.g. fetch data
+// }
+
 // const handleBlock = async (blockEvent) => {
 //   const findings = [];
 //   // detect some block condition
 //   return findings;
 // };
 
+// const handleAlert = async (alertEvent) => {
+//   const findings = [];
+//   // detect some alert condition
+//   return findings;
+// };
+
 module.exports = {
+  // initialize,
   handleTransaction,
   // handleBlock,
+  // handleAlert,
   ERC20_TRANSFER_EVENT, // exported for unit tests
   TETHER_ADDRESS, // exported for unit tests
   TETHER_DECIMALS, // exported for unit tests

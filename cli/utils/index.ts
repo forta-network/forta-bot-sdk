@@ -6,7 +6,14 @@ import { Keccak } from 'sha3'
 import { ShellString } from 'shelljs'
 import { getContractAddress } from '@ethersproject/address'
 
-import { BlockEvent, EventType, Finding, Log, TransactionEvent } from "../../sdk"
+import {
+  Alert, AlertEvent,
+  BlockEvent,
+  EventType,
+  Finding,
+  Log,
+  TransactionEvent
+} from "../../sdk"
 import { Trace } from '../../sdk/trace'
 import { JsonRpcBlock, JsonRpcTransaction } from './get.block.with.transactions'
 import { JsonRpcLog } from './get.transaction.receipt'
@@ -196,6 +203,16 @@ export const createTransactionEvent: CreateTransactionEvent = (
     blok,
     lgs,
     contractAddress
+  )
+}
+// creates a Forta AlertEvent from a public alert object
+export type CreateAlertEvent = (alert: Alert) => AlertEvent
+export const createAlertEvent: CreateAlertEvent = (
+    alert: Alert
+) => {
+
+  return new AlertEvent(
+    alert
   )
 }
 

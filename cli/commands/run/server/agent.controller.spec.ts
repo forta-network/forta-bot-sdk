@@ -1,12 +1,14 @@
-import { BlockEvent, EventType, Network, TransactionEvent } from "../../../../sdk"
-import { formatAddress } from "../../../utils"
+import {AlertEvent, BlockEvent, EventType, Network, TransactionEvent} from "../../../../sdk"
+import {formatAddress} from "../../../utils"
 import AgentController from "./agent.controller"
 
 describe("AgentController", () => {
   // cheating here by using any so that we can invoke initializeAgentHandlers() for synchronous testing
   let agentController: any
   const mockHandleBlock = jest.fn()
+  const mockInitialize = jest.fn()
   const mockHandleTransaction = jest.fn()
+  const mockHandleAlert = jest.fn()
   const mockGetAgentHandlers = jest.fn()
   const mockCallback = jest.fn()
   const mockFinding = { some: 'finding' }
@@ -42,6 +44,16 @@ describe("AgentController", () => {
           "transactions": ["0xfadb14c4d6bc7985583f6aded4d64bd0e071010ff4c29ab341a357550147fb28"],
           "transactionsRoot": "0xb5bbf490945d26e4f0c5ca88f8ca12807abcfd46f272de2712d814a43bdeef44",
           "uncles": []
+        }
+      }
+    }
+  })
+
+  const generateAlertRequest = () => ({
+    request: {
+      event: {
+        alert: {
+          hash: "0x123"
         }
       }
     }
@@ -124,6 +136,7 @@ describe("AgentController", () => {
     mockGetAgentHandlers.mockReset()
     mockHandleBlock.mockReset()
     mockHandleTransaction.mockReset()
+    mockHandleAlert.mockReset()
   }
 
   beforeEach(() => resetMocks())
@@ -146,14 +159,26 @@ describe("AgentController", () => {
   })
 
   describe("Initialize", () => {
-    it("invokes callback with success response", async () => {
-      mockGetAgentHandlers.mockReturnValueOnce({})
+    it("invokes callback with bot subscription", async () => {
+      mockInitialize.mockReturnValue({
+        status: "SUCCESS",
+        alertConfig: {
+          subscriptions: [{botId: "0x123"}]
+        }
+      })
+      mockGetAgentHandlers.mockReturnValue({initialize: mockInitialize})
       agentController = new AgentController(mockGetAgentHandlers)
 
+      await agentController.initializeAgentHandlers()
       await agentController.Initialize({}, mockCallback)
 
       expect(mockCallback).toHaveBeenCalledTimes(1)
-      expect(mockCallback).toHaveBeenCalledWith(null, { status: "SUCCESS" })
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "SUCCESS",
+        alertConfig: {
+          subscriptions: [{botId: "0x123"}]
+        }
+      })
     })
   })
 
@@ -164,7 +189,7 @@ describe("AgentController", () => {
       mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
       agentController = new AgentController(mockGetAgentHandlers)
       await agentController.initializeAgentHandlers()
-      const mockRequest = { 
+      const mockRequest = {
         request: {
           event: {
             blockHash: "0xabc"
@@ -465,4 +490,116 @@ describe("AgentController", () => {
       })
     })
   })
+
+  describe("EvaluateAlert", () => {
+    const mockAlertRequest = generateAlertRequest()
+
+    it("invokes callback with error response if error occurs", async () => {
+      mockGetAgentHandlers.mockReturnValue({ handleAlert: mockHandleAlert })
+      agentController = new AgentController(mockGetAgentHandlers)
+      await agentController.initializeAgentHandlers()
+      const mockRequest = {
+        request: {
+          event: {
+             alert: {
+               hash: "0xabc"
+             }
+          }
+        }
+      }
+
+      await agentController.EvaluateAlert(mockRequest, mockCallback)// error because request object is not fully populated
+
+      expect(mockCallback).toHaveBeenCalledTimes(1)
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "ERROR",
+        findings: [],
+        metadata: {
+          timestamp: systemTime.toISOString(),
+        },
+        private: false
+      })
+    })
+
+    it("invokes callback with success response and empty findings if no alert handlers",
+        async () => {
+      mockGetAgentHandlers.mockReturnValue({ })
+      agentController = new AgentController(mockGetAgentHandlers)
+
+      await agentController.EvaluateAlert({}, mockCallback)
+
+      expect(mockCallback).toHaveBeenCalledTimes(1)
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "SUCCESS",
+        findings: [],
+        metadata: {
+          timestamp: systemTime.toISOString(),
+        },
+        private: false
+      })
+    })
+
+    it("invokes callback with success response and findings from alert handlers", async () => {
+      const mockFinding = { some: 'finding' }
+      mockHandleAlert.mockReturnValue([mockFinding])
+      mockGetAgentHandlers.mockReturnValue({ handleAlert: mockHandleAlert })
+      agentController = new AgentController(mockGetAgentHandlers)
+      await agentController.initializeAgentHandlers()
+
+      await agentController.EvaluateAlert(mockAlertRequest, mockCallback)
+
+      expect(mockCallback).toHaveBeenCalledTimes(1)
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "SUCCESS",
+        findings: [mockFinding],
+        metadata: {
+          timestamp: systemTime.toISOString(),
+        },
+        private: false
+      })
+      expect(mockHandleAlert).toHaveBeenCalledTimes(1)
+      const alertEvent: AlertEvent = mockHandleAlert.mock.calls[0][0]
+      expect(alertEvent).toBeInstanceOf(AlertEvent)
+    })
+
+    it("throws an error if more than 10 findings when handling an alert", async () => {
+      const findings = (new Array(11)).fill(mockFinding)
+      mockHandleAlert.mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValue({ handleAlert: mockHandleAlert })
+      agentController = new AgentController(mockGetAgentHandlers)
+
+      await agentController.initializeAgentHandlers()
+      await agentController.EvaluateAlert(mockAlertRequest, mockCallback)
+
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "ERROR",
+        findings: [],
+        metadata: {
+          timestamp: systemTime.toISOString(),
+        },
+        private: false
+      })
+
+    })
+
+    it("throws an error if more than 50kB of findings fetched when handling an alert", async () => {
+      const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 50) })
+      mockHandleBlock.mockReturnValue(findings)
+      mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
+      agentController = new AgentController(mockGetAgentHandlers)
+
+      await agentController.initializeAgentHandlers()
+      await agentController.EvaluateBlock(mockAlertRequest, mockCallback)
+
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "ERROR",
+        findings: [],
+        metadata: {
+          timestamp: systemTime.toISOString(),
+        },
+        private: false
+      })
+    })
+  })
+
 })
