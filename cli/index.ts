@@ -44,6 +44,12 @@ yargs
       }).option('block', {
         description: 'Run with the specified block hash/number',
         type: 'string'
+      }).option('alert', {
+        description: 'Run with the specified alert hash',
+        type: 'string'
+      }).option('sequence', {
+        description: 'Run with the specified sequence of transaction hash, block number or alert hash',
+        type: 'string'
       }).option('range', {
         description: 'Run with the specified block range (e.g. 15..20)',
         type: 'string'
