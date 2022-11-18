@@ -85,8 +85,8 @@ while True:
     msgJson = json.loads(input())
     msgType = msgJson['msgType']
     if msgType == '${INITIALIZE_METHOD_NAME}':
-      ${agentModule}.${INITIALIZE_METHOD_NAME}()
-      print(f'${INITIALIZE_MARKER}')
+      initializeResponse = ${agentModule}.${INITIALIZE_METHOD_NAME}()
+      print(f'${INITIALIZE_MARKER}{json.dumps(initializeResponse)}')
     elif msgType == '${HANDLE_TRANSACTION_METHOD_NAME}':
       hash = msgJson['hash']
       event = TransactionEvent(msgJson)
@@ -117,8 +117,14 @@ while True:
     .on("message", function (message: string) {
       // use findingMarker/initializeMarker to distinguish between returned findings and regular log output
       if (message.startsWith(INITIALIZE_MARKER)) {
+        const initializeResponseStartIndex = INITIALIZE_MARKER.length
+        const initializeResponseJson = message.substr(initializeResponseStartIndex)
+        let initializeResponse = undefined
+        if (initializeResponseJson.length) {
+          initializeResponse = JSON.parse(initializeResponseJson)
+        }
         const { resolve } = promiseCallbackMap['init']
-        resolve(undefined)
+        resolve(initializeResponse)
         delete promiseCallbackMap['init']
         return
       } else if (!message.startsWith(FINDING_MARKER)) {
