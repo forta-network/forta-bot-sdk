@@ -13,6 +13,10 @@ class Alert:
         self.source = Source(dict.get('source')) if dict.get('source') is not None else None
         self.metadata = dict.get('metadata')
         self.projects = list(map(lambda t: Projects(t), dict.get('projects', []))) if dict.get('projects') is not None else []
+        self.scan_node_count = dict.get('scanNodeCount')
+        self.alert_document_type = dict.get('alertDocumentType')
+        self.related_alerts = dict.get('relatedAlerts')
+
 
 
 class Source:
@@ -20,6 +24,7 @@ class Source:
         self.transaction_hash = dict.get('transactionHash')
         self.block = dict.get('block')
         self.bot = dict.get('bot')
+        self.sourceAlert = dict.get('sourceAlert')
 
 
 class Contract:

@@ -7,4 +7,5 @@ declare class AgentController {
   Initialize(call: any, callback: any): void
   EvaluateBlock(call: any, callback: any): void
   EvaluateTx(call: any, callback: any): void
+  EvaluateAlert(call: any, callback: any): void
 }

@@ -9,9 +9,13 @@ interface AlertCursor {
 export interface AlertQueryOptions {
     botIds: string[], // filter results by bot ids
     addresses?: string[], // filter results based on addresses involved in alerts
+    alertHash?: string,
+    alertName?: string,
     alertId?: string,
+    alertIds?: string[],
     chainId?: number,
     createdSince?: number,
+    createdBefore?: number,
     first?: number, // indicates max number of results,
     startingCursor?: AlertCursor, // query results after the specified cursor
     projectId?: string, 
@@ -60,7 +64,10 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                 $bots: [String]!, 
                 $addresses: [String], 
                 $after: AlertEndCursorInput,
+                $alertHash: String, 
+                $alertName: String, 
                 $alertId: String, 
+                $alertIds: [String], 
                 $chainId: NonNegativeInt,
                 $first: NonNegativeInt,
                 $projectId: String,
@@ -69,6 +76,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                 $transactionHash: String,
                 $blockSortDirection: Sort,
                 $createdSince: NonNegativeInt,
+                $createdBefore: NonNegativeInt,
                 $blockDateRange: DateRange,
                 $blockNumberRange: BlockRange
                 ) {
@@ -76,7 +84,10 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                         bots: $bots,
                         addresses: $addresses,
                         after: $after,
+                        alertHash: $alertHash,
+                        alertName: $alertName,
                         alertId: $alertId,
+                        alertIds: $alertIds,
                         chainId: $chainId,
                         projectId: $projectId,
                         scanNodeConfirmations: $scanNodeConfirmations,
@@ -85,13 +96,13 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                         blockSortDirection: $blockSortDirection,
                         first: $first,
                         createdSince: $createdSince,
+                        createdBefore: $createdBefore,
                         blockDateRange: $blockDateRange,
                         blockNumberRange: $blockNumberRange
                     }) {
                         alerts {
                             alertId
                             addresses
-                            hash
                             contracts {
                                 address
                                 name
@@ -99,7 +110,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                             }
                             createdAt
                             description
-                            findingType
+                            hash
                             metadata
                             name
                             projects {
@@ -111,9 +122,36 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                             source {
                                 transactionHash
                                 bot {
+                                    chainIds
+                                    createdAt
+                                    description
+                                    developer
+                                    docReference
+                                    enabled
                                     id
+                                    image
+                                    name
+                                    reference
+                                    repository
+                                    projects
+                                    scanNodes
+                                    version
+                                }
+                                block {
+                                    number
+                                    hash
+                                    timestamp
+                                    chainId
+                                }
+                                sourceAlert {
+                                    hash
+                                    botId
+                                    timestamp
                                 }
                             }
+                            alertDocumentType
+                            findingType
+                            relatedAlerts
                         }
                         pageInfo {
                             hasNextPage
@@ -138,10 +176,14 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
             transactionHash: options.transactionHash,
             blockSortDirection: options.blockSortDirection,
             createdSince: options.createdSince,
-            blockDateRange: options.blockDateRange ? 
+            createdBefore: options.createdBefore,
+            blockDateRange: options.blockDateRange ?
                 { startDate: options.blockDateRange.startDate.toISOString().split('T')[0], endDate: options.blockDateRange.endDate.toISOString().split('T')[0]} :
                 undefined,
-            blockNumberRange: options.blockNumberRange
+            blockNumberRange: options.blockNumberRange,
+            alertIds: options.alertIds,
+            alertHash: options.alertHash,
+            alertName: options.alertName
         } 
     }
 }

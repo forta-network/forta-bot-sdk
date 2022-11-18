@@ -2,8 +2,13 @@ const {
   BlockEvent,
   TransactionEvent,
   isPrivateFindings,
+  AlertEvent,
 } = require("../../../../sdk");
-const { assertExists, formatAddress, assertFindings } = require("../../../utils");
+const {
+  assertExists,
+  formatAddress,
+  assertFindings,
+} = require("../../../utils");
 
 module.exports = class AgentController {
   constructor(getAgentHandlers) {
@@ -13,8 +18,23 @@ module.exports = class AgentController {
   }
 
   async Initialize(call, callback) {
-    // no-op response
-    callback(null, { status: "SUCCESS" });
+    let initializeResponse = {};
+    let status = "SUCCESS";
+
+    if (this.initialize) {
+      try {
+        initializeResponse = await this.initialize();
+      } catch (e) {
+        console.log(`${new Date().toISOString()}    initialize`);
+        console.log(e);
+        status = "ERROR";
+      }
+    }
+
+    callback(null, {
+      status: status,
+      alertConfig: initializeResponse ? initializeResponse.alertConfig : undefined,
+    });
   }
 
   async EvaluateBlock(call, callback) {
@@ -26,8 +46,8 @@ module.exports = class AgentController {
         const blockEvent = this.createBlockEventFromGrpcRequest(call.request);
 
         const returnedFindings = await this.handleBlock(blockEvent);
-        
-        assertFindings(returnedFindings)
+
+        assertFindings(returnedFindings);
 
         findings.push(...returnedFindings);
       } catch (e) {
@@ -63,7 +83,7 @@ module.exports = class AgentController {
 
         const returnedFindings = await this.handleTransaction(txEvent);
 
-        assertFindings(returnedFindings)
+        assertFindings(returnedFindings);
 
         findings.push(...returnedFindings);
       } catch (e) {
@@ -87,12 +107,44 @@ module.exports = class AgentController {
     });
   }
 
+  async EvaluateAlert(call, callback) {
+    const findings = [];
+    let status = "SUCCESS";
+
+    if (this.handleAlert) {
+      try {
+        const alertEvent = this.createAlertEventFromGrpcRequest(call.request);
+        const returnedFindings = await this.handleAlert(alertEvent);
+
+        assertFindings(returnedFindings);
+
+        findings.push(...returnedFindings);
+      } catch (e) {
+        console.log(
+          `${new Date().toISOString()}    evaluateAlert ${call.request.hash}`
+        );
+        console.log(e);
+        status = "ERROR";
+      }
+    }
+
+    callback(null, {
+      status,
+      findings,
+      metadata: {
+        timestamp: new Date().toISOString(),
+      },
+      private: isPrivateFindings(),
+    });
+  }
+
   async initializeAgentHandlers() {
     try {
-      // getAgentHandlers will also call any initialize handler
-      const agentHandlers = await this.getAgentHandlers();
+      const agentHandlers = await this.getAgentHandlers({shouldRunInitialize: false});
+      this.initialize = agentHandlers.initialize;
       this.handleBlock = agentHandlers.handleBlock;
       this.handleTransaction = agentHandlers.handleTransaction;
+      this.handleAlert = agentHandlers.handleAlert;
     } catch (e) {
       console.log(e);
     }
@@ -127,6 +179,12 @@ module.exports = class AgentController {
     return new BlockEvent(type, parseInt(network.chainId), blok);
   }
 
+  createAlertEventFromGrpcRequest(request) {
+    const { alert } = request.event;
+
+    return new AlertEvent(alert);
+  }
+
   createTransactionEventFromGrpcRequest(request) {
     const {
       type,
@@ -136,7 +194,7 @@ module.exports = class AgentController {
       traces: trcs,
       addresses,
       block,
-      contractAddress
+      contractAddress,
     } = request.event;
 
     const transaction = {
@@ -163,7 +221,7 @@ module.exports = class AgentController {
       transactionIndex: parseInt(log.transactionIndex),
       transactionHash: log.transactionHash,
       removed: log.removed,
-    }))
+    }));
 
     const traces = !trcs
       ? []
