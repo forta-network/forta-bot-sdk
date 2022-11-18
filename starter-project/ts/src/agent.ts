@@ -4,6 +4,7 @@ import {
   HandleBlock,
   HandleTransaction,
   HandleAlert,
+  AlertEvent,
   TransactionEvent,
   FindingSeverity,
   FindingType,
@@ -63,7 +64,14 @@ const handleTransaction: HandleTransaction = async (
 //   return findings;
 // }
 
+// const handleAlert: HandleAlert = async (alertEvent: AlertEvent) => {
+//   const findings: Finding[] = [];
+//   // detect some alert condition
+//   return findings;
+// }
+
 export default {
   handleTransaction,
-  // handleBlock
+  // handleBlock,
+  // handleAlert
 };

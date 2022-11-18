@@ -162,7 +162,7 @@ while True:
       }
 
       // store reference to promise callbacks (use hash as a key to invoke promise callback on completion)
-      promiseCallbackMap[hash] = { resolve, reject }
+      promiseCallbackMap[hash!] = { resolve, reject }
       // send event as json string through stdin to python wrapper
       pythonWrapper.send(JSON.stringify({ msgType, hash, ...event }))
     })

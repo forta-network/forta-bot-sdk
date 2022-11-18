@@ -25,7 +25,7 @@ import {
   verifyJwt
 } from "./utils"
 import awilixConfigureContainer from '../cli/di.container';
-import {InitializeResponse} from "./initialize_response";
+import {InitializeResponse} from "./initialize.response";
 
 interface DiContainer {
   resolve<T>(key: string): T
@@ -53,7 +53,7 @@ interface FortaConfig {
   keyfilePassword?: string
 }
 
-type Initialize = () => Promise<InitializeResponse>
+type Initialize = () => Promise<InitializeResponse | void>
 type HandleTransaction = (txEvent: TransactionEvent) => Promise<Finding[]>
 type HandleBlock = (blockEvent: BlockEvent) => Promise<Finding[]>
 type HandleAlert = (alertEvent: AlertEvent) => Promise<Finding[]>

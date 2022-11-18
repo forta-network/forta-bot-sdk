@@ -34,6 +34,7 @@ class AlertQueryOptions:
                     alertId
                     addresses
                     contracts {
+                        address
                         name
                         projectId
                     }
@@ -81,6 +82,13 @@ class AlertQueryOptions:
                     alertDocumentType
                     findingType
                     relatedAlerts
+                }
+                pageInfo {
+                    hasNextPage
+                    endCursor {
+                        blockNumber
+                        alertId
+                    }
                 }
             }
           }

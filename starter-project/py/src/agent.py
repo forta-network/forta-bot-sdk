@@ -43,16 +43,12 @@ def handle_transaction(transaction_event):
 
     return findings
 
+# def handle_block(block_event):
+#     findings = []
+#     # detect some block condition
+#     return findings
 
-def handle_alert(alert_event):
-    findings = []
-
-    if alert_event.alert.name == "FORTA-1":
-        findings.append(Finding({
-            'name': 'High ERC20 Transfer',
-            'description': f'High amount of ERC20 transferred',
-            'alert_id': 'FORTA-2',
-            'severity': FindingSeverity.Low,
-            'type': FindingType.Info,
-        }))
-    return findings
+# def handle_alert(alert_event):
+#     findings = []
+#     # detect some alert condition
+#     return findings

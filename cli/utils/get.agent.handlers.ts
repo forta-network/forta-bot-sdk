@@ -9,8 +9,12 @@ type AgentHandlers = {
   handleAlert?: HandleAlert
 }
 
+type GetAgentHandlersOptions = {
+  shouldRunInitialize?: boolean
+}
+
 // imports agent handlers from project
-export type GetAgentHandlers = () => Promise<AgentHandlers>
+export type GetAgentHandlers = (options?: GetAgentHandlersOptions) => Promise<AgentHandlers>
 
 export function provideGetAgentHandlers(
   agentPath: string,
@@ -23,7 +27,7 @@ export function provideGetAgentHandlers(
 
   let agentHandlers: AgentHandlers
 
-  return async function getAgentHandlers() {
+  return async function getAgentHandlers(options: GetAgentHandlersOptions = { shouldRunInitialize: true }) {
     // only get the agent handlers once
     if (agentHandlers) {
       return agentHandlers
@@ -39,7 +43,7 @@ export function provideGetAgentHandlers(
       throw new Error(`issue getting agent handlers: ${e.message}`)
     }
     
-    if (agentHandlers.initialize) {
+    if (options.shouldRunInitialize && agentHandlers.initialize) {
       try {
         console.log('initializing agent...')
         await agentHandlers.initialize()

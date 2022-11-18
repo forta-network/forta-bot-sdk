@@ -4,7 +4,11 @@ const {
   isPrivateFindings,
   AlertEvent,
 } = require("../../../../sdk");
-const { assertExists, formatAddress, assertFindings } = require("../../../utils");
+const {
+  assertExists,
+  formatAddress,
+  assertFindings,
+} = require("../../../utils");
 
 module.exports = class AgentController {
   constructor(getAgentHandlers) {
@@ -14,13 +18,14 @@ module.exports = class AgentController {
   }
 
   async Initialize(call, callback) {
-    let initializeResponse = {}
+    let initializeResponse = {};
     let status = "SUCCESS";
 
     if (this.initialize) {
       try {
         initializeResponse = await this.initialize();
       } catch (e) {
+        console.log(`${new Date().toISOString()}    initialize`);
         console.log(e);
         status = "ERROR";
       }
@@ -28,7 +33,7 @@ module.exports = class AgentController {
 
     callback(null, {
       status: status,
-      alertConfig: initializeResponse.alertConfig
+      alertConfig: initializeResponse ? initializeResponse.alertConfig : undefined,
     });
   }
 
@@ -41,8 +46,8 @@ module.exports = class AgentController {
         const blockEvent = this.createBlockEventFromGrpcRequest(call.request);
 
         const returnedFindings = await this.handleBlock(blockEvent);
-        
-        assertFindings(returnedFindings)
+
+        assertFindings(returnedFindings);
 
         findings.push(...returnedFindings);
       } catch (e) {
@@ -78,7 +83,7 @@ module.exports = class AgentController {
 
         const returnedFindings = await this.handleTransaction(txEvent);
 
-        assertFindings(returnedFindings)
+        assertFindings(returnedFindings);
 
         findings.push(...returnedFindings);
       } catch (e) {
@@ -111,14 +116,12 @@ module.exports = class AgentController {
         const alertEvent = this.createAlertEventFromGrpcRequest(call.request);
         const returnedFindings = await this.handleAlert(alertEvent);
 
-        assertFindings(returnedFindings)
+        assertFindings(returnedFindings);
 
         findings.push(...returnedFindings);
       } catch (e) {
         console.log(
-            `${new Date().toISOString()}    evaluateAlert ${
-                call.request.hash
-            }`
+          `${new Date().toISOString()}    evaluateAlert ${call.request.hash}`
         );
         console.log(e);
         status = "ERROR";
@@ -137,9 +140,8 @@ module.exports = class AgentController {
 
   async initializeAgentHandlers() {
     try {
-      // getAgentHandlers will also call any initialize handler
-      const agentHandlers = await this.getAgentHandlers();
-      this.initialize = agentHandlers.initialize
+      const agentHandlers = await this.getAgentHandlers({shouldRunInitialize: false});
+      this.initialize = agentHandlers.initialize;
       this.handleBlock = agentHandlers.handleBlock;
       this.handleTransaction = agentHandlers.handleTransaction;
       this.handleAlert = agentHandlers.handleAlert;
@@ -192,7 +194,7 @@ module.exports = class AgentController {
       traces: trcs,
       addresses,
       block,
-      contractAddress
+      contractAddress,
     } = request.event;
 
     const transaction = {
@@ -219,7 +221,7 @@ module.exports = class AgentController {
       transactionIndex: parseInt(log.transactionIndex),
       transactionHash: log.transactionHash,
       removed: log.removed,
-    }))
+    }));
 
     const traces = !trcs
       ? []

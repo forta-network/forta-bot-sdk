@@ -104,6 +104,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                             alertId
                             addresses
                             contracts {
+                                address
                                 name
                                 projectId
                             }

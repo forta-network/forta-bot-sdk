@@ -52,30 +52,16 @@ const handleTransaction = async (txEvent) => {
 //   return findings;
 // };
 
-const handleAlert = async (alertEvent) => {
-  const findings = [];
-  console.log(JSON.stringify(alertEvent))
-  if (alertEvent.alert.name === "FORTA-1"){
-      // combine some alerts
-      findings.push(
-          Finding.fromObject({
-              name: "High Tether Transfer Alert Detected",
-              description: `High amount of USDT transferred`,
-              alertId: "FORTA-2",
-              severity: FindingSeverity.Low,
-              type: FindingType.Info,
-              metadata: {},
-          })
-      );
-  }
-
-  return findings;
-};
+// const handleAlert = async (alertEvent) => {
+//   const findings = [];
+//   // detect some alert condition
+//   return findings;
+// };
 
 module.exports = {
   handleTransaction,
   // handleBlock,
-  handleAlert,
+  // handleAlert,
   ERC20_TRANSFER_EVENT, // exported for unit tests
   TETHER_ADDRESS, // exported for unit tests
   TETHER_DECIMALS, // exported for unit tests
