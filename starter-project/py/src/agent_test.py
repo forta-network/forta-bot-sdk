@@ -1,9 +1,8 @@
 from unittest.mock import Mock
-from forta_agent import FindingSeverity, FindingType, create_transaction_event, create_alert_event
+from forta_agent import FindingSeverity, FindingType, create_transaction_event
 from agent import handle_transaction, ERC20_TRANSFER_EVENT, TETHER_ADDRESS, TETHER_DECIMALS
 
 mock_tx_event = create_transaction_event({})
-mock_alert_event = create_alert_event({"alert": {"name": "FORTA-1"}})
 mock_tx_event.filter_log = Mock()
 
 
@@ -35,3 +34,5 @@ class TestHighTetherTransferAgent:
         assert finding.alert_id == "FORTA-1"
         assert finding.severity == FindingSeverity.Low
         assert finding.type == FindingType.Info
+        assert finding.metadata['to'] == mock_transfer_event['args']['to']
+        assert finding.metadata['from'] == mock_transfer_event['args']['from']
