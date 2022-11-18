@@ -1,3 +1,4 @@
+import { Label } from "./label"
 import { assertIsFromEnum, assertIsNonEmptyString } from "./utils"
 
 export enum FindingSeverity {
@@ -26,6 +27,7 @@ type FindingInput = {
   type: FindingType,
   metadata?: { [key: string]: string},
   addresses?: string[],
+  labels?: Label[]
 }
 
 export class Finding {
@@ -37,7 +39,8 @@ export class Finding {
     readonly severity: FindingSeverity,
     readonly type: FindingType,
     readonly metadata: { [key: string]: string},
-    readonly addresses: string[]
+    readonly addresses: string[],
+    readonly labels: Label[]
   ) {}
 
   toString() {
@@ -60,7 +63,8 @@ export class Finding {
     severity,
     type,
     metadata = {},
-    addresses = []
+    addresses = [],
+    labels = []
   }: FindingInput) {
     assertIsNonEmptyString(name, 'name')
     assertIsNonEmptyString(description, 'description')
@@ -70,6 +74,6 @@ export class Finding {
     assertIsFromEnum(type, FindingType, 'type')
     // TODO assert metadata keys and values are strings
 
-    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses)
+    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses, labels)
   }
 }
