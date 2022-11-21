@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package network.forta;
+
+option go_package = "./;protocol";
+
+message TrackingTimestamps {
+  string block = 1;
+  string feed = 2;
+  string botRequest = 3;
+  string botResponse = 4;
+  string sourceAlert = 5;
+}
+
+enum AlertType {
+  UNKNOWN_ALERT_TYPE = 0;
+  TRANSACTION = 1;
+  BLOCK = 2;
+  PRIVATE = 3;
+  COMBINATION = 4;
+}
+
+message AgentInfo {
+  string image = 1;
+  string imageHash = 2;
+  string id = 3;
+  bool isTest = 4;
+  string manifest = 5;
+}
+
+message ScannerInfo {
+  string address = 1;
+}
+
+message AlertResponse {
+  repeated SignedAlert alerts = 1;
+  string nextPageToken = 2;
+}
+
+message Signature {
+  string signature = 1;
+  string algorithm = 2;
+  string signer = 3;
+}
+
+message Alert {
+  string id = 1;
+  AlertType type = 2;
+  Finding finding = 3;
+  string timestamp = 4;
+  map<string, string> metadata = 5;
+  AgentInfo agent = 6;
+  map<string, string> tags = 7;
+  ScannerInfo scanner = 8;
+  TrackingTimestamps timestamps = 9;
+}
+
+message SignedAlert {
+  Alert alert = 1;
+  Signature signature = 2;
+  string chainId = 3;
+  string blockNumber = 4;
+  string publishedWithTx = 5;
+}
+
+message Finding {
+  enum Severity {
+    UNKNOWN = 0;
+    INFO = 1;
+    LOW = 2;
+    MEDIUM = 3;
+    HIGH = 4;
+    CRITICAL = 5;
+  }
+
+  enum FindingType {
+    UNKNOWN_TYPE = 0;
+    EXPLOIT = 1;
+    SUSPICIOUS = 2;
+    DEGRADED = 3;
+    INFORMATION = 4;
+  }
+
+  string protocol = 1;
+  Severity severity = 2;
+  map<string, string> metadata = 3;
+  FindingType type = 4;
+  string alertId = 5;
+  string name = 6;
+  string description = 7;
+  string everestId = 8;
+  bool private = 9;
+  repeated string addresses = 10;
+  map<string, double> indicators = 11;
+  repeated string related_alerts = 12;
+}

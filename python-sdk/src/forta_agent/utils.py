@@ -92,6 +92,11 @@ def create_transaction_event(dict):
     return TransactionEvent(dict)
 
 
+def create_alert_event(dict):
+    from .alert_event import AlertEvent  # avoid circular import
+    return AlertEvent(dict)
+
+
 def get_alerts(dict):
     from .forta_graphql import AlertQueryOptions
     forta_api = "https://api.forta.network/graphql"

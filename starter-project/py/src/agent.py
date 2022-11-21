@@ -42,3 +42,16 @@ def handle_transaction(transaction_event):
             findings_count += 1
 
     return findings
+
+# def initialize():
+#     # do some initialization on startup e.g. fetch data
+
+# def handle_block(block_event):
+#     findings = []
+#     # detect some block condition
+#     return findings
+
+# def handle_alert(alert_event):
+#     findings = []
+#     # detect some alert condition
+#     return findings
