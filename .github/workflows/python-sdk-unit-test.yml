@@ -1,0 +1,29 @@
+name: Python Sdk Unit Test
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.6"]
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Dependencies
+        run: npm install && pip install build && pip install pytest
+      
+      - name: Build
+        run: npm run python:build
+
+      - name: Publish Local
+        run: npm run python:publish:local
+
+      - name: Run the tests
+        run: npm run python-sdk-test
