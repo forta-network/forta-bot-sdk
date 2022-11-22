@@ -35,6 +35,7 @@ class Finding:
         self.type = dict['type']
         self.metadata = dict.get('metadata')
         self.addresses = dict.get('addresses')
+        self.labels = dict.get('labels')
 
     def toJson(self):
         d = dict(self.__dict__, **{'alertId': self.alert_id})

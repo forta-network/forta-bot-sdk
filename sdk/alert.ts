@@ -14,6 +14,8 @@ export interface Alert {
     protocol?: string,
     scanNodeCount?: number,
     severity?: string,
+    alertDocumentType?: string,
+    relatedAlerts?: string[],
     source?: {
         transactionHash?: string,
         block?: {
@@ -26,6 +28,11 @@ export interface Alert {
             id?: string,
             reference?: string,
             image?: string,
+        }
+        sourceAlert?: {
+            hash?: string,
+            botId?: string,
+            timestamp?: string,
         }
     }
     metadata?: any,

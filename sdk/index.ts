@@ -1,14 +1,18 @@
 import { ethers } from "ethers"
 import { Finding, FindingSeverity, FindingType } from "./finding"
+import { Label, LabelType, EntityType } from "./label"
 import { BlockEvent } from "./block.event"
+import {AlertEvent} from "./alert.event";
 import { Block } from "./block"
+import { Alert } from "./alert"
 import { TransactionEvent, TxEventBlock, LogDescription } from "./transaction.event"
 import { Log, Receipt } from "./receipt"
 import { Trace, TraceAction, TraceResult } from "./trace"
 import { Transaction } from "./transaction"
 import { 
   createBlockEvent, 
-  createTransactionEvent, 
+  createTransactionEvent,
+  createAlertEvent,
   getJsonRpcUrl, 
   getEthersProvider, 
   getEthersBatchProvider, 
@@ -22,6 +26,7 @@ import {
   verifyJwt
 } from "./utils"
 import awilixConfigureContainer from '../cli/di.container';
+import {InitializeResponse} from "./initialize.response";
 
 interface DiContainer {
   resolve<T>(key: string): T
@@ -49,9 +54,10 @@ interface FortaConfig {
   keyfilePassword?: string
 }
 
-type Initialize = () => Promise<void>
+type Initialize = () => Promise<InitializeResponse | void>
 type HandleTransaction = (txEvent: TransactionEvent) => Promise<Finding[]>
 type HandleBlock = (blockEvent: BlockEvent) => Promise<Finding[]>
+type HandleAlert = (alertEvent: AlertEvent) => Promise<Finding[]>
 
 enum EventType {
   BLOCK = 0,
@@ -76,12 +82,18 @@ export {
   Initialize,
   HandleTransaction,
   HandleBlock,
+  HandleAlert,
   Finding,
   FindingSeverity,
   FindingType,
+  Label,
+  LabelType,
+  EntityType,
   BlockEvent,
   TransactionEvent,
+  AlertEvent,
   TxEventBlock,
+  Alert,
   Block,
   Transaction,
   Receipt,
@@ -95,6 +107,7 @@ export {
   getJsonRpcUrl,
   createTransactionEvent,
   createBlockEvent,
+  createAlertEvent,
   getEthersProvider,
   getEthersBatchProvider,
   ethers,

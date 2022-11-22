@@ -2,12 +2,16 @@ syntax = "proto3";
 
 package network.forta;
 
+import public "alert.proto";
+
 option go_package = "./;protocol";
+
 
 service Agent {
   rpc Initialize (InitializeRequest) returns (InitializeResponse) {}
   rpc EvaluateTx (EvaluateTxRequest) returns (EvaluateTxResponse) {}
   rpc EvaluateBlock (EvaluateBlockRequest) returns (EvaluateBlockResponse) {}
+  rpc EvaluateAlert (EvaluateAlertRequest) returns (EvaluateAlertResponse) {}
 }
 
 message Error {
@@ -29,6 +33,16 @@ message InitializeResponse {
   ResponseStatus status = 1;
   repeated Error errors = 2;
   repeated string addresses = 3;
+  AlertConfig alertConfig = 4;
+}
+
+message AlertConfig {
+  repeated CombinerBotSubscription subscriptions = 1;
+}
+
+message CombinerBotSubscription {
+  string botId = 1;
+  string alertId = 2;
 }
 
 message EvaluateTxRequest {
@@ -39,6 +53,38 @@ message EvaluateTxRequest {
 message EvaluateBlockRequest {
   string requestId = 1;
   BlockEvent event = 2;
+}
+
+message Label {
+  enum EntityType {
+    UNKNOWN_ENTITY_TYPE = 0;
+    ADDRESS = 1;
+    TRANSACTION = 2;
+    BLOCK = 3;
+    URL = 4;
+  }
+
+  enum LabelType {
+    UNKNOWN_LABEL_TYPE = 0;
+    CUSTOM = 1;
+    PROTOCOL_ATTACK = 2;
+    SCAM = 3;
+    RUG_PULL = 4;
+    BRIDGE = 5;
+    MIXER = 6;
+    DEX = 7;
+    CEX = 8;
+    ATTACKER = 9;
+    VICTIM = 10;
+    EOA = 11;
+    CONTRACT = 12;
+  }
+
+  EntityType entityType = 1;
+  string entity = 2;
+  LabelType labelType = 3;
+  float confidence = 4;
+  string customValue = 5;
 }
 
 message Finding {
@@ -69,6 +115,12 @@ message Finding {
   string everestId = 8;
   bool private = 9;
   repeated string addresses = 10;
+  repeated Label labels = 11;
+}
+
+message EvaluateAlertRequest {
+  string requestId = 1;
+  AlertEvent event = 2;
 }
 
 message EvaluateTxResponse {
@@ -91,36 +143,46 @@ message EvaluateBlockResponse {
   bool private = 7;
 }
 
+message EvaluateAlertResponse {
+  ResponseStatus status = 1;
+  repeated Error errors = 2;
+  repeated Finding findings = 3;
+  map<string, string> metadata = 4;
+  string timestamp = 5;
+  uint32 latencyMs = 6;
+  bool private = 7;
+}
+
 message BlockEvent {
   enum EventType {
     BLOCK = 0;
-    REORG = 1 [deprecated=true];
+    REORG = 1 [deprecated = true];
   }
   message Network {
     string chainId = 1;
   }
 
   message EthBlock {
-      string difficulty = 1;
-      string extraData = 2;
-      string gasLimit = 3;
-      string gasUsed = 4;
-      string hash = 5;
-      string logsBloom = 6;
-      string miner = 7;
-      string mixHash = 8;
-      string nonce = 9;
-      string number = 10;
-      string parentHash = 11;
-      string receiptsRoot = 12;
-      string sha3Uncles = 13;
-      string size = 14;
-      string stateRoot =15;
-      string timestamp = 16;
-      string totalDifficulty = 17;
-      repeated string transactions = 18;
-      string transactionsRoot = 19;
-      repeated string uncles = 20;
+    string difficulty = 1;
+    string extraData = 2;
+    string gasLimit = 3;
+    string gasUsed = 4;
+    string hash = 5;
+    string logsBloom = 6;
+    string miner = 7;
+    string mixHash = 8;
+    string nonce = 9;
+    string number = 10;
+    string parentHash = 11;
+    string receiptsRoot = 12;
+    string sha3Uncles = 13;
+    string size = 14;
+    string stateRoot = 15;
+    string timestamp = 16;
+    string totalDifficulty = 17;
+    repeated string transactions = 18;
+    string transactionsRoot = 19;
+    repeated string uncles = 20;
   }
 
   EventType type = 1;
@@ -128,6 +190,7 @@ message BlockEvent {
   string blockNumber = 3;
   Network network = 4;
   EthBlock block = 5;
+  TrackingTimestamps timestamps = 6;
 }
 
 message TransactionEvent {
@@ -189,15 +252,15 @@ message TransactionEvent {
   }
 
   message TraceAction {
-   string callType = 1;
-   string to = 2;
-   string input = 3;
-   string from = 4;
-   string value = 5;
-   string init = 6;
-   string address = 7;
-   string balance = 8;
-   string refundAddress = 9;
+    string callType = 1;
+    string to = 2;
+    string input = 3;
+    string from = 4;
+    string value = 5;
+    string init = 6;
+    string address = 7;
+    string balance = 8;
+    string refundAddress = 9;
   }
 
   message TraceResult {
@@ -222,7 +285,7 @@ message TransactionEvent {
 
   EventType type = 1;
   EthTransaction transaction = 2;
-  EthReceipt receipt = 3 [deprecated=true];
+  EthReceipt receipt = 3 [deprecated = true];
   Network network = 4;
   repeated Trace traces = 5;
   map<string, bool> addresses = 6;
@@ -230,4 +293,79 @@ message TransactionEvent {
   repeated Log logs = 8;
   bool isContractDeployment = 9;
   string contractAddress = 10;
+  TrackingTimestamps timestamps = 11;
+  map<string, bool> txAddresses = 12;
+}
+
+message AlertEvent {
+  message Alert {
+    message Contract {
+      string name = 1;
+      string projectId = 2;
+    }
+
+    message Project {
+      string id = 1;
+    }
+
+    message Block {
+      uint64 number = 1;
+      string hash = 2;
+      string timestamp = 3;
+      uint64 chainId = 4;
+    }
+
+    message Bot {
+      repeated string chainIds = 1;
+      string createdAt = 2;
+      string description = 3;
+      string developer = 4;
+      string DocReference = 5;
+      bool enabled = 6;
+      string id = 7;
+      string image = 8;
+      string name = 9;
+      string reference = 10;
+      string repository = 11;
+      repeated string projects = 12;
+      repeated string scanNodes = 13;
+      string version = 14;
+    }
+
+    message SourceAlertEvent {
+      string botId = 1;
+      string alertHash = 2;
+      string timestamp = 3;
+    }
+
+    message Source {
+      string transactionHash = 1;
+      Bot bot = 2;
+      Block block = 3;
+      SourceAlertEvent sourceEvent = 4;
+    }
+
+    // Unique string to identify this class of finding,
+    // primarily used to group similar findings for the end user
+    string alertId = 1;
+    // List of addresses involved in the alert
+    repeated string addresses = 2;
+    // List of contracts related to the alert
+    repeated Contract contracts = 3;
+    // Timestamp when the alert was published
+    string createdAt = 4;
+    string description = 5;
+    string hash = 6;
+    map<string, string> metadata = 7;
+    string name = 8;
+    repeated Project projects = 9;
+    int32 scanNodeCount = 10;
+    string severity = 11;
+    Source source = 12;
+    string findingType = 13;
+    repeated string relatedAlerts = 14;
+  }
+
+  Alert alert = 1;
+  TrackingTimestamps timestamps = 2;
 }

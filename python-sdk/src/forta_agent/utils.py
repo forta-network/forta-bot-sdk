@@ -92,12 +92,18 @@ def create_transaction_event(dict):
     return TransactionEvent(dict)
 
 
+def create_alert_event(dict):
+    from .alert_event import AlertEvent  # avoid circular import
+    return AlertEvent(dict)
+
+
 def get_alerts(dict):
     from .forta_graphql import AlertQueryOptions
     forta_api = "https://api.forta.network/graphql"
     headers = {"content-type": "application/json"}
     query_options = AlertQueryOptions(dict)
     payload = query_options.get_query()
+
     response = requests.request("POST", forta_api, json=payload, headers=headers)
 
     if response.status_code == 200:
@@ -105,9 +111,9 @@ def get_alerts(dict):
 
         if data:
             return AlertsResponse(data.get('alerts'))
-        return data
-
-    return response
+    else:
+        message = response.text
+        raise Exception(message)
 
 
 def assert_non_empty_string_in_dict(dict, key):
