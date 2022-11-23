@@ -1,12 +1,14 @@
 import { HandleBlock, HandleTransaction, HandleAlert, Initialize } from "../../sdk"
 import { assertExists, assertIsNonEmptyString } from "."
 import { GetPythonAgentHandlers } from './get.python.agent.handlers'
+import { InitializeResponse } from "../../sdk/initialize.response"
 
 type AgentHandlers = { 
   initialize?: Initialize,
+  initializeResponse?: InitializeResponse | void,
   handleTransaction?: HandleTransaction,
-  handleBlock?: HandleBlock
-  handleAlert?: HandleAlert
+  handleBlock?: HandleBlock,
+  handleAlert?: HandleAlert,
 }
 
 type GetAgentHandlersOptions = {
@@ -46,7 +48,7 @@ export function provideGetAgentHandlers(
     if (options.shouldRunInitialize && agentHandlers.initialize) {
       try {
         console.log('initializing agent...')
-        await agentHandlers.initialize()
+        agentHandlers.initializeResponse = await agentHandlers.initialize()
       } catch (e) {
         throw new Error(`error initializing agent: ${e.message}`)
       }

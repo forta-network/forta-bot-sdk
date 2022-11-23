@@ -32,7 +32,7 @@ import { provideDecryptKeyfile } from "./utils/decrypt.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
 import provideGetCredentials from './utils/get.credentials'
 import { provideGetTraceData } from './utils/get.trace.data'
-import { FortaConfig } from '../sdk'
+import { FortaConfig, getAlerts } from '../sdk'
 import { provideGetPythonAgentHandlers } from './utils/get.python.agent.handlers'
 import provideAddToIpfs from './utils/add.to.ipfs'
 import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
@@ -57,6 +57,7 @@ import { provideRunAlert } from './commands/run/run.alert'
 import { provideRunSequence } from './commands/run/run.sequence'
 import { provideRunHandlersOnAlert } from './utils/run.handlers.on.alert'
 import provideGetAlert from './utils/get.alert'
+import { provideGetSubscriptionAlerts } from './utils/get.subscription.alerts'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -202,6 +203,8 @@ export default function configureContainer(args: any = {}) {
     getLogsForBlock: asFunction(provideGetLogsForBlock),
 
     getAlert: asFunction(provideGetAlert),
+    getAlerts: asValue(getAlerts),
+    getSubscriptionAlerts: asFunction(provideGetSubscriptionAlerts),
     getTraceData: asFunction(provideGetTraceData),
     getAgentLogs: asFunction(provideGetAgentLogs),
     fortaApiUrl: asValue('https://api.forta.network'),

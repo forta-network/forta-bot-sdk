@@ -1,9 +1,11 @@
 import { assertExists, assertFindings, CreateAlertEvent } from ".";
-import { Finding } from "../../sdk";
+import { Alert, Finding } from "../../sdk";
 import { GetAgentHandlers } from "./get.agent.handlers";
 import { GetAlert } from "./get.alert";
 
-export type RunHandlersOnAlert = (alertHash: string) => Promise<Finding[]>;
+export type RunHandlersOnAlert = (
+  alertOrHash: string | Alert
+) => Promise<Finding[]>;
 
 export function provideRunHandlersOnAlert(
   getAgentHandlers: GetAgentHandlers,
@@ -14,20 +16,27 @@ export function provideRunHandlersOnAlert(
   assertExists(getAlert, "getAlert");
   assertExists(createAlertEvent, "createAlertEvent");
 
-  return async function runHandlersOnAlert(alertHash: string) {
+  return async function runHandlersOnAlert(alertOrHash: string | Alert) {
     const { handleAlert } = await getAgentHandlers();
     if (!handleAlert) {
       throw new Error("no alert handler found");
     }
 
-    console.log(`fetching alert ${alertHash}...`)
-    const alert = await getAlert(alertHash);
+    let alert;
+    // if passed in a string hash
+    if (typeof alertOrHash === "string") {
+      console.log(`fetching alert ${alertOrHash}...`);
+      alert = await getAlert(alertOrHash);
+    } else {
+      // if passed in an alert
+      alert = alertOrHash;
+    }
     const alertEvent = createAlertEvent(alert);
     const findings = await handleAlert(alertEvent);
 
     assertFindings(findings);
     console.log(
-      `${findings.length} findings for alert ${alertHash} ${findings}`
+      `${findings.length} findings for alert ${alert.hash} ${findings}`
     );
     return findings;
   };
