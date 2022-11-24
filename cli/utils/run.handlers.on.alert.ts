@@ -22,7 +22,7 @@ export function provideRunHandlersOnAlert(
       throw new Error("no alert handler found");
     }
 
-    let alert;
+    let alert: Alert;
     // if passed in a string hash
     if (typeof alertOrHash === "string") {
       console.log(`fetching alert ${alertOrHash}...`);

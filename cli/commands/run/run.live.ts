@@ -25,20 +25,23 @@ export function provideRunLive(
   assertExists(sleep, "sleep");
 
   return async function runLive(shouldContinuePolling: Function = () => true) {
-    const { initializeResponse } = await getAgentHandlers();
+    const { handleBlock, handleTransaction, handleAlert, initializeResponse } =
+      await getAgentHandlers();
+    if (!handleBlock && !handleTransaction && !handleAlert) {
+      throw new Error("no block/transaction/alert handler found");
+    }
+
     let botSubscriptions: BotSubscription[] = [];
     if (initializeResponse?.alertConfig) {
       botSubscriptions = initializeResponse.alertConfig.subscriptions;
     }
 
     console.log("listening for blockchain data...");
-    let currBlockNumber;
-    let lastAlertFetchTimestamp = new Date();
-
     const network = await ethersProvider.getNetwork();
     const { chainId } = network;
-
     const { blockTimeInSeconds } = getBlockChainNetworkConfig(chainId);
+    let currBlockNumber;
+    let lastAlertFetchTimestamp = new Date();
 
     // poll for latest blocks
     while (shouldContinuePolling()) {
@@ -54,19 +57,23 @@ export function provideRunLive(
       } else {
         // process new blocks
         while (currBlockNumber <= latestBlockNumber) {
-          await runHandlersOnBlock(currBlockNumber);
+          if (handleBlock || handleTransaction) {
+            await runHandlersOnBlock(currBlockNumber);
+          }
           currBlockNumber++;
         }
 
         // process new alerts
-        const queryStartTime = new Date();
-        const alerts = await getSubscriptionAlerts(
-          botSubscriptions,
-          lastAlertFetchTimestamp
-        );
-        lastAlertFetchTimestamp = queryStartTime;
-        for (const alert of alerts) {
-          await runHandlersOnAlert(alert);
+        if (handleAlert) {
+          const queryStartTime = new Date();
+          const alerts = await getSubscriptionAlerts(
+            botSubscriptions,
+            lastAlertFetchTimestamp
+          );
+          lastAlertFetchTimestamp = queryStartTime;
+          for (const alert of alerts) {
+            await runHandlersOnAlert(alert);
+          }
         }
       }
     }

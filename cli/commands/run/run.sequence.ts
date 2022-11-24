@@ -16,11 +16,11 @@ export function provideRunSequence(
   assertExists(runHandlersOnAlert, "runHandlerOnAlert");
 
   return async function runSequence(sequence: string) {
-    if (!sequence.includes(",")) {
-      throw new Error("sequence must be a comma-delimited list of strings");
+    let steps = [sequence];
+    if (sequence.includes(",")) {
+      steps = sequence.split(",");
     }
 
-    const steps = sequence.split(",");
     for (const step of steps) {
       if (step.startsWith("tx")) {
         // transaction step

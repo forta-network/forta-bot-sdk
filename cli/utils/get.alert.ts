@@ -6,8 +6,8 @@ import { AlertQueryOptions, AlertsResponse } from "../../sdk/graphql/forta";
 // used by runHandlersOnAlert to fetch a specific alert and process it
 export type GetAlert = (alertHash: string) => Promise<Alert>;
 
-const ONE_DAY_IN_MS = 86400000;
-const LOOKBACK_PERIOD_DAYS = 30;
+export const ONE_DAY_IN_MS = 86400000;
+export const LOOKBACK_PERIOD_DAYS = 30;
 
 export default function provideGetAlert(
   getAlerts: (q: AlertQueryOptions) => Promise<AlertsResponse>,

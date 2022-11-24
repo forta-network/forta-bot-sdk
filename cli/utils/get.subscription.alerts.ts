@@ -30,11 +30,13 @@ export function provideGetSubscriptionAlerts(
 
     const subscriptionAlerts: Alert[] = [];
     let response: AlertsResponse | undefined;
+    const now = new Date();
     do {
       response = await getAlerts({
         botIds: Array.from(botIds),
         alertIds: Array.from(alertIds),
-        createdSince: createdSince.getTime(),
+        createdSince: now.getTime() - createdSince.getTime(),
+        first: 100,
         startingCursor: response?.pageInfo.endCursor,
       });
       subscriptionAlerts.push(...response.alerts);
