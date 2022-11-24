@@ -20,11 +20,12 @@
     "build": "npm run js:build",
     "js:build": "tsc --p ./tsconfig.build.json && cp -r ./starter-project ./dist && cp ./cli/commands/init/forta.config.json ./dist/cli/commands/init/forta.config.json && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto",
     "js:publish": "npm run js:build && npm publish",
-    "js:publish:local": "npm link",
+    "js:publish:local": "npm link --force",
     "python:build": "python3 -m build ./python-sdk",
     "python:publish": "npm run python:build && python3 -m twine upload ./python-sdk/dist/*",
     "python:publish:local": "python3 -m pip install -e ./python-sdk",
     "python:pack": "cd ./python-sdk && python3 setup.py sdist",
+    "python-sdk-test": "python3 -m pytest python-sdk",
     "test": "jest"
   },
   "dependencies": {

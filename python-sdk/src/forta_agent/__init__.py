@@ -1,4 +1,5 @@
 from .finding import Finding, FindingSeverity, FindingType
+from .label import Label, LabelType, EntityType
 from .block_event import BlockEvent
 from .transaction_event import TransactionEvent, TxEventBlock
 from .alert_event import AlertEvent

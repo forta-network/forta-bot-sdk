@@ -1,5 +1,6 @@
 import { ethers } from "ethers"
 import { Finding, FindingSeverity, FindingType } from "./finding"
+import { Label, LabelType, EntityType } from "./label"
 import { BlockEvent } from "./block.event"
 import {AlertEvent} from "./alert.event";
 import { Block } from "./block"
@@ -85,6 +86,9 @@ export {
   Finding,
   FindingSeverity,
   FindingType,
+  Label,
+  LabelType,
+  EntityType,
   BlockEvent,
   TransactionEvent,
   AlertEvent,
