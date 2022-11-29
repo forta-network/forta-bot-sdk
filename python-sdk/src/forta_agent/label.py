@@ -15,6 +15,7 @@ class LabelType(IntEnum):
     Victim = 10
     Eoa = 11
     Contract = 12
+    Good = 13
 
 class EntityType(IntEnum):
     Unknown = 0
