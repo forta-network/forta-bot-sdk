@@ -10,7 +10,12 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.13
+### 0.1.14
+
+- Added support for `handleAlert` handler
+- Added support for specifying labels on findings
+
+### [0.1.13](https://github.com/forta-network/forta-bot-sdk/commit/d73d5070897c9cbad8c1d356589d53222a9e692d)
 
 - Return findings from `runHandlersOnBlock` and `runHandlersOnTransaction` methods
 
