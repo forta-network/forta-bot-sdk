@@ -55,6 +55,14 @@ message EvaluateBlockRequest {
   BlockEvent event = 2;
 }
 
+message TrackingTimestamps {
+  string block = 1;
+  string feed = 2;
+  string botRequest = 3;
+  string botResponse = 4;
+  string sourceAlert = 5;
+}
+
 message Label {
   enum EntityType {
     UNKNOWN_ENTITY_TYPE = 0;
