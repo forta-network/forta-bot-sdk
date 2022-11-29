@@ -9,10 +9,12 @@ describe("getAgentHandlers", () => {
   const mockHandleBlock = jest.fn()
   const mockHandleTransaction = jest.fn()
   const mockHandleAlert = jest.fn()
+  const mockInitialize = jest.fn()
 
   const resetMocks = () => {
     mockGetPythonAgentHandlers.mockReset()
     mockDynamicImport.mockReset()
+    mockInitialize.mockReset()
   }
 
   beforeEach(() => {
@@ -33,18 +35,25 @@ describe("getAgentHandlers", () => {
     expect(mockDynamicImport).toHaveBeenCalledTimes(1)
   })
 
-  it("imports javascript agent and returns its block and transaction handlers", async () => {
+  it("imports javascript agent and returns its handlers", async () => {
+    const mockInitializeResponse = { some:"response" }
+    mockInitialize.mockReturnValue(mockInitializeResponse)
     mockDynamicImport.mockReturnValueOnce({ default: { 
       handleBlock: mockHandleBlock,
-      handleTransaction: mockHandleTransaction, handleAlert: mockHandleAlert,
+      handleTransaction: mockHandleTransaction,
+      handleAlert: mockHandleAlert,
+      initialize: mockInitialize
     }})
     getAgentHandlers = provideGetAgentHandlers(mockAgentPath, mockGetPythonAgentHandlers, mockDynamicImport)
 
-    const { handleBlock, handleTransaction, handleAlert } = await getAgentHandlers()
+    const { handleBlock, handleTransaction, handleAlert, initialize, initializeResponse } = await getAgentHandlers()
 
     expect(handleBlock).toBe(mockHandleBlock)
     expect(handleTransaction).toBe(mockHandleTransaction)
     expect(handleAlert).toBe(mockHandleAlert)
+    expect(initialize).toBe(mockInitialize)
+    expect(initializeResponse).toBe(mockInitializeResponse)
+    expect(mockInitialize).toHaveBeenCalledTimes(1)
     expect(mockDynamicImport).toHaveBeenCalledTimes(1)
     expect(mockDynamicImport).toHaveBeenCalledWith(mockAgentPath)
     expect(mockGetPythonAgentHandlers).toHaveBeenCalledTimes(0)

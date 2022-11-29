@@ -77,7 +77,7 @@ function getPythonHandler(agentPath: string, contextPath: string) {
 import sys
 sys.path.append('${contextPath}')
 import json
-from forta_agent import BlockEvent, TransactionEvent
+from forta_agent import BlockEvent, TransactionEvent, AlertEvent
 import ${agentModule}
 
 while True:

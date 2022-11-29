@@ -3,10 +3,12 @@ import { providers } from 'ethers';
 import { Cache } from 'flat-cache';
 import { CommandHandler } from '../..';
 import { assertExists } from '../../utils';
+import { RunAlert } from './run.alert';
 import { RunBlock } from './run.block';
 import { RunBlockRange } from './run.block.range';
 import { RunFile } from './run.file';
 import { RunLive } from './run.live';
+import { RunSequence } from './run.sequence';
 import { RunTransaction } from './run.transaction';
 import { RunProdServer } from './server';
 
@@ -42,6 +44,12 @@ export default function provideRun(
     } else if (args.block) {
       const runBlock = container.resolve<RunBlock>("runBlock")
       await runBlock(args.block)
+    } else if (args.alert) {
+      const runAlert = container.resolve<RunAlert>("runAlert")
+      await runAlert(args.alert)
+    } else if (args.sequence) {
+      const runSequence = container.resolve<RunSequence>("runSequence")
+      await runSequence(args.sequence)
     } else if (args.range) {
       const runBlockRange = container.resolve<RunBlockRange>("runBlockRange")
       await runBlockRange(args.range)
@@ -63,7 +71,7 @@ export default function provideRun(
 
     // invoke process.exit() for short-lived functions, otherwise
     // a child process (i.e. python agent process) can prevent commandline from returning
-    let isShortLived = args.tx || args.block || args.range || args.file
+    let isShortLived = args.tx || args.block || args.range || args.file || args.alert || args.sequence
     if (isShortLived) process.exit()
   }
 }

@@ -32,7 +32,7 @@ import { provideDecryptKeyfile } from "./utils/decrypt.keyfile"
 import { provideCreateKeyfile } from "./utils/create.keyfile"
 import provideGetCredentials from './utils/get.credentials'
 import { provideGetTraceData } from './utils/get.trace.data'
-import { FortaConfig } from '../sdk'
+import { FortaConfig, getAlerts } from '../sdk'
 import { provideGetPythonAgentHandlers } from './utils/get.python.agent.handlers'
 import provideAddToIpfs from './utils/add.to.ipfs'
 import { provideRunHandlersOnBlock } from './utils/run.handlers.on.block'
@@ -53,6 +53,11 @@ import provideLogs from './commands/logs'
 import provideInfo from './commands/info'
 import provideGetFromIpfs from './utils/ipfs/get.from.ipfs'
 import provideGetLogsFromPolyscan from './utils/polyscan/get.logs.from.polyscan'
+import { provideRunAlert } from './commands/run/run.alert'
+import { provideRunSequence } from './commands/run/run.sequence'
+import { provideRunHandlersOnAlert } from './utils/run.handlers.on.alert'
+import provideGetAlert from './utils/get.alert'
+import { provideGetSubscriptionAlerts } from './utils/get.subscription.alerts'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -110,6 +115,8 @@ export default function configureContainer(args: any = {}) {
     runBlockRange: asFunction(provideRunBlockRange),
     runFile: asFunction(provideRunFile),
     runLive: asFunction(provideRunLive),
+    runAlert: asFunction(provideRunAlert),
+    runSequence: asFunction(provideRunSequence),
 
     getCredentials: asFunction(provideGetCredentials),
     uploadImage: asFunction(provideUploadImage),
@@ -173,6 +180,7 @@ export default function configureContainer(args: any = {}) {
     getPythonAgentHandlers: asFunction(provideGetPythonAgentHandlers),
     runHandlersOnBlock: asFunction(provideRunHandlersOnBlock),
     runHandlersOnTransaction: asFunction(provideRunHandlersOnTransaction),
+    runHandlersOnAlert: asFunction(provideRunHandlersOnAlert),
     getJsonFile: asValue(getJsonFile),
     createBlockEvent: asValue(createBlockEvent),
     createTransactionEvent: asValue(createTransactionEvent),
@@ -194,6 +202,9 @@ export default function configureContainer(args: any = {}) {
     getTransactionReceipt: asFunction(provideGetTransactionReceipt),
     getLogsForBlock: asFunction(provideGetLogsForBlock),
 
+    getAlert: asFunction(provideGetAlert),
+    getAlerts: asValue(getAlerts),
+    getSubscriptionAlerts: asFunction(provideGetSubscriptionAlerts),
     getTraceData: asFunction(provideGetTraceData),
     getAgentLogs: asFunction(provideGetAgentLogs),
     fortaApiUrl: asValue('https://api.forta.network'),

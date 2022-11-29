@@ -80,6 +80,40 @@ describe("run", () => {
     expect(mockExit).toHaveBeenCalledTimes(1)
   })
 
+  it("invokes runAlert if --alert argument is provided", async () => {
+    const mockCliArgs = {alert: '0xabc'}
+    const mockRunAlert = jest.fn()
+    mockContainer.resolve.mockReturnValueOnce(mockRunAlert)
+
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, testRpcUrl, mockIsProduction, mockCache, mockCliArgs)
+    await run()
+
+    expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
+    expect(mockContainer.resolve).toHaveBeenCalledWith("runAlert")
+    expect(mockRunAlert).toHaveBeenCalledTimes(1)
+    expect(mockRunAlert).toHaveBeenCalledWith(mockCliArgs.alert)
+    expect(mockCache.save).toHaveBeenCalledTimes(1)
+    expect(mockCache.save).toHaveBeenCalledWith(true)
+    expect(mockExit).toHaveBeenCalledTimes(1)
+  })
+
+  it("invokes runSequence if --sequence argument is provided", async () => {
+    const mockCliArgs = {sequence: '0xabc,1234,tx0x5678'}
+    const mockRunSequence = jest.fn()
+    mockContainer.resolve.mockReturnValueOnce(mockRunSequence)
+
+    run = provideRun(mockContainer, mockEthersProvider, defaultChainIds, testRpcUrl, mockIsProduction, mockCache, mockCliArgs)
+    await run()
+
+    expect(mockContainer.resolve).toHaveBeenCalledTimes(1)
+    expect(mockContainer.resolve).toHaveBeenCalledWith("runSequence")
+    expect(mockRunSequence).toHaveBeenCalledTimes(1)
+    expect(mockRunSequence).toHaveBeenCalledWith(mockCliArgs.sequence)
+    expect(mockCache.save).toHaveBeenCalledTimes(1)
+    expect(mockCache.save).toHaveBeenCalledWith(true)
+    expect(mockExit).toHaveBeenCalledTimes(1)
+  })
+
   it("invokes runBlockRange if --range argument is provided", async () => {
     const mockCliArgs = {range: '1..2'}
     const mockRunBlockRange = jest.fn()

@@ -7,7 +7,7 @@ interface AlertCursor {
     blockNumber: number
 }
 export interface AlertQueryOptions {
-    botIds: string[], // filter results by bot ids
+    botIds?: string[], // filter results by bot ids
     addresses?: string[], // filter results based on addresses involved in alerts
     alertHash?: string,
     alertName?: string,
@@ -61,7 +61,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
         "operationName": "fetchAlerts",
         "query" : `
             query fetchAlerts(
-                $bots: [String]!, 
+                $bots: [String], 
                 $addresses: [String], 
                 $after: AlertEndCursorInput,
                 $alertHash: String, 
