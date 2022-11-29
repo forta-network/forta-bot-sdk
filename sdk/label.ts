@@ -12,7 +12,8 @@ export enum LabelType {
     Attacker,
     Victim,
     Eoa,
-    Contract
+    Contract,
+    Good
 }
 
 export enum EntityType {
