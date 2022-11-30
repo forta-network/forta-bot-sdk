@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "npm run js:build",
-    "js:build": "tsc --p ./tsconfig.build.json && cp -r ./starter-project ./dist && cp ./cli/commands/init/forta.config.json ./dist/cli/commands/init/forta.config.json && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto",
+    "js:build": "tsc --p ./tsconfig.build.json && cp -r ./starter-project ./dist && cp ./cli/commands/init/forta.config.json ./dist/cli/commands/init/forta.config.json && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto && cp ./cli/commands/run/server/alert.proto ./dist/cli/commands/run/server/alert.proto",
     "js:publish": "npm run js:build && npm publish",
     "js:publish:local": "npm link --force",
     "python:build": "python3 -m build ./python-sdk",
