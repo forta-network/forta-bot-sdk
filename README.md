@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.14
+### 0.1.15
+
+- Fixed grpc proto definitions
+
+### [0.1.14](https://github.com/forta-network/forta-bot-sdk/commit/ce13e4273bc45b227cc4f7f3387f101277b1a303)
 
 - Added support for `handleAlert` handler
 - Added support for specifying labels on findings
