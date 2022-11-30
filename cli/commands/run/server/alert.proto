@@ -63,6 +63,40 @@ message SignedAlert {
   string publishedWithTx = 5;
 }
 
+message Label {
+  enum EntityType {
+    UNKNOWN_ENTITY_TYPE = 0;
+    ADDRESS = 1;
+    TRANSACTION = 2;
+    BLOCK = 3;
+    URL = 4;
+  }
+
+  enum LabelType {
+    UNKNOWN_LABEL_TYPE = 0;
+    CUSTOM = 1;
+    PROTOCOL_ATTACK = 2;
+    SCAM = 3;
+    RUG_PULL = 4;
+    BRIDGE = 5;
+    MIXER = 6;
+    DEX = 7;
+    CEX = 8;
+    ATTACKER = 9;
+    VICTIM = 10;
+    EOA = 11;
+    CONTRACT = 12;
+    GOOD = 13;
+  }
+
+  EntityType entityType = 1;
+  string entity = 2;
+  LabelType labelType = 3;
+  float confidence = 4;
+  string customValue = 5;
+  bool remove = 6;
+}
+
 message Finding {
   enum Severity {
     UNKNOWN = 0;
@@ -92,5 +126,6 @@ message Finding {
   bool private = 9;
   repeated string addresses = 10;
   map<string, double> indicators = 11;
-  repeated string related_alerts = 12;
+  repeated Label labels = 12;
+  repeated string relatedAlerts = 13;
 }
