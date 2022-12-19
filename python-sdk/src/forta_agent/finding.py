@@ -1,4 +1,5 @@
 import json
+from .label import Label
 from enum import IntEnum
 from .utils import assert_enum_value_in_dict, assert_non_empty_string_in_dict
 
@@ -35,8 +36,11 @@ class Finding:
         self.type = dict['type']
         self.metadata = dict.get('metadata')
         self.addresses = dict.get('addresses')
-        self.labels = dict.get('labels')
+        self.labels = list(map(lambda t: Label(t), dict.get('labels', [])))
 
     def toJson(self):
-        d = dict(self.__dict__, **{'alertId': self.alert_id})
+        d = dict(self.__dict__, **{
+            'alertId': self.alert_id,
+            'labels': list(map(lambda l: l.toDict(), self.labels))
+        })
         return json.dumps({k: v for k, v in d.items() if v or k == 'type' or k == 'severity'})

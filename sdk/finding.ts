@@ -1,4 +1,4 @@
-import { Label } from "./label"
+import { EntityType, Label, LabelType } from "./label"
 import { assertIsFromEnum, assertIsNonEmptyString } from "./utils"
 
 export enum FindingSeverity {
@@ -47,7 +47,10 @@ export class Finding {
     return JSON.stringify({
       ...this,
       severity: FindingSeverity[this.severity],
-      type: FindingType[this.type]
+      type: FindingType[this.type],
+      labels: this.labels.map(l => Object.assign(l, {
+        entityType: EntityType[l.entityType],
+        labelType: LabelType[l.labelType]}))
     }, null, 2)
   }
 
@@ -74,6 +77,7 @@ export class Finding {
     assertIsFromEnum(type, FindingType, 'type')
     // TODO assert metadata keys and values are strings
 
+    labels = labels.map(l => l instanceof Label ? l : Label.fromObject(l))
     return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses, labels)
   }
 }
