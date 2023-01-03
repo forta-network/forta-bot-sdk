@@ -1,6 +1,7 @@
 export interface BotSubscription {
   botId: string;
-  alertId: string;
+  alertId?: string;
+  alertIds?: string[];
 }
 
 export interface AlertConfig {
