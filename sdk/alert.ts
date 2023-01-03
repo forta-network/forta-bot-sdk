@@ -16,6 +16,7 @@ export interface Alert {
     severity?: string,
     alertDocumentType?: string,
     relatedAlerts?: string[],
+    chainId?: number,
     source?: {
         transactionHash?: string,
         block?: {
@@ -33,6 +34,7 @@ export interface Alert {
             hash?: string,
             botId?: string,
             timestamp?: string,
+            chainId?: number
         }
     }
     metadata?: any,
