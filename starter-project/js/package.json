@@ -12,6 +12,8 @@
     "tx": "forta-agent run --tx",
     "block": "forta-agent run --block",
     "range": "forta-agent run --range",
+    "alert": "forta-agent run --alert",
+    "sequence": "forta-agent run --sequence",
     "file": "forta-agent run --file",
     "publish": "forta-agent publish",
     "info": "forta-agent info",
