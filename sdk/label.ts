@@ -1,20 +1,3 @@
-export enum LabelType {
-  Unknown,
-  Custom,
-  ProtocolAttack,
-  Scam,
-  RugPull,
-  Bridge,
-  Mixer,
-  Dex,
-  Cex,
-  Attacker,
-  Victim,
-  Eoa,
-  Contract,
-  Good,
-}
-
 export enum EntityType {
   Unknown,
   Address,
@@ -26,27 +9,19 @@ export enum EntityType {
 type LabelInput = {
   entityType: EntityType;
   entity: string;
-  labelType: LabelType;
+  label: string;
   confidence: number;
-  customValue?: string;
 };
 
 export class Label {
   private constructor(
     readonly entityType: EntityType,
     readonly entity: string,
-    readonly labelType: LabelType,
-    readonly confidence: number,
-    readonly customValue?: string
+    readonly label: string,
+    readonly confidence: number
   ) {}
 
-  static fromObject({
-    entityType,
-    entity,
-    labelType,
-    confidence,
-    customValue,
-  }: LabelInput) {
-    return new Label(entityType, entity, labelType, confidence, customValue);
+  static fromObject({ entityType, entity, label, confidence }: LabelInput) {
+    return new Label(entityType, entity, label, confidence);
   }
 }

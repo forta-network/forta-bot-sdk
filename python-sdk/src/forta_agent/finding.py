@@ -36,7 +36,7 @@ class Finding:
         self.type = dict['type']
         self.metadata = dict.get('metadata')
         self.addresses = dict.get('addresses')
-        self.labels = list(map(lambda t: Label(t), dict.get('labels', [])))
+        self.labels = list(map(lambda l: l if isinstance(l, Label) else Label(l), dict.get('labels', [])))
 
     def toJson(self):
         d = dict(self.__dict__, **{
