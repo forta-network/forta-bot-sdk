@@ -1,4 +1,4 @@
-import { EntityType, Label, LabelType } from "./label"
+import { EntityType, Label } from "./label"
 import { assertIsFromEnum, assertIsNonEmptyString } from "./utils"
 
 export enum FindingSeverity {
@@ -49,8 +49,7 @@ export class Finding {
       severity: FindingSeverity[this.severity],
       type: FindingType[this.type],
       labels: this.labels.map(l => Object.assign(l, {
-        entityType: EntityType[l.entityType],
-        labelType: LabelType[l.labelType]}))
+        entityType: EntityType[l.entityType]}))
     }, null, 2)
   }
 
