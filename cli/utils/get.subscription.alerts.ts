@@ -23,22 +23,33 @@ export function provideGetSubscriptionAlerts(
     const botIds = new Set<string>();
     const alertIds = new Set<string>();
     for (const subscription of subscriptions) {
-      const { botId, alertId } = subscription;
+      const { botId, alertId, alertIds: subscriptionAlertIds } = subscription;
       botIds.add(botId);
-      alertIds.add(alertId);
+      if (alertId) {
+        alertIds.add(alertId);
+      }
+      if (subscriptionAlertIds) {
+        for (const alertId of subscriptionAlertIds) {
+          alertIds.add(alertId);
+        }
+      }
     }
 
     const subscriptionAlerts: Alert[] = [];
+    let query: AlertQueryOptions;
     let response: AlertsResponse | undefined;
     const now = new Date();
     do {
-      response = await getAlerts({
+      query = {
         botIds: Array.from(botIds),
-        alertIds: Array.from(alertIds),
         createdSince: now.getTime() - createdSince.getTime(),
         first: 100,
         startingCursor: response?.pageInfo.endCursor,
-      });
+      };
+      if (alertIds.size > 0) {
+        query.alertIds = Array.from(alertIds);
+      }
+      response = await getAlerts(query);
       subscriptionAlerts.push(...response.alerts);
     } while (response.pageInfo?.hasNextPage);
 
