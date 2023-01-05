@@ -10,7 +10,14 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.15
+### 0.1.16
+
+- Updated grpc proto definitions for Labels
+- Updated `run --file` command to also accept hashes
+- Add `alert` and `sequence` npm commands to starter projects
+- Updated `BotSubscription` to make `alertId` optional and also allow passing `alertIds`
+
+### [0.1.15](https://github.com/forta-network/forta-bot-sdk/commit/e2e37e9321a5c7a33f8f8d4e30aef5f034ace84c)
 
 - Fixed grpc proto definitions
 
