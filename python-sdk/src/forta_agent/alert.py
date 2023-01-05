@@ -19,6 +19,7 @@ class Alert:
         self.scan_node_count = dict.get('scanNodeCount')
         self.alert_document_type = dict.get('alertDocumentType')
         self.related_alerts = dict.get('relatedAlerts')
+        self.chain_id = dict.get('chainId')
 
 
 class Source:
@@ -52,6 +53,7 @@ class SourceAlert:
         self.hash = dict.get('hash')
         self.bot_id = dict.get('botId')
         self.timestamp = dict.get('timestamp')
+        self.chain_id = dict.get('chainId')
 
 
 class Contract:

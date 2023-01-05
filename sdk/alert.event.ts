@@ -36,6 +36,6 @@ export class AlertEvent {
   }
 
   get chainId() {
-    return this.alert.source?.block?.chainId;
+    return this.alert.chainId;
   }
 }

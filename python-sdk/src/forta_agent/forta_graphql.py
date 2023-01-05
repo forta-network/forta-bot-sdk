@@ -77,11 +77,13 @@ class AlertQueryOptions:
                             hash
                             botId
                             timestamp
+                            chainId
                         }
                     }
                     alertDocumentType
                     findingType
                     relatedAlerts
+                    chainId
                 }
                 pageInfo {
                     hasNextPage

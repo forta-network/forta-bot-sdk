@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
 
@@ -17,8 +17,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Dependencies
-        run: npm install && pip install build && pip install pytest
-      
+        run: npm install && pip install build && pip install pytest && pip install pytest-env
+
       - name: Build
         run: npm run python:build
 
