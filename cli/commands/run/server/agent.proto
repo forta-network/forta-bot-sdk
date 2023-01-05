@@ -43,6 +43,7 @@ message AlertConfig {
 message CombinerBotSubscription {
   string botId = 1;
   string alertId = 2;
+  repeated string alertIds = 3;
 }
 
 message EvaluateTxRequest {

@@ -39,4 +39,4 @@ class AlertEvent:
 
     @property
     def chain_id(self):
-        return self.alert.source.block.chain_id
+        return self.alert.chain_id
