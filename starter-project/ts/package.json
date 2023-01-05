@@ -13,6 +13,8 @@
     "tx": "npm run build && forta-agent run --tx",
     "block": "npm run build && forta-agent run --block",
     "range": "npm run build && forta-agent run --range",
+    "alert": "npm run build && forta-agent run --alert",
+    "sequence": "npm run build && forta-agent run --sequence",
     "file": "npm run build && forta-agent run --file",
     "publish": "forta-agent publish",
     "info": "forta-agent info",
