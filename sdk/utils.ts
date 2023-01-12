@@ -173,10 +173,11 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
   return response.data.data.alerts
 }
 
-export const fetchJwt = async (claims: {}, expiresAt?: Date): Promise<{token: string} | null> => {
+export const fetchJwt = async (claims: {}, expiresAt?: Date): Promise<string | null> => {
   const hostname = 'forta-jwt-provider'
   const port = 8515
   const path = '/create'
+  const mockJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJib3QtaWQiOiIweDEzazM4N2IzNzc2OWNlMjQyMzZjNDAzZTc2ZmMzMGYwMWZhNzc0MTc2ZTE0MTZjODYxeWZlNmMwN2RmZWY3MWYiLCJleHAiOjE2NjAxMTk0NDMsImlhdCI6MTY2MDExOTQxMywianRpIjoicWtkNWNmYWQtMTg4NC0xMWVkLWE1YzktMDI0MjBhNjM5MzA4IiwibmJmIjoxNjYwMTE5MzgzLCJzdWIiOiIweDU1NmY4QkU0MmY3NmMwMUY5NjBmMzJDQjE5MzZEMmUwZTBFYjNGNEQifQ.9v5OiiYhDoEbhZ-abbiSXa5y-nQXa104YCN_2mK7SP0';
 
   let fullClaims = {...claims}
 
@@ -200,8 +201,10 @@ export const fetchJwt = async (claims: {}, expiresAt?: Date): Promise<{token: st
     const response = await axios.post(`http://${hostname}:${port}${path}`, data)
     return response.data
   } catch(err) {
+    // If forta-jwt-provider can't be resolved that means the bot is not running inside of a node
     if((err.message as string).includes("ENOTFOUND forta-jwt-provider")) {
-      throw Error("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node") 
+      console.warn(`Detected bot running in local mode. Generating a mock JWT`)
+      return mockJwt;
     }
     throw err
   }

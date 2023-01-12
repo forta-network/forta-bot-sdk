@@ -14,6 +14,7 @@ from .forta_graphql import AlertsResponse
 
 DISPTACHER_ABI = [{"inputs":[{"internalType":"uint256","name":"agentId","type":"uint256"},{"internalType":"uint256","name":"scannerId","type":"uint256"}],"name":"areTheyLinked","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}]
 DISPATCH_CONTRACT = "0xd46832F3f8EA8bDEFe5316696c0364F01b31a573"; # Source: https://docs.forta.network/en/latest/smart-contracts/
+MOCK_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJib3QtaWQiOiIweDEzazM4N2IzNzc2OWNlMjQyMzZjNDAzZTc2ZmMzMGYwMWZhNzc0MTc2ZTE0MTZjODYxeWZlNmMwN2RmZWY3MWYiLCJleHAiOjE2NjAxMTk0NDMsImlhdCI6MTY2MDExOTQxMywianRpIjoicWtkNWNmYWQtMTg4NC0xMWVkLWE1YzktMDI0MjBhNjM5MzA4IiwibmJmIjoxNjYwMTE5MzgzLCJzdWIiOiIweDU1NmY4QkU0MmY3NmMwMUY5NjBmMzJDQjE5MzZEMmUwZTBFYjNGNEQifQ.9v5OiiYhDoEbhZ-abbiSXa5y-nQXa104YCN_2mK7SP0'
 
 def get_web3_provider():
     from . import web3Provider
@@ -166,8 +167,9 @@ def fetch_jwt(claims, expiresAt=None) -> str:
 
     except requests.exceptions.RequestException as err:
         if("Name does not resolve" in str(err)):
+        ## If forta-jwt-provider can't be resolved that means the bot is not running inside of a node
             print("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node")
-            raise err
+            return MOCK_JWT
         else:
             raise err
 
