@@ -1,8 +1,5 @@
-name: Typscript Bot Build
-on:
-  push:
-    branches:
-      - master
+name: Unit-Test
+on: push
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,3 +15,6 @@ jobs:
       
       - name: Build
         run: npm run build
+
+      - name: Run the tests
+        run: npm run unit-test:cli
