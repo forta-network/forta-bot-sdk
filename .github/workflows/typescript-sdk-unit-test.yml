@@ -1,7 +1,7 @@
-name: Unit-Test
+name: Typescript-Sdk-Unit-Test
 on: push
 jobs:
-  build:
+  typescript-unit-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

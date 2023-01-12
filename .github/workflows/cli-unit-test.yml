@@ -1,7 +1,7 @@
-name: Unit-Test
+name: CLI-Unit-Test
 on: push
 jobs:
-  build:
+  cli-unit-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

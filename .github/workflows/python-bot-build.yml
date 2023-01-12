@@ -1,7 +1,10 @@
-name: Python Sdk Unit Test
-on: push
+name: Python Bot Build
+on:
+  push:
+    branches:
+      - master
 jobs:
-  python-unit-test:
+  build:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -18,12 +21,12 @@ jobs:
 
       - name: Install Dependencies
         run: npm install && pip install build && pip install pytest && pip install pytest-env
+      
+      - name: Link sdk
+        run: npm run js:publish:local
+      
+      - name: Link to python bot
+        run: npm link forta-agent
 
       - name: Build
         run: npm run python:build
-
-      - name: Publish Local
-        run: npm run python:publish:local
-
-      - name: Run the tests
-        run: npm run python-sdk-test

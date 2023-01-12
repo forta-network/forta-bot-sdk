@@ -1,0 +1,35 @@
+name: Typscript Bot Build
+on:
+  push:
+    branches:
+      - master
+jobs:
+  typescript-bot-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+
+      - name: Install Dependencies for sdk
+        run: npm install
+      
+      - name: Build sdk
+        run: npm run js:build
+      
+      - name: Link sdk
+        run: npm run js:publish:local
+      
+      - name: Link typescript bot to sdk
+        working-directory: ./starter-project/ts
+        run: npm link forta-agent
+      
+      - name: Install bot dependencies
+        working-directory: ./starter-project/ts
+        run: npm install
+
+      - name: Build typescript starter bot
+        working-directory: ./starter-project/ts
+        run: npm run build
