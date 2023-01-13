@@ -26,4 +26,4 @@ jobs:
         run: npm run python:publish:local
 
       - name: Run the tests
-        run: npm run python-sdk-test
+        run: npm run python:test
