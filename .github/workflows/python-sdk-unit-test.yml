@@ -19,5 +19,8 @@ jobs:
       - name: Install Dependencies
         run: pip install -r python-sdk/requirements.txt
 
+      - name: Publish Local
+        run: npm run python:publish:local
+
       - name: Run the tests
         run: npm run python:test
