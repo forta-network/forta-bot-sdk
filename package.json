@@ -26,7 +26,8 @@
     "python:publish:local": "python3 -m pip install -e ./python-sdk",
     "python:pack": "cd ./python-sdk && python3 setup.py sdist",
     "python-sdk-test": "python3 -m pytest python-sdk",
-    "test": "jest"
+    "test": "jest",
+    "coverage": "jest --coverage"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.3.6",
