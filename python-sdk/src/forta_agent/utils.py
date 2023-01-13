@@ -43,7 +43,7 @@ def get_forta_config():
 
 def get_json_rpc_url():
     if 'JSON_RPC_HOST' in os.environ:
-        return f'http://{os.environ["JSON_RPC_HOST"]}{":"+os.environ["JSON_RPC_PORT"] if "JSON_RPC_PORT" in os.environ else ""}'
+        return f'https://{os.environ["JSON_RPC_HOST"]}{":"+os.environ["JSON_RPC_PORT"] if "JSON_RPC_PORT" in os.environ else ""}'
 
     config = get_forta_config()
     if "jsonRpcUrl" not in config:

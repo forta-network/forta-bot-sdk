@@ -51,7 +51,7 @@ const getFortaConfig: () => FortaConfig = () => {
 export const getJsonRpcUrl = () => {
   // if rpc url provided by Forta Scanner i.e. in production
   if (process.env.JSON_RPC_HOST) {
-    return `http://${process.env.JSON_RPC_HOST}${process.env.JSON_RPC_PORT ? `:${process.env.JSON_RPC_PORT}` : ''}`
+    return `https://${process.env.JSON_RPC_HOST}${process.env.JSON_RPC_PORT ? `:${process.env.JSON_RPC_PORT}` : ''}`
   }
   
   // else, use the rpc url from forta.config.json

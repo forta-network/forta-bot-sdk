@@ -245,12 +245,17 @@ export default function configureContainer(args: any = {}) {
     }),
 
     jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
-      const jsonRpcUrl = fortaConfig.jsonRpcUrl || "https://cloudflare-eth.com/"
-      if (!jsonRpcUrl.startsWith("http")) {
-        throw new Error(`jsonRpcUrl must begin with http(s)`)
+      if (process.env.JSON_RPC_HOST) {
+        jsonRpcUrl = `https://${process.env.JSON_RPC_HOST}${process.env.JSON_RPC_PORT ? `:${process.env.JSON_RPC_PORT}` : ''}`
+      } else {
+        jsonRpcUrl = fortaConfig.jsonRpcUrl || "https://cloudflare-eth.com/";
       }
-      return jsonRpcUrl
-    }),
+      if (!jsonRpcUrl.startsWith("http")) {
+        throw new Error(`jsonRpcUrl must begin with http(s)`);
+      }
+      return jsonRpcUrl;
+    });
+
     ethersProvider: asFunction((jsonRpcUrl: string) =>  new ethers.providers.JsonRpcProvider(jsonRpcUrl)).singleton(),
     ethersAgentRegistryProvider: asFunction((agentRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(agentRegistryJsonRpcUrl)).singleton(),
 
