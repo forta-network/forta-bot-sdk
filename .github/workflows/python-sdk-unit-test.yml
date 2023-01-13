@@ -17,7 +17,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Dependencies
-        run: npm install && pip install build && pip install pytest && pip install pytest-env
+        run: pip install -r python-sdk/requirements.txt
 
       - name: Build
         run: npm run python:build
