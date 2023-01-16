@@ -21,7 +21,7 @@ import { Block } from './block'
 import { ethers } from '.'
 import { toUtf8Bytes } from "@ethersproject/strings"
 import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlAlertResponse } from './graphql/forta'
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
 export const getEthersProvider = () => {
   return new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
@@ -29,6 +29,13 @@ export const getEthersProvider = () => {
 
 export const getEthersBatchProvider = () => {
   return new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl())
+}
+
+export const mockJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJib3QtaWQiOiIweDEzazM4N2IzNzc2OWNlMjQyMzZjNDAzZTc2ZmMzMGYwMWZhNzc0MTc2ZTE0MTZjODYxeWZlNmMwN2RmZWY3MWYiLCJleHAiOjE2NjAxMTk0NDMsImlhdCI6MTY2MDExOTQxMywianRpIjoicWtkNWNmYWQtMTg4NC0xMWVkLWE1YzktMDI0MjBhNjM5MzA4IiwibmJmIjoxNjYwMTE5MzgzLCJzdWIiOiIweDU1NmY4QkU0MmY3NmMwMUY5NjBmMzJDQjE5MzZEMmUwZTBFYjNGNEQifQ.9v5OiiYhDoEbhZ-abbiSXa5y-nQXa104YCN_2mK7SP0';
+
+
+const getAxiosInstance = () => {
+  return axios.create();
 }
 
 const getFortaConfig: () => FortaConfig = () => {
@@ -173,11 +180,10 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
   return response.data.data.alerts
 }
 
-export const fetchJwt = async (claims: {}, expiresAt?: Date): Promise<string | null> => {
+export const fetchJwt = async (claims: {} = {}, expiresAt?: Date, axiosInstance: AxiosInstance = getAxiosInstance()): Promise<{token: string} | null> => {
   const hostname = 'forta-jwt-provider'
   const port = 8515
   const path = '/create'
-  const mockJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJib3QtaWQiOiIweDEzazM4N2IzNzc2OWNlMjQyMzZjNDAzZTc2ZmMzMGYwMWZhNzc0MTc2ZTE0MTZjODYxeWZlNmMwN2RmZWY3MWYiLCJleHAiOjE2NjAxMTk0NDMsImlhdCI6MTY2MDExOTQxMywianRpIjoicWtkNWNmYWQtMTg4NC0xMWVkLWE1YzktMDI0MjBhNjM5MzA4IiwibmJmIjoxNjYwMTE5MzgzLCJzdWIiOiIweDU1NmY4QkU0MmY3NmMwMUY5NjBmMzJDQjE5MzZEMmUwZTBFYjNGNEQifQ.9v5OiiYhDoEbhZ-abbiSXa5y-nQXa104YCN_2mK7SP0';
 
   let fullClaims = {...claims}
 
@@ -198,13 +204,12 @@ export const fetchJwt = async (claims: {}, expiresAt?: Date): Promise<string | n
   }
 
   try {
-    const response = await axios.post(`http://${hostname}:${port}${path}`, data)
+    const response = await axiosInstance.post(`http://${hostname}:${port}${path}`, data)
     return response.data
   } catch(err) {
-    // If forta-jwt-provider can't be resolved that means the bot is not running inside of a node
-    if((err.message as string).includes("ENOTFOUND forta-jwt-provider")) {
-      console.warn(`Detected bot running in local mode. Generating a mock JWT`)
-      return mockJwt;
+    // If bot not running in production mode return a mock JWT
+    if(process.env.NODE_ENV !== 'production') {
+      return {token: mockJwt};
     }
     throw err
   }
