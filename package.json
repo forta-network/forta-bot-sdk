@@ -17,7 +17,6 @@
     "forta-agent": "./dist/cli/index.js"
   },
   "scripts": {
-    "postinstall": "python3 -m pip install -r ./python-sdk/requirements.txt",
     "build": "npm run js:build",
     "test": "npm run js:test",
     "js:build": "tsc --p ./tsconfig.build.json && cp -r ./starter-project ./dist && cp ./cli/commands/init/forta.config.json ./dist/cli/commands/init/forta.config.json && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto && cp ./cli/commands/run/server/alert.proto ./dist/cli/commands/run/server/alert.proto",
@@ -26,6 +25,7 @@
     "js:pack": "npm pack",
     "js:test": "jest",
     "js:coverage": "jest --coverage",
+    "python:install": "python3 -m pip install -r ./python-sdk/requirements.txt",
     "python:build": "python3 -m build ./python-sdk",
     "python:publish": "npm run python:build && python3 -m twine upload ./python-sdk/dist/*",
     "python:publish:local": "python3 -m pip install -e ./python-sdk",
