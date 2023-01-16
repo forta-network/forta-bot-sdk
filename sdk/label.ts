@@ -11,6 +11,7 @@ type LabelInput = {
   entity: string;
   label: string;
   confidence: number;
+  remove: boolean;
 };
 
 export class Label {
@@ -18,10 +19,17 @@ export class Label {
     readonly entityType: EntityType,
     readonly entity: string,
     readonly label: string,
-    readonly confidence: number
+    readonly confidence: number,
+    readonly remove: boolean
   ) {}
 
-  static fromObject({ entityType, entity, label, confidence }: LabelInput) {
-    return new Label(entityType, entity, label, confidence);
+  static fromObject({
+    entityType,
+    entity,
+    label,
+    confidence,
+    remove = false,
+  }: LabelInput) {
+    return new Label(entityType, entity, label, confidence, remove);
   }
 }
