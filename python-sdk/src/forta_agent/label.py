@@ -19,6 +19,7 @@ class Label:
         self.confidence = dict['confidence']
         self.entity_type = dict['entity_type']
         self.label = dict['label']
+        self.remove = dict.get('remove', False)
 
     def toDict(self):
         d = dict(self.__dict__, **{
