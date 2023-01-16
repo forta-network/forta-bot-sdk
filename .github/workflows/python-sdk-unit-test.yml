@@ -17,7 +17,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Dependencies
-        run: pip install -r python-sdk/requirements.txt
+        run: npm run python:install
 
       - name: Publish Local
         run: npm run python:publish:local
