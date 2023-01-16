@@ -1,6 +1,7 @@
 from .utils import MOCK_JWT, fetch_jwt
 import responses
 import os
+import pytest
 
 
 @responses.activate
@@ -23,11 +24,11 @@ def test_return_mock_jwt():
 @responses.activate
 def test_return_valid_JWT():
     testJWT = "testJWT"
-    # Register error response because we should not make a real call
+    # Register response because we should not make a real call
     rsp1 = responses.Response(
         url="http://forta-jwt-provider:8515/create",
         method="POST",
-        json={"data": {"token": testJWT}},
+        json={"token": testJWT},
         status=200,
     )
     responses.add(rsp1)
@@ -37,3 +38,20 @@ def test_return_valid_JWT():
     token = fetch_jwt()
 
     assert token == testJWT
+
+@responses.activate
+def test_JWT_should_throw_exception():
+    with pytest.raises(Exception) as e_info:
+
+        # Register error response because we should not make a real call
+        rsp1 = responses.Response(
+            url="http://forta-jwt-provider:8515/create",
+            method="POST",
+            json={"message": 'Bad request'},
+            status=400,
+        )
+        responses.add(rsp1)
+
+        os.environ['NODE_ENV'] = 'production'
+
+        token = fetch_jwt()
