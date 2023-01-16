@@ -141,7 +141,7 @@ def hex_to_int(strVal):
 def keccak256(val):
     return Web3.keccak(text=val).hex()
 
-def fetch_jwt(claims, expiresAt=None) -> str:
+def fetch_jwt(claims={}, expiresAt=None) -> str:
     host_name = 'forta-jwt-provider'
     port = 8515
     path = '/create'
@@ -155,23 +155,19 @@ def fetch_jwt(claims, expiresAt=None) -> str:
         exp_in_sec = expiresAt.timestamp()
         claims["exp"] = exp_in_sec
 
-    try:
-        response = requests.request("POST", uri, json={'claims': claims})
+    if(os.environ['NODE_ENV'] != 'production'):
+        return MOCK_JWT
 
-        if response.status_code == 200:
-            data = response.json()
-            return data.get('token')
+    
+    response = requests.request("POST", uri, json={'claims': claims})
 
-        else:
-            raise Exception("Error occured with response fetching jwt token.")
+    if response.status_code == 200:
+        data = response.json()
+        return data.get('token')
 
-    except requests.exceptions.RequestException as err:
-        if("Name does not resolve" in str(err)):
-        ## If forta-jwt-provider can't be resolved that means the bot is not running inside of a node
-            print("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node")
-            return MOCK_JWT
-        else:
-            raise err
+    else:
+        raise Exception("Error occured with response fetching jwt token.", response)
+
 
 def verify_jwt(token: str, polygonUrl: str ='https://polygon-rpc.com') -> bool:
     splitJwt = token.split('.')
