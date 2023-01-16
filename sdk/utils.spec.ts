@@ -15,10 +15,6 @@ describe("JWT util methods", () => {
 
         it("should return a mock JWT when bot is not in production mode", async () => {
             process.env.NODE_ENV = 'development'
-            
-            mockAxios.post.mockImplementation(() => {
-                throw new Error();
-            });
 
             const data = await fetchJwt({},undefined,mockAxios);
             expect(data?.token).toEqual(mockJwt)

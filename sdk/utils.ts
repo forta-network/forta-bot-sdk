@@ -203,16 +203,12 @@ export const fetchJwt = async (claims: {} = {}, expiresAt?: Date, axiosInstance:
     claims: fullClaims
   }
 
-  try {
-    const response = await axiosInstance.post(`http://${hostname}:${port}${path}`, data)
-    return response.data
-  } catch(err) {
-    // If bot not running in production mode return a mock JWT
-    if(process.env.NODE_ENV !== 'production') {
-      return {token: mockJwt};
-    }
-    throw err
+  if(process.env.NODE_ENV !== 'production') {
+    return {token: mockJwt};
   }
+
+  const response = await axiosInstance.post(`http://${hostname}:${port}${path}`, data)
+  return response.data
 }
 
 interface DecodedJwt {
