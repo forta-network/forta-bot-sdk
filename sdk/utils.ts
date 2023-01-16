@@ -21,7 +21,7 @@ import { Block } from './block'
 import { ethers } from '.'
 import { toUtf8Bytes } from "@ethersproject/strings"
 import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlAlertResponse } from './graphql/forta'
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
 export const getEthersProvider = () => {
   return new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
@@ -29,6 +29,10 @@ export const getEthersProvider = () => {
 
 export const getEthersBatchProvider = () => {
   return new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl())
+}
+
+const getAxiosInstance = () => {
+  return axios.create();
 }
 
 const getFortaConfig: () => FortaConfig = () => {
@@ -173,7 +177,7 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
   return response.data.data.alerts
 }
 
-export const fetchJwt = async (claims: {}, expiresAt?: Date): Promise<{token: string} | null> => {
+export const fetchJwt = async (claims: {}, axiosInstance: AxiosInstance = getAxiosInstance() ,expiresAt?: Date): Promise<{token: string} | null> => {
   const hostname = 'forta-jwt-provider'
   const port = 8515
   const path = '/create'
@@ -197,8 +201,8 @@ export const fetchJwt = async (claims: {}, expiresAt?: Date): Promise<{token: st
   }
 
   try {
-    const response = await axios.post(`http://${hostname}:${port}${path}`, data)
-    return response.data
+    const response = await axiosInstance.post(`http://${hostname}:${port}${path}`, data)
+    return response.data.token;
   } catch(err) {
     if((err.message as string).includes("ENOTFOUND forta-jwt-provider")) {
       throw Error("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node") 
