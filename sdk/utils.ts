@@ -31,10 +31,6 @@ export const getEthersBatchProvider = () => {
   return new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl())
 }
 
-const getAxiosInstance = () => {
-  return axios.create();
-}
-
 const getFortaConfig: () => FortaConfig = () => {
   let config = {}
   // try to read from global config
@@ -177,39 +173,10 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
   return response.data.data.alerts
 }
 
-export const fetchJwt = async (claims: {}, axiosInstance: AxiosInstance = getAxiosInstance() ,expiresAt?: Date): Promise<{token: string} | null> => {
-  const hostname = 'forta-jwt-provider'
-  const port = 8515
-  const path = '/create'
-
-  let fullClaims = {...claims}
-
-  if(expiresAt) {
-    const expInSec = Math.floor(expiresAt.getTime()/1000);
-
-    // This covers the edge case where a Date that causes a seconds value to have number overflow resulting in a null exp
-    const safeExpInSec = expInSec > Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : expInSec;
-
-    fullClaims = {
-      exp: safeExpInSec,
-      ...fullClaims
-    }
-  }
-
-  const data = {
-    claims: fullClaims
-  }
-
-  try {
-    const response = await axiosInstance.post(`http://${hostname}:${port}${path}`, data)
-    return response.data.token;
-  } catch(err) {
-    if((err.message as string).includes("ENOTFOUND forta-jwt-provider")) {
-      throw Error("Could not resolve host 'forta-jwt-provider'. This url host can only be resolved inside of a running scan node") 
-    }
-    throw err
-  }
+export const fetchJwt = async (claims: {}={}, expiresAt?: Date): Promise<{token: string} | null> => {
+  return await provideFetchJwt(claims,expiresAt);
 }
+
 
 interface DecodedJwt {
   header: any,
@@ -283,4 +250,34 @@ export const verifyJwt = async (token: string, polygonRpcUrl: string = "https://
   const areTheyLinked = await dispatchContract.areTheyLinked(botId, recoveredSignerAddress)
   
   return areTheyLinked
+}
+
+export const provideFetchJwt = async (claims: {}, expiresAt?: Date, axiosInstance?: AxiosInstance) => {
+  axiosInstance = axiosInstance ? axiosInstance : axios.create();
+  
+  const hostname = 'forta-jwt-provider'
+  const port = 8515
+  const path = '/create'
+
+
+  let fullClaims = {...claims}
+
+  if(expiresAt) {
+    const expInSec = Math.floor(expiresAt.getTime()/1000);
+
+    // This covers the edge case where a Date that causes a seconds value to have number overflow resulting in a null exp
+    const safeExpInSec = expInSec > Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : expInSec;
+
+    fullClaims = {
+      exp: safeExpInSec,
+      ...fullClaims
+    }
+  }
+
+  const data = {
+    claims: fullClaims
+  }
+
+  const response = await axiosInstance.post(`http://${hostname}:${port}${path}`, data)
+  return response.data.token;
 }

@@ -1,4 +1,4 @@
-import { fetchJwt } from "./utils"
+import { provideFetchJwt } from "./utils"
 
 describe("JWT util methods", () => {
     const testJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
@@ -23,9 +23,8 @@ describe("JWT util methods", () => {
         it("should return a JWT as a string", async () => {
             mockAxios.post.mockReturnValueOnce(mockAnalyzerJWTResponse)
 
-            const token = await fetchJwt({}, mockAxios);
+            const token = await provideFetchJwt({}, undefined, mockAxios);
             expect(token).toEqual(testJWT)
         })
-        
     })
 })
