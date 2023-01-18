@@ -10,7 +10,15 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.16
+### 0.1.17
+
+- Added support for `remove` field for Labels
+- Fixed `filter_function` bug in Python SDK
+- Fixed `fetchJwt` SDK method to return mock value during development
+- Fixed `fetchJwt` JS SDK method to return string instead of object
+- Added `repository` URL to starter project package.json
+
+### [0.1.16](https://github.com/forta-network/forta-bot-sdk/commit/5963444413b09cf2505dbacd2212481f592caedd)
 
 - Updated grpc proto definitions for Labels
 - Updated `run --file` command to also accept hashes
