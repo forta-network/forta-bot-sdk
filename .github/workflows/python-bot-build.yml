@@ -19,14 +19,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Dependencies
-        run: npm install && pip install build && pip install pytest && pip install pytest-env
+      - name: Install Dependencies for sdk
+        run: npm run python:install
       
-      - name: Link sdk
-        run: npm run js:publish:local
-      
-      - name: Link to python bot
-        run: npm link forta-agent
-
-      - name: Build
+      - name: Build python sdk
         run: npm run python:build
+      
+      - name: Link python sdk
+        run: npm run python:publish:local
+
+      - name: Install bot dependencies
+        working-directory: ./starter-project/py
+        run: npm run install
+      
+      - name: Install local python sdk on bot
+        working-directory: ./starter-project/py
+        run: npm run postinstall
