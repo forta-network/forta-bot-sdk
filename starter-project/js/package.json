@@ -2,6 +2,7 @@
   "name": "forta-agent-starter",
   "version": "0.0.1",
   "description": "Forta Agent Javascript starter project",
+  "repository": "https://github.com/forta-network/forta-bot-sdk/tree/master/starter-project",
   "chainIds": [
     1
   ],
@@ -25,7 +26,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "forta-agent": "^0.1.16"
+    "forta-agent": "^0.1.17"
   },
   "devDependencies": {
     "jest": "^27.0.6",

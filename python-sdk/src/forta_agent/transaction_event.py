@@ -117,7 +117,7 @@ class TransactionEvent:
             try:
                 decoded_function = contract.decode_function_input(
                     source['data'])
-                decoded_function["address"] = source['to'].lower()
+                decoded_function[1]["address"] = source['to'].lower()
                 results.append(decoded_function)
             except:
                 continue  # TODO see if theres a better way to handle 'no matching function' error

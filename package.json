@@ -1,6 +1,10 @@
 {
   "name": "forta-agent",
+<<<<<<< HEAD
   "version": "0.1.19",
+=======
+  "version": "0.1.17",
+>>>>>>> master
   "license": "MIT",
   "description": "Forta Agent SDK and CLI tool",
   "homepage": "https://forta.org/",
@@ -18,17 +22,22 @@
   },
   "scripts": {
     "build": "npm run js:build",
+    "test": "npm run js:test",
     "js:build": "tsc --p ./tsconfig.build.json && cp -r ./starter-project ./dist && cp ./cli/commands/init/forta.config.json ./dist/cli/commands/init/forta.config.json && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto && cp ./cli/commands/run/server/alert.proto ./dist/cli/commands/run/server/alert.proto",
     "js:publish": "npm run js:build && npm publish",
     "js:publish:local": "npm link --force",
+    "js:pack": "npm pack",
+    "js:test": "jest",
+    "js:coverage": "jest --coverage",
+    "python:install": "python3 -m pip install -r ./python-sdk/requirements.txt",
     "python:build": "python3 -m build ./python-sdk",
     "python:publish": "npm run python:build && python3 -m twine upload ./python-sdk/dist/*",
     "python:publish:local": "python3 -m pip install -e ./python-sdk",
     "python:pack": "cd ./python-sdk && python3 setup.py sdist",
-    "python-sdk-test": "python3 -m pytest python-sdk",
-    "test": "jest",
     "unit-test:cli": "jest ./cli",
-    "unit-test:typescript-sdk": "jest ./sdk"
+    "unit-test:typescript-sdk": "jest ./sdk",
+    "python:test": "python3 -m pytest python-sdk",
+    "python:coverage": "COVERAGE_FILE=python-sdk/.coverage python3 -m coverage run -m pytest python-sdk && cd python-sdk && python3 -m coverage html --directory=coverage"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.3.6",
