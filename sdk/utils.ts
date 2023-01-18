@@ -19,7 +19,6 @@ import { Log, Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
 import { ethers } from '.'
-import { toUtf8Bytes } from "@ethersproject/strings"
 import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlAlertResponse } from './graphql/forta'
 import axios, { AxiosInstance } from 'axios'
 
@@ -145,6 +144,10 @@ export const createAlertEvent = ({
   return new AlertEvent(alert)
 }
 
+export const assertExists = (obj: any, objName: string) => {
+  if (_.isNil(obj)) throw new Error(`${objName} is required`)
+}
+
 export const assertIsNonEmptyString = (str: string, varName: string) => {
   if (!_.isString(str) || str.length === 0) {
     throw new Error(`${varName} must be non-empty string`);
@@ -178,109 +181,4 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
   if(response.data && response.data.errors) throw Error(response.data.errors)
 
   return response.data.data.alerts
-}
-
-export const fetchJwt = async (claims: {} = {}, expiresAt?: Date, axiosInstance: AxiosInstance = getAxiosInstance()): Promise<{token: string} | null> => {
-  const hostname = 'forta-jwt-provider'
-  const port = 8515
-  const path = '/create'
-
-  let fullClaims = {...claims}
-
-  if(expiresAt) {
-    const expInSec = Math.floor(expiresAt.getTime()/1000);
-
-    // This covers the edge case where a Date that causes a seconds value to have number overflow resulting in a null exp
-    const safeExpInSec = expInSec > Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : expInSec;
-
-    fullClaims = {
-      exp: safeExpInSec,
-      ...fullClaims
-    }
-  }
-
-  const data = {
-    claims: fullClaims
-  }
-
-  if(process.env.NODE_ENV !== 'production') {
-    return {token: mockJwt};
-  }
-
-  const response = await axiosInstance.post(`http://${hostname}:${port}${path}`, data)
-  return response.data
-}
-
-interface DecodedJwt {
-  header: any,
-  payload: any
-}
-
-export const decodeJwt = (token: string): DecodedJwt => {
-
-  const splitJwt = (token).split('.');
-  const header = JSON.parse(Buffer.from(splitJwt[0], 'base64').toString())
-  const payload = JSON.parse(Buffer.from(splitJwt[1], 'base64').toString())
-
-  return {
-    header,
-    payload
-  }
-}
-
-const DISPTACHER_ARE_THEY_LINKED = "function areTheyLinked(uint256 agentId, uint256 scannerId) external view returns(bool)";
-const DISPATCH_CONTRACT = "0xd46832F3f8EA8bDEFe5316696c0364F01b31a573"; // Source: https://docs.forta.network/en/latest/smart-contracts/
-
-export const verifyJwt = async (token: string, polygonRpcUrl: string = "https://polygon-rpc.com"): Promise<boolean> => {
-  const splitJwt = (token).split('.')
-  const rawHeader = splitJwt[0]
-  const rawPayload = splitJwt[1]
-
-  const header = JSON.parse(Buffer.from(rawHeader, 'base64').toString())
-  const payload = JSON.parse(Buffer.from(rawPayload, 'base64').toString())
-
-  const botId = payload["bot-id"] as string
-  const expiresAt = payload["exp"] as number
-  const algorithm = header?.alg;
-
-  if(algorithm !== "ETH") {
-    console.warn(`Unexpected signing method: ${algorithm}`)
-    return false
-  }
-
-  if(!botId) {
-    console.warn(`Invalid claim`)
-    return false
-  }
-
-  const signerAddress = payload?.sub as string | undefined // public key should be contract address that signed the JWT
-
-  if(!signerAddress) {
-    console.warn(`Invalid claim`)
-    return false
-  }
-
-  const currentUnixTime = Math.floor((Date.now() / 1000))
-
-  if(expiresAt < currentUnixTime) {
-    console.warn(`Jwt is expired`)
-    return false
-  }
-
-  const digest = ethers.utils.keccak256(toUtf8Bytes(`${rawHeader}.${rawPayload}`))
-  const signature = `0x${ Buffer.from(splitJwt[2], 'base64').toString('hex')}`
-
-  const recoveredSignerAddress = ethers.utils.recoverAddress(digest, signature) // Contract address that signed message
-
-  if(recoveredSignerAddress !== signerAddress) {
-    console.warn(`Signature invalid: expected=${signerAddress}, got=${recoveredSignerAddress}`)
-    return false
-  }
-
-  const polygonProvider = new ethers.providers.JsonRpcProvider(polygonRpcUrl)
-
-  const dispatchContract = new ethers.Contract(DISPATCH_CONTRACT, [DISPTACHER_ARE_THEY_LINKED], polygonProvider)
-  const areTheyLinked = await dispatchContract.areTheyLinked(botId, recoveredSignerAddress)
-  
-  return areTheyLinked
 }
