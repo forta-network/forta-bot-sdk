@@ -1,9 +1,6 @@
-import { FetchJwt, provideFetchJwt } from "./jwt";
+import { FetchJwt, provideFetchJwt, MOCK_JWT } from "./jwt";
 
 describe("JWT methods", () => {
-  const mockJWT =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-
   describe("fetchJWT", () => {
     let fetchJwt: FetchJwt;
     const mockAxios = {
@@ -20,10 +17,12 @@ describe("JWT methods", () => {
 
     beforeEach(() => resetMocks());
 
-    it("should return a JWT string", async () => {
+    it("should return a JWT string from scan node when in production mode", async () => {
+      process.env.NODE_ENV = "production";
+      const jwt = "someJwt";
       mockAxios.post.mockReturnValueOnce({
         data: {
-          token: mockJWT,
+          token: jwt,
         },
       });
       const claims = { some: "claim" };
@@ -31,7 +30,7 @@ describe("JWT methods", () => {
 
       const token = await fetchJwt(claims, expiresAt);
 
-      expect(token).toEqual(mockJWT);
+      expect(token).toEqual(jwt);
       expect(mockAxios.post).toHaveBeenCalledTimes(1);
       expect(mockAxios.post).toHaveBeenCalledWith(
         `http://forta-jwt-provider:8515/create`,
@@ -42,6 +41,15 @@ describe("JWT methods", () => {
           },
         }
       );
+    });
+
+    it("should return a mock JWT when not in production mode", async () => {
+      process.env.NODE_ENV = "development";
+
+      const token = await fetchJwt({});
+
+      expect(token).toEqual(MOCK_JWT);
+      expect(mockAxios.post).toHaveBeenCalledTimes(0);
     });
   });
 });

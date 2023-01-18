@@ -25,7 +25,8 @@ import {
 import {
   fetchJwt,
   decodeJwt,
-  verifyJwt
+  verifyJwt,
+  MOCK_JWT
 } from "./jwt"
 import awilixConfigureContainer from '../cli/di.container';
 import {InitializeResponse} from "./initialize.response";
@@ -120,5 +121,6 @@ export {
   getAlerts,
   fetchJwt,
   decodeJwt,
-  verifyJwt
+  verifyJwt,
+  MOCK_JWT
  }
