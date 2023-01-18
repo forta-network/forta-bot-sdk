@@ -21,10 +21,12 @@ import {
   isPrivateFindings,
   getTransactionReceipt,
   getAlerts,
+} from "./utils"
+import {
   fetchJwt,
   decodeJwt,
   verifyJwt
-} from "./utils"
+} from "./jwt"
 import awilixConfigureContainer from '../cli/di.container';
 import {InitializeResponse} from "./initialize.response";
 
