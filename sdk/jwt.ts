@@ -8,11 +8,16 @@ interface DecodedJwt {
   payload: any;
 }
 
+export const MOCK_JWT =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJib3QtaWQiOiIweDEzazM4N2IzNzc2OWNlMjQyMzZjNDAzZTc2ZmMzMGYwMWZhNzc0MTc2ZTE0MTZjODYxeWZlNmMwN2RmZWY3MWYiLCJleHAiOjE2NjAxMTk0NDMsImlhdCI6MTY2MDExOTQxMywianRpIjoicWtkNWNmYWQtMTg4NC0xMWVkLWE1YzktMDI0MjBhNjM5MzA4IiwibmJmIjoxNjYwMTE5MzgzLCJzdWIiOiIweDU1NmY4QkU0MmY3NmMwMUY5NjBmMzJDQjE5MzZEMmUwZTBFYjNGNEQifQ.9v5OiiYhDoEbhZ-abbiSXa5y-nQXa104YCN_2mK7SP0";
+
 export type FetchJwt = (claims: object, expiresAt?: Date) => Promise<string>;
 export const provideFetchJwt = (axios: AxiosInstance): FetchJwt => {
   assertExists(axios, "axios");
 
   return async function fetchJwt(claims: object, expiresAt?: Date) {
+    if (process.env.NODE_ENV !== "production") return MOCK_JWT;
+
     const hostname = "forta-jwt-provider";
     const port = 8515;
     const path = "/create";

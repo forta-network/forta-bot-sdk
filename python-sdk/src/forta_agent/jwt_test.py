@@ -1,4 +1,4 @@
-from .utils import MOCK_JWT, fetch_jwt
+from .jwt import MOCK_JWT, fetch_jwt
 import responses
 import os
 import pytest
@@ -21,6 +21,7 @@ def test_return_mock_jwt():
 
     assert token == MOCK_JWT
 
+
 @responses.activate
 def test_return_valid_JWT():
     testJWT = "testJWT"
@@ -38,6 +39,7 @@ def test_return_valid_JWT():
     token = fetch_jwt()
 
     assert token == testJWT
+
 
 @responses.activate
 def test_JWT_should_throw_exception():
