@@ -17,7 +17,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Dependencies
-        run: npm run python:install
+        run: npm install && npm run python:install
 
-      - name: Publish Local
+      - name: Build python
         run: npm run python:build

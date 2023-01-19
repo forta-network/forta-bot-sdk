@@ -1,8 +1,5 @@
 name: Typscript Build
-on:
-  push:
-    branches:
-      - master
+on: push
 jobs:
   typescript-build:
     runs-on: ubuntu-latest

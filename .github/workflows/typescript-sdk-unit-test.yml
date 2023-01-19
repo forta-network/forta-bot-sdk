@@ -12,9 +12,6 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
-      
-      - name: Build
-        run: npm run build
 
       - name: Run the tests
         run: npm run unit-test:typescript-sdk
