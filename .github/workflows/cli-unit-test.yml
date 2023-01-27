@@ -31,11 +31,10 @@ jobs:
           echo "total=$(sed -n 47p coverage/lcov-report/index.html | awk -F '>' '{print $2}' | awk -F '%' '{print $1}')" >> $GITHUB_OUTPUT
         working-directory: ./master
       - name: Coverage threshold check
-        shell: bash {0}
         run: |
           COVERAGE=${{ steps.coverage.outputs.total }}
           MASTER_COVERAGE=${{ steps.master-coverage.outputs.total }}
-          COVERAGE_THRESHOLD=
+          COVERAGE_THRESHOLD=${{ vars.COVERAGE_THRESHOLD }}
           if (( $(echo "$MASTER_COVERAGE - $COVERAGE > $COVERAGE_THRESHOLD" | bc -l)  )) ; then
             echo "coverage fell by more than $COVERAGE_THRESHOLD%"
             exit 1
