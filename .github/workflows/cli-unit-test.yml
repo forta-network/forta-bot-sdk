@@ -12,8 +12,6 @@ jobs:
           node-version: "14"
       - name: Install Dependencies
         run: npm install
-      - name: Build
-        run: npm run build
       - name: Run the tests
         run: npm run js:coverage
       - name: Code coverage
@@ -28,6 +26,7 @@ jobs:
       - name: Master branch code coverage
         id: master-coverage
         run: |
+          npm install
           npm run js:coverage
           echo "total=$(sed -n 47p coverage/lcov-report/index.html | awk -F '>' '{print $2}' | awk -F '%' '{print $1}')" >> $GITHUB_OUTPUT
         working-directory: ./master
