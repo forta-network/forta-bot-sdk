@@ -5,16 +5,21 @@ import { UploadImage } from '../publish/upload.image'
 
 export default function providePush(
   uploadImage: UploadImage,
-  appendToFile: AppendToFile
+  appendToFile: AppendToFile,
+  args: any
 ): CommandHandler {
   assertExists(uploadImage, 'uploadImage')
   assertExists(appendToFile, 'appendToFile')
+  assertExists(args, 'args')
 
   return async function push() {
     const imageReference = await uploadImage()
 
-    const logMessage = `successfully pushed image with reference ${imageReference}`
+    let logMessage = `${new Date().toUTCString()}: successfully pushed image with reference ${imageReference}`
+    if (args.refOnly) {
+      logMessage = imageReference
+    }
     console.log(logMessage)
-    appendToFile(`${new Date().toUTCString()}: ${logMessage}`, 'publish.log')
+    appendToFile(logMessage, 'publish.log')
   } 
 }
