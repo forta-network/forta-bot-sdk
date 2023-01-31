@@ -2,7 +2,7 @@
 import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
 
-type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile" | "logs" | "info"
+type CommandName = "init" | "run" | "publish" | "push" | "upload" | "disable" | "enable" | "keyfile" | "logs" | "info"
 export type CommandHandler = (args?: any) => Promise<void>
 
 async function executeCommand(cliCommandName: CommandName, cliArgs: any) {

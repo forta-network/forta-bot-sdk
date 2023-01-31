@@ -1,5 +1,4 @@
 import providePush from "."
-import { CommandHandler } from "../.."
 
 describe("push", () => {
   it("uploads agent image and prints out the reference with a message", async () => {
