@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.17
+### 0.1.18
+
+- Updated grpc proto definition to add `alert.chainId` field
+
+### [0.1.17](https://github.com/forta-network/forta-bot-sdk/commit/37194c3913ba8473e6e5406270539f857ee4045a)
 
 - Added support for `remove` field for Labels
 - Fixed `filter_function` bug in Python SDK
