@@ -17,6 +17,7 @@ describe("pushToRegistry", () => {
     
   }
   const mockFromWallet = {
+    getAddress: jest.fn(),
     getBalance: jest.fn(),
     connect: jest.fn().mockReturnThis(),
     address: mockFromAddress
@@ -37,6 +38,7 @@ describe("pushToRegistry", () => {
 
   it("throws error if insufficient funds to deploy", async () => {
     mockAgentRegistry.getAgent.mockReturnValueOnce({created: false})
+    mockFromWallet.getAddress.mockReturnValue('0x123')
     mockFromWallet.getBalance.mockReturnValueOnce(BigNumber.from(0))
 
     try {
@@ -64,6 +66,7 @@ describe("pushToRegistry", () => {
     const systemTime = new Date()
     jest.useFakeTimers('modern').setSystemTime(systemTime)
     mockAgentRegistry.getAgent.mockReturnValueOnce({created: false})
+    mockFromWallet.getAddress.mockReturnValue('0x123')
     mockFromWallet.getBalance.mockReturnValueOnce(BigNumber.from(1))
 
     await pushToRegistry(mockManifestRef, mockFromWallet as any)
@@ -87,6 +90,7 @@ describe("pushToRegistry", () => {
     const systemTime = new Date()
     jest.useFakeTimers('modern').setSystemTime(systemTime)
     mockAgentRegistry.getAgent.mockReturnValueOnce({created: true, owner: mockFromAddress})
+    mockFromWallet.getAddress.mockReturnValue('0x123')
     mockFromWallet.getBalance.mockReturnValueOnce(BigNumber.from(1))
 
     await pushToRegistry(mockManifestRef,  mockFromWallet as any)

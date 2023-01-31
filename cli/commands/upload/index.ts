@@ -20,7 +20,14 @@ export default function provideUpload(
       return
     }
 
-    const { privateKey } = await getCredentials()
+    let privateKey;
+    if (args.privateKey) {
+      privateKey = args.privateKey
+    } else {
+      const creds = await getCredentials()
+      privateKey = creds.privateKey
+    }
+
     const manifestReference = await uploadManifest(args.imageRef, privateKey)
 
     let logMessage = `${new Date().toUTCString()}: successfully uploaded manifest with reference ${manifestReference}`
