@@ -1,10 +1,17 @@
 import fs from "fs"
 import { ethers, Wallet } from "ethers"
-import { assertExists, assertIsNonEmptyString, keccak256 } from "../../utils"
+import { assertExists, assertIsNonEmptyString, assertIsValidChainSettings, keccak256 } from "../../utils"
 import { AddToIpfs } from "../../utils/add.to.ipfs"
 
 // uploads signed agent manifest to ipfs and returns ipfs reference
 export type UploadManifest = (imageReference: string, privateKey: string) => Promise<string>
+
+export type ChainSetting = {
+  shards: number;
+  target: number;
+}
+
+export type ChainSettings = { [id: string]: ChainSetting }
 
 type Manifest = {
   from: string,
@@ -18,7 +25,8 @@ type Manifest = {
   documentation: string,
   repository?: string,
   chainIds: number[],
-  publishedFrom: string
+  publishedFrom: string,
+  chainSettings?: ChainSettings
 }
 
 export default function provideUploadManifest(
@@ -32,6 +40,7 @@ export default function provideUploadManifest(
   repository: string,
   cliVersion: string,
   chainIds: number[],
+  chainSettings: ChainSettings
 ): UploadManifest {
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
@@ -42,6 +51,7 @@ export default function provideUploadManifest(
   assertIsNonEmptyString(documentation, 'documentation')
   assertIsNonEmptyString(cliVersion, 'cliVersion')
   assertExists(chainIds, 'chainIds')
+  assertIsValidChainSettings(chainSettings)
 
   return async function uploadManifest(imageReference: string, privateKey: string) {
     // upload documentation to ipfs
@@ -68,7 +78,8 @@ export default function provideUploadManifest(
       documentation: documentationReference,
       repository,
       chainIds,
-      publishedFrom: `Forta CLI ${cliVersion}`
+      publishedFrom: `Forta CLI ${cliVersion}`,
+      chainSettings,
     }
 
     // sign agent manifest

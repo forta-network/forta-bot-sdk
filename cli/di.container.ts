@@ -143,6 +143,13 @@ export default function configureContainer(args: any = {}) {
       }
       return chainIds.sort((a: number, b: number) => a-b)// sort by ascending integers
     }).singleton(),
+    chainSettings: asFunction((packageJson:any) => {
+      const chainSettings = packageJson.chainSettings
+      if(typeof chainSettings === "object") {
+        return chainSettings;
+      }
+      return undefined;
+    }).singleton(),
     version: asFunction((packageJson: any) => packageJson.version),
     documentation: asFunction((contextPath: string) => { return join(contextPath, 'README.md') }).singleton(),
     repository: asFunction((packageJson: any) => {
