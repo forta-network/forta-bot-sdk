@@ -66,9 +66,7 @@ export const assertIsValidChainSettings = (chainSettings?: any) => {
     if(key == "default") {
       continue 
     }
-    try {
-      parseInt(key)
-    }catch(e){
+    if(isNaN(parseInt(key))) {
       throw new Error("keys in chainSettings must be numerical string or default")
     }
   }
