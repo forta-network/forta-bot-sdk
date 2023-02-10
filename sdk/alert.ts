@@ -1,3 +1,5 @@
+import { Label } from "./label"
+
 export interface Alert {
     addresses?: string[],
     alertId?: string,
@@ -17,6 +19,7 @@ export interface Alert {
     alertDocumentType?: string,
     relatedAlerts?: string[],
     chainId?: number,
+    labels?: Label[],
     source?: {
         transactionHash?: string,
         block?: {

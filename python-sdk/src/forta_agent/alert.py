@@ -1,5 +1,6 @@
 class Alert:
     def __init__(self, dict):
+        from .label import Label
         self.addresses = dict.get('addresses')
         self.alert_id = dict.get('alertId')
         self.contracts = list(map(lambda t: Contract(t), dict.get(
@@ -20,6 +21,8 @@ class Alert:
         self.alert_document_type = dict.get('alertDocumentType')
         self.related_alerts = dict.get('relatedAlerts')
         self.chain_id = dict.get('chainId')
+        self.labels = list(map(lambda t: Label(t), dict.get(
+            'labels', []))) if dict.get('labels') is not None else []
 
 
 class Source:

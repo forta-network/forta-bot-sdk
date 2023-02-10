@@ -84,6 +84,13 @@ class AlertQueryOptions:
                     findingType
                     relatedAlerts
                     chainId
+                    labels {
+                        label,
+                        confidence,
+                        entity,
+                        entityType,
+                        remove
+                    }
                 }
                 pageInfo {
                     hasNextPage

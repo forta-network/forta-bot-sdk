@@ -10,6 +10,7 @@ import {
   BlockEvent,
   EventType,
   FortaConfig,
+  Label,
   Network,
   Trace,
   TransactionEvent
@@ -173,5 +174,9 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
 
   if(response.data && response.data.errors) throw Error(response.data.errors)
 
+  const alerts = response.data.data.alerts.alerts
+  for (const alert of alerts) {
+    alert.labels = alert.labels!.map((l) => Label.fromObject(l));
+  }
   return response.data.data.alerts
 }

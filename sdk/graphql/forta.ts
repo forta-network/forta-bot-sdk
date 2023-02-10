@@ -154,6 +154,13 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                             findingType
                             relatedAlerts
                             chainId
+                            labels {
+                                label,
+                                confidence,
+                                entity,
+                                entityType,
+                                remove
+                            }
                         }
                         pageInfo {
                             hasNextPage
