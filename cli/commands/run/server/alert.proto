@@ -43,6 +43,12 @@ message Signature {
   string signer = 3;
 }
 
+message BloomFilter {
+  uint64 k = 1;
+  uint64 m = 2;
+  string bitset = 3;
+}
+
 message Alert {
   string id = 1;
   AlertType type = 2;
@@ -53,6 +59,8 @@ message Alert {
   map<string, string> tags = 7;
   ScannerInfo scanner = 8;
   TrackingTimestamps timestamps = 9;
+  bool truncated = 10;
+  BloomFilter addressBloomFilter = 11;
 }
 
 message SignedAlert {
