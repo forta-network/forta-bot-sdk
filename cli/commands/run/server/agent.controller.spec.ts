@@ -137,6 +137,7 @@ describe("AgentController", () => {
     mockHandleBlock.mockReset()
     mockHandleTransaction.mockReset()
     mockHandleAlert.mockReset()
+    mockInitialize.mockReset()
   }
 
   beforeEach(() => resetMocks())
@@ -159,6 +160,8 @@ describe("AgentController", () => {
   })
 
   describe("Initialize", () => {
+    agentController = new AgentController(mockGetAgentHandlers)
+
     it("invokes callback with bot subscription", async () => {
       mockInitialize.mockReturnValue({
         status: "SUCCESS",
@@ -167,11 +170,24 @@ describe("AgentController", () => {
         }
       })
       mockGetAgentHandlers.mockReturnValue({initialize: mockInitialize})
-      agentController = new AgentController(mockGetAgentHandlers)
 
       await agentController.initializeAgentHandlers()
       await agentController.Initialize({}, mockCallback)
 
+      expect(mockInitialize).toHaveBeenCalledTimes(1)
+      expect(mockCallback).toHaveBeenCalledTimes(1)
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "SUCCESS",
+        alertConfig: {
+          subscriptions: [{botId: "0x123"}]
+        }
+      })
+    })
+
+    it("only invokes bot initialize method once", async () => {
+      await agentController.Initialize({}, mockCallback)
+
+      expect(mockInitialize).toHaveBeenCalledTimes(0)
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
         status: "SUCCESS",
