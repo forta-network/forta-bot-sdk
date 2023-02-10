@@ -58,6 +58,20 @@ export const assertFindings = (findings: Finding[]) => {
   if(findings.length > 10) throw Error(`Cannot return more than 10 findings per request (received ${findings.length})`)
 }
 
+export const assertIsValidChainSettings = (chainSettings?: any) => {
+  if(!chainSettings) {
+    return 
+  }
+  for(let key in chainSettings) {
+    if(key == "default") {
+      continue 
+    }
+    if(isNaN(parseInt(key))) {
+      throw new Error("keys in chainSettings must be numerical string or default")
+    }
+  }
+}
+
 export const isValidTimeRange = (earliestTimestamp: Date, latestTimestamp: Date): boolean => {
   // If given a start range and end range
   return earliestTimestamp < latestTimestamp;

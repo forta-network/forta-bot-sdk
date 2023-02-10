@@ -1,6 +1,6 @@
 import { ethers, Wallet } from "ethers"
 import { keccak256 } from "../../utils"
-import provideUploadManifest, { UploadManifest } from "./upload.manifest"
+import provideUploadManifest, { ChainSettings, UploadManifest } from "./upload.manifest"
 
 describe("uploadManifest", () => {
   let uploadManifest: UploadManifest
@@ -20,6 +20,16 @@ describe("uploadManifest", () => {
   const mockPrivateKey = "0xabcd"
   const mockCliVersion = "0.2"
   const mockChainIds = [1, 1337];
+  const mockChainSettings = {
+    "default": {
+      "shards": 1,
+      "target": 1
+    },
+    "1": {
+      "shards": 5,
+      "target": 10
+    }
+  } 
 
   const resetMocks = () => {
     mockFilesystem.existsSync.mockReset()
@@ -28,7 +38,7 @@ describe("uploadManifest", () => {
 
   beforeAll(() => {
     uploadManifest = provideUploadManifest(
-      mockFilesystem, mockAddToIpfs, mockAgentName, mockDescription, mockAgentId, mockVersion, mockDocumentation, mockRepository, mockCliVersion, mockChainIds
+      mockFilesystem, mockAddToIpfs, mockAgentName, mockDescription, mockAgentId, mockVersion, mockDocumentation, mockRepository, mockCliVersion, mockChainIds, mockChainSettings
     )
   })
 
@@ -84,7 +94,8 @@ describe("uploadManifest", () => {
       documentation: mockDocumentationRef,
       repository: mockRepository,
       chainIds: mockChainIds,
-      publishedFrom: `Forta CLI ${mockCliVersion}`
+      publishedFrom: `Forta CLI ${mockCliVersion}`,
+      chainSettings: mockChainSettings
     }
     const mockManifestRef = "manifestRef"
     mockAddToIpfs.mockReturnValueOnce(mockManifestRef)
