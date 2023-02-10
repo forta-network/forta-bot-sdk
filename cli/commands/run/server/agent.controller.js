@@ -15,15 +15,17 @@ module.exports = class AgentController {
     assertExists(getAgentHandlers, "getAgentHandlers");
     this.getAgentHandlers = getAgentHandlers;
     this.initializeAgentHandlers();
+    this.isInitialized = false; // makes sure agent initialize handler only called once
+    this.initializeResponse = {};
   }
 
   async Initialize(call, callback) {
-    let initializeResponse = {};
     let status = "SUCCESS";
 
-    if (this.initialize) {
+    if (this.initialize && !this.isInitialized) {
       try {
-        initializeResponse = await this.initialize();
+        this.initializeResponse = await this.initialize();
+        this.isInitialized = true;
       } catch (e) {
         console.log(`${new Date().toISOString()}    initialize`);
         console.log(e);
@@ -33,7 +35,9 @@ module.exports = class AgentController {
 
     callback(null, {
       status: status,
-      alertConfig: initializeResponse ? initializeResponse.alertConfig : undefined,
+      alertConfig: this.initializeResponse
+        ? this.initializeResponse.alertConfig
+        : undefined,
     });
   }
 
@@ -140,7 +144,9 @@ module.exports = class AgentController {
 
   async initializeAgentHandlers() {
     try {
-      const agentHandlers = await this.getAgentHandlers({shouldRunInitialize: false});
+      const agentHandlers = await this.getAgentHandlers({
+        shouldRunInitialize: false,
+      });
       this.initialize = agentHandlers.initialize;
       this.handleBlock = agentHandlers.handleBlock;
       this.handleTransaction = agentHandlers.handleTransaction;
