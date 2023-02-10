@@ -53,7 +53,8 @@ describe("AgentController", () => {
     request: {
       event: {
         alert: {
-          hash: "0x123"
+          hash: "0x123",
+          labels: []
         }
       }
     }
