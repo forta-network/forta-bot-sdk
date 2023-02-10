@@ -14,6 +14,10 @@ describe("getSubscriptionAlerts", () => {
     hash: "0x456",
     alertId: "ALERT-2",
   };
+  const mockAlert3 = {
+    hash: "0x789",
+    alertId: "ALERT-3",
+  };
   const mockSubscriptions = [
     {
       botId: "0xbot1",
@@ -22,6 +26,11 @@ describe("getSubscriptionAlerts", () => {
     {
       botId: "0xbot2",
       alertId: "ALERT-2",
+    },
+    {
+      botId: "0xbot3",
+      alertIds: ["ALERT-3", "ALERT-4"],
+      chainId: 137,
     },
   ];
 
@@ -53,6 +62,12 @@ describe("getSubscriptionAlerts", () => {
         pageInfo: {
           hasNextPage: false,
         },
+      })
+      .mockReturnValueOnce({
+        alerts: [mockAlert3],
+        pageInfo: {
+          hasNextPage: false,
+        },
       });
 
     const alerts = await getSubscriptionAlerts(
@@ -60,20 +75,30 @@ describe("getSubscriptionAlerts", () => {
       mockCreatedSince
     );
 
-    expect(alerts).toStrictEqual([mockAlert, mockAlert2]);
-    expect(mockGetAlerts).toHaveBeenCalledTimes(2);
-    expect(mockGetAlerts).toHaveBeenNthCalledWith(1, {
+    expect(alerts.length).toEqual(3);
+    expect(alerts.includes(mockAlert)).toBeTrue();
+    expect(alerts.includes(mockAlert2)).toBeTrue();
+    expect(alerts.includes(mockAlert3)).toBeTrue();
+    expect(mockGetAlerts).toHaveBeenCalledTimes(3);
+    expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot1", "0xbot2"],
       alertIds: ["ALERT-1", "ALERT-2"],
       createdSince: 0,
       first: 100,
     });
-    expect(mockGetAlerts).toHaveBeenNthCalledWith(2, {
+    expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot1", "0xbot2"],
       alertIds: ["ALERT-1", "ALERT-2"],
       createdSince: 0,
       first: 100,
       startingCursor: mockEndCursor,
+    });
+    expect(mockGetAlerts).toHaveBeenCalledWith({
+      botIds: ["0xbot3"],
+      alertIds: ["ALERT-3", "ALERT-4"],
+      createdSince: 0,
+      chainId: 137,
+      first: 100,
     });
     jest.useRealTimers();
   });
