@@ -7,7 +7,7 @@ import { AlertQueryOptions, AlertsResponse } from "../../sdk/graphql/forta";
 export type GetAlert = (alertHash: string) => Promise<Alert>;
 
 export const ONE_DAY_IN_MS = 86400000;
-export const LOOKBACK_PERIOD_DAYS = 30;
+export const LOOKBACK_PERIOD_DAYS = 90;
 
 export default function provideGetAlert(
   getAlerts: (q: AlertQueryOptions) => Promise<AlertsResponse>,
