@@ -85,10 +85,10 @@ class AlertQueryOptions:
                     relatedAlerts
                     chainId
                     labels {
-                        label,
-                        confidence,
-                        entity,
-                        entityType,
+                        label
+                        confidence
+                        entity
+                        entityType
                         remove
                     }
                 }
