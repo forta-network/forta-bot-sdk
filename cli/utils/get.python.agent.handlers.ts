@@ -75,6 +75,7 @@ function getPythonHandler(agentPath: string, contextPath: string) {
   // WARNING! BE CAREFUL OF INDENTATION HERE
   const pythonWrapperScript = `
 import sys
+import traceback
 sys.path.append('${contextPath}')
 import json
 from forta_agent import BlockEvent, TransactionEvent, AlertEvent
@@ -103,7 +104,7 @@ while True:
       findings = ${agentModule}.${HANDLE_ALERT_METHOD_NAME}(event)
       print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
   except Exception as e:
-    print(e, file=sys.stderr)
+    traceback.print_exc(file=sys.stdout)
 `
   // write the wrapper script to file
   const randomInt = Math.floor(Math.random() * Date.now())
