@@ -10,7 +10,15 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.18
+### 0.1.19
+
+- Added support for running shards i.e. multiple bot instances
+- Added labels to alerts
+- Updated handleAlert subscriptions to allow specifying filter by chainId
+- Updated grpc controller to ensure initialize handler only invoked once
+- Updated grpc proto definition
+
+### [0.1.18](https://github.com/forta-network/forta-bot-sdk/commit/87268d3034bd79498a0690708cbfe2aaa851f00d)
 
 - Updated grpc proto definition to add `alert.chainId` field
 
