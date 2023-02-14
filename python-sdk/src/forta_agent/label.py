@@ -17,7 +17,6 @@ class Label:
             entityTypeVal) == str else EntityType(entityTypeVal)
         assert_enum_value_in_dict(self.__dict__, 'entity_type', EntityType)
         assert_non_empty_string_in_dict(dict, 'entity')
-        assert_non_empty_string_in_dict(dict, 'label')
         self.entity = dict['entity']
         self.confidence = dict['confidence']
         self.label = dict['label']
