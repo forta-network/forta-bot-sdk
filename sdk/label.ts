@@ -6,6 +6,14 @@ export enum EntityType {
   Url,
 }
 
+export const ENTITY_TYPE_STRING_TO_ENUM = {
+  UNKNOWN: EntityType.Unknown,
+  ADDRESS: EntityType.Address,
+  TRANSACTION: EntityType.Transaction,
+  BLOCK: EntityType.Block,
+  URL: EntityType.Url,
+};
+
 type LabelInput = {
   entityType: EntityType;
   entity: string;
@@ -30,6 +38,9 @@ export class Label {
     confidence,
     remove = false,
   }: LabelInput) {
+    if (typeof entityType == "string") {
+      entityType = ENTITY_TYPE_STRING_TO_ENUM[entityType];
+    }
     return new Label(entityType, entity, label, confidence, remove);
   }
 }
