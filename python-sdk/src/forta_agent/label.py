@@ -12,7 +12,7 @@ class EntityType(IntEnum):
 
 class Label:
     def __init__(self, dict):
-        entityTypeVal = dict.get('entity_type', dict['entityType'])
+        entityTypeVal = dict.get('entity_type', dict.get('entityType'))
         self.entity_type = EntityType[entityTypeVal.title()] if type(
             entityTypeVal) == str else EntityType(entityTypeVal)
         assert_enum_value_in_dict(self.__dict__, 'entity_type', EntityType)
