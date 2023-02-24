@@ -176,7 +176,7 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
 
   const alerts = response.data.data.alerts.alerts
   for (const alert of alerts) {
-    alert.labels = alert.labels!.map((l) => Label.fromObject(l));
+    alert.labels = alert.labels ? alert.labels.map((l) => Label.fromObject(l)) : [];
   }
   return response.data.data.alerts
 }
