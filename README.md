@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.19
+### 0.1.20
+
+- Fixed labels parsing when querying for alerts
+
+### [0.1.19](https://github.com/forta-network/forta-bot-sdk/commit/7c28f8f5d043f61fa17db60784f00d894f777eb7)
 
 - Added support for running shards i.e. multiple bot instances
 - Added labels to alerts
