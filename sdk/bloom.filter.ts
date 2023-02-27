@@ -38,10 +38,7 @@ export class BloomFilter {
       let b = (ii + (ii % BigInt(2))) % BigInt(4);
       let c = BigInt(2) + b / BigInt(2);
       let d = BigInt.asUintN(64, ii * baseHashes[Number(c)]);
-      // console.log(a, b, c, d);
       const location = BigInt.asUintN(64, a + d);
-      // console.log(i, location);
-      // console.log(i, location % BigInt(this.m));
       indices.push(Number(location % BigInt(this.m)));
     }
     return indices;
@@ -68,7 +65,7 @@ class BitSet {
   private readonly data: BigUint64Array;
 
   constructor(public readonly m: number, public readonly base64Data: string) {
-    // first Uint64 encodes m, next Uint64 encodes k, next Uint64 encodes m again (so we slice them out)
+    // first Uint64 (i.e. 8 bytes) encodes m, next Uint64 encodes k, next Uint64 encodes m again (so we slice them out)
     const buffer = decode(base64Data).slice(8 * 3);
     const dataView = new DataView(buffer);
     const arrayLength = Math.ceil(this.m / 64); // how many Uint64 do we need to store m bits
@@ -80,10 +77,9 @@ class BitSet {
 
   public has(index: number): boolean {
     const wordIndex = index >> 6;
-    var wordsIndexI = index & (64 - 1);
-    var mask = BigInt(Math.pow(2, wordsIndexI));
-    var word = this.data[wordIndex];
-    // console.log(wordIndex, wordsIndexI, mask, word)
+    const wordsIndexI = index & (64 - 1);
+    const mask = BigInt(Math.pow(2, wordsIndexI));
+    const word = this.data[wordIndex];
     return (word & mask) !== BigInt(0);
   }
 }
