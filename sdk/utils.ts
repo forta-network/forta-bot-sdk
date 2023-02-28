@@ -174,9 +174,10 @@ export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsRespons
 
   if(response.data && response.data.errors) throw Error(response.data.errors)
 
-  const alerts = response.data.data.alerts.alerts
-  for (const alert of alerts) {
-    alert.labels = alert.labels ? alert.labels.map((l) => Label.fromObject(l)) : [];
+  const pageInfo = response.data.data.alerts.pageInfo
+  const alerts: Alert[] = []
+  for (const alertData of response.data.data.alerts.alerts) {
+    alerts.push(Alert.fromObject(alertData))
   }
-  return response.data.data.alerts
+  return { alerts, pageInfo }
 }
