@@ -3,7 +3,7 @@ const {
   TransactionEvent,
   isPrivateFindings,
   AlertEvent,
-  Label
+  Alert,
 } = require("../../../../sdk");
 const {
   assertExists,
@@ -189,8 +189,7 @@ module.exports = class AgentController {
   createAlertEventFromGrpcRequest(request) {
     const { alert } = request.event;
 
-    alert.labels = alert.labels.map((l) => Label.fromObject(l));
-    return new AlertEvent(alert);
+    return new AlertEvent(Alert.fromObject(alert));
   }
 
   createTransactionEventFromGrpcRequest(request) {
