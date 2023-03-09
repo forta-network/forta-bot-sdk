@@ -74,8 +74,8 @@ describe("runHandlersOnTransaction", () => {
     expect(mockHandleTransaction).toHaveBeenCalledWith(mockTxEvent)
   })
 
-  it("throws an error if more than 10 findings when executing transaction handler", async () => {
-    const findings = getFindingsArray(11, 4)
+  it("throws an error if more than 50 findings when executing transaction handler", async () => {
+    const findings = getFindingsArray(51, 4)
 
     try {
       const mockHandleTransaction = jest.fn().mockReturnValue(findings)
@@ -97,7 +97,7 @@ describe("runHandlersOnTransaction", () => {
 
       fail()
     } catch(err) {
-      expect(err.message).toBe(`Cannot return more than 10 findings per request (received ${findings.length})`)
+      expect(err.message).toBe(`Cannot return more than 50 findings per request (received ${findings.length})`)
     }
   })
 

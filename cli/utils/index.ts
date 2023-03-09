@@ -55,7 +55,7 @@ export const assertFindings = (findings: Finding[]) => {
   const kilobyte = 1024;
 
   if(byteLength > kilobyte * 50) throw Error(`Cannot return more than 50kB of findings per request (received ${byteLength} bytes)`)
-  if(findings.length > 10) throw Error(`Cannot return more than 10 findings per request (received ${findings.length})`)
+  if(findings.length > 50) throw Error(`Cannot return more than 50 findings per request (received ${findings.length})`)
 }
 
 export const assertIsValidChainSettings = (chainSettings?: any) => {
