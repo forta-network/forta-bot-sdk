@@ -1,3 +1,4 @@
+import { Alert } from "../../sdk";
 import {
   provideGetSubscriptionAlerts,
   GetSubscriptionAlerts,
@@ -6,18 +7,18 @@ import {
 describe("getSubscriptionAlerts", () => {
   let getSubscriptionAlerts: GetSubscriptionAlerts;
   const mockGetAlerts = jest.fn();
-  const mockAlert = {
+  const mockAlert = Alert.fromObject({
     hash: "0x123",
     alertId: "ALERT-1",
-  };
-  const mockAlert2 = {
+  });
+  const mockAlert2 = Alert.fromObject({
     hash: "0x456",
     alertId: "ALERT-2",
-  };
-  const mockAlert3 = {
+  });
+  const mockAlert3 = Alert.fromObject({
     hash: "0x789",
     alertId: "ALERT-3",
-  };
+  });
   const mockSubscriptions = [
     {
       botId: "0xbot1",

@@ -1,3 +1,4 @@
+import { BloomFilter } from "./bloom.filter";
 import { Label } from "./label";
 
 export type AlertContract = {
@@ -50,6 +51,12 @@ export type AlertProject = {
   };
 };
 
+export type AlertAddressBloomFilter = {
+  bitset: string;
+  k: string;
+  m: string;
+};
+
 type AlertInput = {
   addresses?: string[];
   alertId?: string;
@@ -69,9 +76,12 @@ type AlertInput = {
   source?: AlertSource;
   metadata?: any;
   projects?: AlertProject[];
+  addressBloomFilter?: AlertAddressBloomFilter;
 };
 
 export class Alert {
+  private readonly addressFilter?: BloomFilter;
+
   private constructor(
     readonly addresses?: string[],
     readonly alertId?: string,
@@ -90,8 +100,34 @@ export class Alert {
     readonly labels?: Label[],
     readonly source?: AlertSource,
     readonly metadata?: any,
-    readonly projects?: AlertProject[]
-  ) {}
+    readonly projects?: AlertProject[],
+    readonly addressBloomFilter?: AlertAddressBloomFilter
+  ) {
+    this.addressFilter = addressBloomFilter
+      ? new BloomFilter(
+          Number(addressBloomFilter.m),
+          Number(addressBloomFilter.k),
+          addressBloomFilter.bitset
+        )
+      : undefined;
+  }
+
+  public hasAddress(address: string): boolean {
+    if (this.addressFilter) {
+      return this.addressFilter.has(address);
+    }
+    if (this.addresses?.length) {
+      return this.addresses.includes(address);
+    }
+    return false;
+  }
+
+  public toString(): string {
+    return JSON.stringify(this, (key, value) => {
+      if (key === "addressFilter") return undefined; //dont try to serialize BloomFilter object
+      return value;
+    });
+  }
 
   static fromObject({
     addresses,
@@ -112,6 +148,7 @@ export class Alert {
     source,
     metadata,
     projects,
+    addressBloomFilter,
   }: AlertInput) {
     labels = labels ? labels.map((l) => Label.fromObject(l)) : [];
 
@@ -133,7 +170,8 @@ export class Alert {
       labels,
       source,
       metadata,
-      projects
+      projects,
+      addressBloomFilter
     );
   }
 }

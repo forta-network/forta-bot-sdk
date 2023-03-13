@@ -161,6 +161,11 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                                 entityType
                                 remove
                             }
+                            addressBloomFilter {
+                                bitset
+                                k
+                                m
+                            }
                         }
                         pageInfo {
                             hasNextPage

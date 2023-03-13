@@ -1,3 +1,4 @@
+import { Alert } from "../../sdk";
 import provideGetAlert, {
   GetAlert,
   getCacheKey,
@@ -13,10 +14,10 @@ describe("getAlert", () => {
     setKey: jest.fn(),
   } as any;
   const mockAlertHash = "0x123";
-  const mockAlert = {
+  const mockAlert = Alert.fromObject({
     hash: mockAlertHash,
     alertId: "ALERT-1",
-  };
+  });
 
   const resetMocks = () => {
     mockGetAlerts.mockReset();
