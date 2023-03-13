@@ -1,3 +1,4 @@
+import { Alert } from "../../sdk";
 import {
   provideRunHandlersOnAlert,
   RunHandlersOnAlert,
@@ -10,10 +11,10 @@ describe("runHandlersOnAlert", () => {
   const mockCreateAlertEvent = jest.fn();
   const mockHandleAlert = jest.fn();
   const mockAlertHash = "0x123";
-  const mockAlert = {
+  const mockAlert = Alert.fromObject({
     hash: mockAlertHash,
     alertId: "ALERT-1",
-  };
+  });
   const mockFinding = {
     some: "finding",
   };
