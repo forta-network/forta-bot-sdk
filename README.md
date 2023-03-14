@@ -10,7 +10,14 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.20
+### 0.1.21
+
+- Added support for address bloom filters on AlertEvent
+- Updated CLI errors to return a non-zero exit code
+- Changed Alert interface into a class
+- Increased maximum number of findings returned in a response to 50
+
+### [0.1.20](https://github.com/forta-network/forta-bot-sdk/commit/32d296e4d3fc28a6a55ff820cfdaa4a04b01c668)
 
 - Fixed labels parsing when querying for alerts
 
