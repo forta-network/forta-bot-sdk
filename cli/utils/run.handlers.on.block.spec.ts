@@ -86,7 +86,7 @@ describe("runHandlersOnBlock", () => {
   })
 
   it("throws an error if more than 10 findings when handling a block", async () => {
-    const findings = getFindingsArray(11, 10)
+    const findings = getFindingsArray(51, 10)
     try {
 
       const mockHandleBlock = jest.fn().mockReturnValue(findings)
@@ -103,12 +103,12 @@ describe("runHandlersOnBlock", () => {
 
       fail()
     } catch(err) {
-      expect(err.message).toBe(`Cannot return more than 10 findings per request (received ${findings.length})`)
+      expect(err.message).toBe(`Cannot return more than 50 findings per request (received ${findings.length})`)
     }
   })
 
-  it("throws an error if more than 10 findings when handling a transaction", async () => {
-    const findings = getFindingsArray(11, 10)
+  it("throws an error if more than 50 findings when handling a transaction", async () => {
+    const findings = getFindingsArray(51, 10)
     
     try {
       const mockHandleBlock = jest.fn().mockReturnValue([])
@@ -132,7 +132,7 @@ describe("runHandlersOnBlock", () => {
 
       fail()
     }catch(err) {
-      expect(err.message).toBe(`Cannot return more than 10 findings per request (received ${findings.length})`)
+      expect(err.message).toBe(`Cannot return more than 50 findings per request (received ${findings.length})`)
     }
   })
 

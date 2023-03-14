@@ -294,8 +294,8 @@ describe("AgentController", () => {
       })
     })
 
-    it("throws an error if more than 10 findings when handling a block", async () => {
-        const findings = (new Array(11)).fill(mockFinding)
+    it("throws an error if more than 50 findings when handling a block", async () => {
+        const findings = (new Array(51)).fill(mockFinding)
         mockHandleBlock.mockReturnValue(findings)
         mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
         agentController = new AgentController(mockGetAgentHandlers)
@@ -469,8 +469,8 @@ describe("AgentController", () => {
       expect(txEvent.contractAddress).toStrictEqual(formatAddress(mockTxRequest.request.event.contractAddress))
     })
   
-    it("throws an error if more than 10 findings when handling a transaction", async () => {
-        const findings = (new Array(21)).fill(mockFinding)
+    it("throws an error if more than 50 findings when handling a transaction", async () => {
+        const findings = (new Array(51)).fill(mockFinding)
         mockHandleTransaction.mockReturnValue(findings)
         mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
         agentController = new AgentController(mockGetAgentHandlers)
@@ -579,8 +579,8 @@ describe("AgentController", () => {
       expect(alertEvent).toBeInstanceOf(AlertEvent)
     })
 
-    it("throws an error if more than 10 findings when handling an alert", async () => {
-      const findings = (new Array(11)).fill(mockFinding)
+    it("throws an error if more than 50 findings when handling an alert", async () => {
+      const findings = (new Array(51)).fill(mockFinding)
       mockHandleAlert.mockReturnValue(findings)
       mockGetAgentHandlers.mockReturnValue({ handleAlert: mockHandleAlert })
       agentController = new AgentController(mockGetAgentHandlers)
