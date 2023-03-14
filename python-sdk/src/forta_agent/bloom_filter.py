@@ -5,14 +5,16 @@ import math
 
 class BloomFilter:
     def __init__(self, dict):
-        self.k = dict.get('k')
-        self.m = dict.get('m')
-        self.base64_data = dict.get('data')
+        self.k = int(dict.get('k'), 16) if type(
+            dict.get('k')) == str else dict.get('k')
+        self.m = int(dict.get('m'), 16) if type(
+            dict.get('m')) == str else dict.get('m')
+        self.base64_data = dict.get('bitset')
         self.bitset = None
 
     def has(self, key):
-        if (self.bitset is None):
-            self.bitset = BitSet({'m': self.m, 'data': self.base64_data})
+        if self.bitset is None:
+            self.bitset = BitSet({'m': self.m, 'bitset': self.base64_data})
         indices = self.get_indices(key)
         for index in indices:
             if not self.bitset.has(index):
@@ -46,7 +48,7 @@ class BloomFilter:
 class BitSet:
     def __init__(self, dict):
         # first Uint64 (i.e. 8 bytes) encodes m, next Uint64 encodes k, next Uint64 encodes m again (so we slice them out)
-        decoded_bytes = base64.b64decode(dict.get('data'))[8*3:]
+        decoded_bytes = base64.b64decode(dict.get('bitset'))[8*3:]
         # how many Uint64 do we need to store m bits
         array_length = math.ceil(dict.get('m') / 64)
         self.data = []

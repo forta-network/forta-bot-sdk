@@ -91,6 +91,11 @@ class AlertQueryOptions:
                         entityType
                         remove
                     }
+                    addressBloomFilter {
+                        bitset
+                        k
+                        m
+                    }
                 }
                 pageInfo {
                     hasNextPage

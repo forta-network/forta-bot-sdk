@@ -22,7 +22,7 @@
     "js:build": "tsc --p ./tsconfig.build.json && cp -r ./starter-project ./dist && cp ./cli/commands/init/forta.config.json ./dist/cli/commands/init/forta.config.json && cp ./cli/commands/run/server/agent.proto ./dist/cli/commands/run/server/agent.proto && cp ./cli/commands/run/server/alert.proto ./dist/cli/commands/run/server/alert.proto",
     "js:publish": "npm run js:build && npm publish",
     "js:publish:local": "npm link --force",
-    "js:pack": "npm pack",
+    "js:pack": "npm run js:build && npm pack",
     "js:test": "jest",
     "js:coverage": "jest --coverage",
     "python:install": "python3 -m pip install -r ./python-sdk/requirements.txt",
