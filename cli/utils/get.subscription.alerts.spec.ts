@@ -85,13 +85,13 @@ describe("getSubscriptionAlerts", () => {
       botIds: ["0xbot1", "0xbot2"],
       alertIds: ["ALERT-1", "ALERT-2"],
       createdSince: 0,
-      first: 100,
+      first: 1000,
     });
     expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot1", "0xbot2"],
       alertIds: ["ALERT-1", "ALERT-2"],
       createdSince: 0,
-      first: 100,
+      first: 1000,
       startingCursor: mockEndCursor,
     });
     expect(mockGetAlerts).toHaveBeenCalledWith({
@@ -99,7 +99,7 @@ describe("getSubscriptionAlerts", () => {
       alertIds: ["ALERT-3", "ALERT-4"],
       createdSince: 0,
       chainId: 137,
-      first: 100,
+      first: 1000,
     });
     jest.useRealTimers();
   });
