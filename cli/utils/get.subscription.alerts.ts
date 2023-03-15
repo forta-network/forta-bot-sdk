@@ -65,7 +65,7 @@ async function runQuery(
     query = {
       botIds: Array.from(botIds),
       createdSince: now.getTime() - createdSince.getTime(),
-      first: 100,
+      first: 1000,
       startingCursor: response?.pageInfo.endCursor,
     };
     if (chainId > 0) {

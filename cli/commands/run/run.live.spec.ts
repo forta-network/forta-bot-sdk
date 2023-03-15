@@ -12,6 +12,11 @@ describe("runLive", () => {
   const mockRunHandlersOnAlert = jest.fn();
   const mockSleep = jest.fn();
   const mockShouldContinuePolling = jest.fn();
+  const mockInitializeResponse = {
+    alertConfig: {
+      subscriptions: [{ botId: "0x123", alertId: "ALERT-1" }],
+    },
+  };
   const latestBlockNumber = 1000;
   const systemTime = new Date();
 
@@ -80,11 +85,6 @@ describe("runLive", () => {
   });
 
   it("processes new blocks on following iterations", async () => {
-    const mockInitializeResponse = {
-      alertConfig: {
-        subscriptions: [{ botId: "0x123", alertId: "ALERT-1" }],
-      },
-    };
     mockGetAgentHandlers.mockReturnValue({
       handleTransaction: jest.fn(),
       handleAlert: jest.fn(),
@@ -115,10 +115,10 @@ describe("runLive", () => {
     expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(latestBlockNumber + 1);
     expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(latestBlockNumber + 2);
     expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(latestBlockNumber + 3);
-    expect(mockGetSubscriptionAlerts).toHaveBeenCalledTimes(2);
+    expect(mockGetSubscriptionAlerts).toHaveBeenCalledTimes(1);
     expect(mockGetSubscriptionAlerts).toHaveBeenCalledWith(
       mockInitializeResponse.alertConfig.subscriptions,
-      systemTime
+      new Date(systemTime.getTime() - 60000)
     );
     expect(mockRunHandlersOnAlert).toHaveBeenCalledTimes(1);
     expect(mockRunHandlersOnAlert).toHaveBeenCalledWith(mockAlert);

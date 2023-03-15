@@ -41,7 +41,7 @@ export function provideRunLive(
     const { chainId } = network;
     const { blockTimeInSeconds } = getBlockChainNetworkConfig(chainId);
     let currBlockNumber;
-    let lastAlertFetchTimestamp = new Date();
+    let lastAlertFetchTimestamp: Date | undefined = undefined;
 
     // poll for latest blocks
     while (shouldContinuePolling()) {
@@ -64,12 +64,18 @@ export function provideRunLive(
         }
 
         // process new alerts
-        if (handleAlert) {
+        if (
+          handleAlert &&
+          (lastAlertFetchTimestamp == undefined ||
+            Date.now() - lastAlertFetchTimestamp.getTime() > 60000)
+        ) {
           const queryStartTime = new Date();
+          console.log("querying alerts...");
           const alerts = await getSubscriptionAlerts(
             botSubscriptions,
-            lastAlertFetchTimestamp
+            lastAlertFetchTimestamp || new Date(Date.now() - 60000)
           );
+          console.log(`found ${alerts.length} alerts`);
           lastAlertFetchTimestamp = queryStartTime;
           for (const alert of alerts) {
             await runHandlersOnAlert(alert);
