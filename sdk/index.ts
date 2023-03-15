@@ -30,6 +30,7 @@ import {
 } from "./jwt"
 import awilixConfigureContainer from '../cli/di.container';
 import {InitializeResponse} from "./initialize.response";
+import { BloomFilter } from "./bloom.filter";
 
 interface DiContainer {
   resolve<T>(key: string): T
@@ -122,5 +123,6 @@ export {
   fetchJwt,
   decodeJwt,
   verifyJwt,
+  BloomFilter,
   MOCK_JWT
  }

@@ -6,10 +6,16 @@ export class BloomFilter {
   public bitSet: BitSet | undefined;
 
   constructor(
-    public readonly m: number,
-    public readonly k: number,
+    public readonly m: number | string,
+    public readonly k: number | string,
     public readonly base64Data: string
   ) {
+    if (typeof this.m === "string") {
+      this.m = Number(this.m);
+    }
+    if (typeof this.k === "string") {
+      this.k = Number(this.k);
+    }
     // create bitset lazily
     this.bitSet = undefined;
   }
@@ -17,7 +23,7 @@ export class BloomFilter {
   // returns true if key is in bloom filter, else false
   public has(key: string): boolean {
     if (this.bitSet == undefined) {
-      this.bitSet = new BitSet(this.m, this.base64Data);
+      this.bitSet = new BitSet(Number(this.m), this.base64Data);
     }
     var indices = this.getIndices(key);
     for (var i = 0; i < indices.length; i++) {

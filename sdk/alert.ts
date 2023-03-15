@@ -105,8 +105,8 @@ export class Alert {
   ) {
     this.addressFilter = addressBloomFilter
       ? new BloomFilter(
-          Number(addressBloomFilter.m),
-          Number(addressBloomFilter.k),
+          addressBloomFilter.m,
+          addressBloomFilter.k,
           addressBloomFilter.bitset
         )
       : undefined;
