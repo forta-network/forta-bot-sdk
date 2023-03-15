@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.21
+### 0.1.22
+
+- Updated `run` command to wait 60 seconds between alert queries for bots using `handleAlert` locally
+
+### [0.1.21](https://github.com/forta-network/forta-bot-sdk/commit/4b6a795b98c211b3e48253aec383405a4b676f41)
 
 - Added support for address bloom filters on AlertEvent
 - Updated CLI errors to return a non-zero exit code
