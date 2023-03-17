@@ -160,6 +160,7 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                                 entity
                                 entityType
                                 remove
+                                metadata
                             }
                             addressBloomFilter {
                                 bitset

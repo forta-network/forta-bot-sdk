@@ -21,6 +21,7 @@ class Label:
         self.confidence = dict['confidence']
         self.label = dict['label']
         self.remove = dict.get('remove', False)
+        self.metadata = dict.get('metadata')
 
     def toDict(self):
         d = dict(self.__dict__, **{

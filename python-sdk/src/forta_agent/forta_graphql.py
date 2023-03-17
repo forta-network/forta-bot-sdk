@@ -90,6 +90,7 @@ class AlertQueryOptions:
                         entity
                         entityType
                         remove
+                        metadata
                     }
                     addressBloomFilter {
                         bitset
