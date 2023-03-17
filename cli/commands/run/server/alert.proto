@@ -44,9 +44,10 @@ message Signature {
 }
 
 message BloomFilter {
-  uint64 k = 1;
-  uint64 m = 2;
+  string k = 1;
+  string m = 2;
   string bitset = 3;
+  uint32 itemCount = 4;
 }
 
 message Alert {
@@ -87,6 +88,7 @@ message Label {
   reserved 5;
   bool remove = 6;
   string label = 7;
+  repeated string metadata = 8;
 }
 
 message Finding {
