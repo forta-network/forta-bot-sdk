@@ -25,12 +25,12 @@ type LabelInput = {
 
 export class Label {
   private constructor(
-      readonly entityType: EntityType,
-      readonly entity: string,
-      readonly label: string,
-      readonly confidence: number,
-      readonly remove: boolean,
-      readonly metadata: string[]
+    readonly entityType: EntityType,
+    readonly entity: string,
+    readonly label: string,
+    readonly confidence: number,
+    readonly remove: boolean,
+    readonly metadata: string[]
   ) {}
 
   static fromObject({
@@ -39,7 +39,7 @@ export class Label {
     label,
     confidence,
     remove = false,
-    metadata,
+    metadata = [],
   }: LabelInput) {
     if (typeof entityType == "string") {
       entityType = ENTITY_TYPE_STRING_TO_ENUM[entityType];
