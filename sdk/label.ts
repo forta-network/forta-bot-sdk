@@ -19,8 +19,8 @@ type LabelInput = {
   entity: string;
   label: string;
   confidence: number;
-  remove: boolean;
-  metadata: string[];
+  remove?: boolean;
+  metadata?: string[];
 };
 
 export class Label {
