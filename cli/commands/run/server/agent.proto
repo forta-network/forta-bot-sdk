@@ -291,6 +291,7 @@ message AlertEvent {
       string entity = 3;
       string entityType = 4;
       bool remove = 5;
+      repeated string metadata = 6;
     }
 
     // Unique string to identify this class of finding,
