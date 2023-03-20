@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.22
+### 0.1.23
+
+- Added metadata field to Labels
+
+### [0.1.22](https://github.com/forta-network/forta-bot-sdk/commit/4b624a2b2917da47439dfb356ab2f50566be29e3)
 
 - Updated `run` command to wait 60 seconds between alert queries for bots using `handleAlert` locally
 
