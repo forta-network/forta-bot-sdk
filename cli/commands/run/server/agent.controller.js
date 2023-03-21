@@ -68,7 +68,7 @@ module.exports = class AgentController {
 
     callback(null, {
       status,
-      findings,
+      findings: this.formatFindings(findings),
       metadata: {
         timestamp: new Date().toISOString(),
       },
@@ -104,7 +104,7 @@ module.exports = class AgentController {
 
     callback(null, {
       status,
-      findings,
+      findings: this.formatFindings(findings),
       metadata: {
         timestamp: new Date().toISOString(),
       },
@@ -135,7 +135,7 @@ module.exports = class AgentController {
 
     callback(null, {
       status,
-      findings,
+      findings: this.formatFindings(findings),
       metadata: {
         timestamp: new Date().toISOString(),
       },
@@ -276,5 +276,22 @@ module.exports = class AgentController {
       logs,
       formatAddress(contractAddress)
     );
+  }
+
+  formatFindings(findings) {
+    // convert any label metadata from map to array
+    for (const finding of findings) {
+      for (const label of finding.labels) {
+        if (!Array.isArray(label.metadata)) {
+          const metadataArray = [];
+          for (const key of Object.keys(label.metadata)) {
+            metadataArray.push(`${key}=${label.metadata[key]}`);
+          }
+          label.metadata = metadataArray;
+        }
+      }
+    }
+
+    return findings;
   }
 };
