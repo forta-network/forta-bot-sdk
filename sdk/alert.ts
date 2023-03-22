@@ -57,7 +57,7 @@ export type AlertAddressBloomFilter = {
   m: string;
 };
 
-type AlertInput = {
+export type AlertInput = {
   addresses?: string[];
   alertId?: string;
   hash?: string;
@@ -82,7 +82,7 @@ type AlertInput = {
 export class Alert {
   private readonly addressFilter?: BloomFilter;
 
-  private constructor(
+  constructor(
     readonly addresses?: string[],
     readonly alertId?: string,
     readonly hash?: string,
