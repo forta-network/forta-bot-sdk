@@ -20,7 +20,7 @@ type LabelInput = {
   label: string;
   confidence: number;
   remove?: boolean;
-  metadata?: string[];
+  metadata?: { [key: string]: string };
 };
 
 export class Label {
@@ -30,7 +30,7 @@ export class Label {
     readonly label: string,
     readonly confidence: number,
     readonly remove: boolean,
-    readonly metadata: string[]
+    readonly metadata: { [key: string]: string }
   ) {}
 
   static fromObject({
@@ -39,10 +39,22 @@ export class Label {
     label,
     confidence,
     remove = false,
-    metadata = [],
+    metadata = {},
   }: LabelInput) {
     if (typeof entityType == "string") {
       entityType = ENTITY_TYPE_STRING_TO_ENUM[entityType];
+    }
+    if (Array.isArray(metadata)) {
+      // convert string array to string key/value map using first '=' character as separator
+      // (label metadata is received as string array for handleAlert)
+      let metadataMap: { [key: string]: string } = {};
+      for (const arrayItem of metadata) {
+        const separatorIndex = arrayItem.indexOf("=");
+        const key = arrayItem.substring(0, separatorIndex);
+        const value = arrayItem.substring(separatorIndex + 1, arrayItem.length);
+        metadataMap[key] = value;
+      }
+      metadata = metadataMap;
     }
     return new Label(entityType, entity, label, confidence, remove, metadata);
   }
