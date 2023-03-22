@@ -10,7 +10,12 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.23
+### 0.1.24
+
+- Increased max findings response size to 250kB
+- Updated label metadata field to be a map
+
+### [0.1.23](https://github.com/forta-network/forta-bot-sdk/commit/2b6763bb4df5bcdbb22b29e5ec0bea062d4acd44)
 
 - Added metadata field to Labels
 
