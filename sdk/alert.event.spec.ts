@@ -15,13 +15,15 @@ describe("alertEvent", () => {
 		}
 	}
 
+	const mockAddress1 = "0x111", mockAddress2 = "0x112", mockAddress3 = "0x113", mockAddress4 = "0x114";
+
 	const mockAlert = Alert.fromObject({
 		alertId: "ALERT-1",
 		name: "Mock Alert 1",
 		hash: "0x123",
 		source: alertSource,
 		chainId: 1,
-		addresses: ["0x111", "0x112", "0x113"],
+		addresses: [mockAddress1, mockAddress2, mockAddress3],
 	});
 		
 	const alertEvent = new AlertEvent(mockAlert)
@@ -39,10 +41,12 @@ describe("alertEvent", () => {
 	});
 
 	it("returns true when it contains a specific address", () => {
-		expect(alertEvent.hasAddress("0x111")).toBeTrue();
+		expect(alertEvent.hasAddress(mockAddress1)).toBeTrue();
+		expect(alertEvent.hasAddress(mockAddress2)).toBeTrue();
+		expect(alertEvent.hasAddress(mockAddress3)).toBeTrue();
 	});
 
 	it("returns false when it does not contain a specific address", () => {
-		expect(alertEvent.hasAddress("0x123")).toBeFalse();
+		expect(alertEvent.hasAddress(mockAddress4)).toBeFalse();
 	});
 });
