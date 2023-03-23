@@ -57,7 +57,7 @@ export type AlertAddressBloomFilter = {
   m: string;
 };
 
-export type AlertInput = {
+type AlertInput = {
   addresses?: string[];
   alertId?: string;
   hash?: string;
