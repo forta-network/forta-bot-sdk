@@ -28,7 +28,7 @@ describe("alertEvent", () => {
 		
 	const alertEvent = new AlertEvent(mockAlert)
 
-	it("returns AlertEvent attributes", () => {
+	it("should returns AlertEvent attributes", () => {
 		expect(alertEvent.alertId).toEqual(mockAlert.alertId);
 		expect(alertEvent.name).toEqual(mockAlert.name);
 		expect(alertEvent.hash).toEqual(mockAlert.hash);
@@ -40,13 +40,13 @@ describe("alertEvent", () => {
 		expect(alertEvent.chainId).toEqual(mockAlert.chainId);
 	});
 
-	it("returns true when it contains a specific address", () => {
+	it("should returns true when it contains a specific address", () => {
 		expect(alertEvent.hasAddress(mockAddress1)).toBeTrue();
 		expect(alertEvent.hasAddress(mockAddress2)).toBeTrue();
 		expect(alertEvent.hasAddress(mockAddress3)).toBeTrue();
 	});
 
-	it("returns false when it does not contain a specific address", () => {
+	it("should returns false when it does not contain a specific address", () => {
 		expect(alertEvent.hasAddress(mockAddress4)).toBeFalse();
 	});
 });
