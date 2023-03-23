@@ -1,5 +1,4 @@
 import { Alert } from "./alert";
-import { BloomFilter } from "./bloom.filter";
 
 describe("alert", () => {
   describe("no addressBloomFilter", () => {
@@ -29,7 +28,7 @@ describe("alert", () => {
       addressBloomFilter: {k, m, bitset},
     });
 
-    it("returns true when it contains a specific address", () => {
+    it("returns true when it contains a specific address on addressBloomFilter", () => {
       expect(
         mockAlert.hasAddress("0x030cb0fd022b0a66d2d6e39d0691cce86d4188b8")
       ).toBeTrue();
@@ -41,7 +40,23 @@ describe("alert", () => {
       ).toBeTrue();
     });
 
-    it("returns false when it does not contain a specific address", () => {
+    it("returns false when it does not contain a specific address on addressBloomFilter", () => {
+      expect(mockAlert.hasAddress("a")).toBeFalse();
+      expect(mockAlert.hasAddress("b")).toBeFalse();
+      expect(mockAlert.hasAddress("c")).toBeFalse();
+    });
+  })
+
+  describe("no address and no addressBloomFilter", () => {
+    const mockAlert = Alert.fromObject({});
+
+    it("returns false", () => {
+      expect(mockAlert.hasAddress("0x111")).toBeFalse();
+      expect(mockAlert.hasAddress("0x112")).toBeFalse();
+      expect(mockAlert.hasAddress("0x113")).toBeFalse();
+      expect(mockAlert.hasAddress("0x030cb0fd022b0a66d2d6e39d0691cce86d4188b8")).toBeFalse();
+      expect(mockAlert.hasAddress("0x1727b5a84fee033c3065473cc91c23e8607eef6b")).toBeFalse();
+      expect(mockAlert.hasAddress("0x1f11417c24fecc07154ce96db1b7b6af11c3af3f")).toBeFalse();
       expect(mockAlert.hasAddress("a")).toBeFalse();
       expect(mockAlert.hasAddress("b")).toBeFalse();
       expect(mockAlert.hasAddress("c")).toBeFalse();
