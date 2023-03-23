@@ -1,4 +1,4 @@
-import { Alert, AlertSource } from "./alert";
+import { Alert } from "./alert";
 import { AlertEvent } from "./alert.event";
 
 describe("alertEvent", () => {
