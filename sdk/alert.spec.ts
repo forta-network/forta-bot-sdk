@@ -7,13 +7,13 @@ describe("alert", () => {
       addresses: [mockAddress1, mockAddress2, mockAddress3],
     });
 
-    it("returns true when it contains a specific address", () => {
+    it("should returns true when it contains a specific address", () => {
       expect(mockAlert.hasAddress(mockAddress1)).toBeTrue();
       expect(mockAlert.hasAddress(mockAddress2)).toBeTrue();
       expect(mockAlert.hasAddress(mockAddress3)).toBeTrue();
     });
 
-    it("returns false when it does not contain a specific address", () => {
+    it("should returns false when it does not contain a specific address", () => {
       expect(mockAlert.hasAddress(mockAddress4)).toBeFalse();
     });
   });
@@ -28,7 +28,7 @@ describe("alert", () => {
       addressBloomFilter: {k, m, bitset},
     });
 
-    it("returns true when it contains a specific address on addressBloomFilter", () => {
+    it("should returns true when it contains a specific address on addressBloomFilter", () => {
       expect(
         mockAlert.hasAddress("0x030cb0fd022b0a66d2d6e39d0691cce86d4188b8")
       ).toBeTrue();
@@ -40,7 +40,7 @@ describe("alert", () => {
       ).toBeTrue();
     });
 
-    it("returns false when it does not contain a specific address on addressBloomFilter", () => {
+    it("should returns false when it does not contain a specific address on addressBloomFilter", () => {
       expect(mockAlert.hasAddress("a")).toBeFalse();
       expect(mockAlert.hasAddress("b")).toBeFalse();
       expect(mockAlert.hasAddress("c")).toBeFalse();
@@ -50,7 +50,7 @@ describe("alert", () => {
   describe("no address and no addressBloomFilter", () => {
     const mockAlert = Alert.fromObject({});
 
-    it("returns false", () => {
+    it("should returns false", () => {
       expect(mockAlert.hasAddress("0x111")).toBeFalse();
       expect(mockAlert.hasAddress("0x112")).toBeFalse();
       expect(mockAlert.hasAddress("0x113")).toBeFalse();
