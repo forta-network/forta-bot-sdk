@@ -34,6 +34,7 @@ import { BloomFilter } from "./bloom.filter";
 import { FortaConfig } from "./forta.config";
 import { EventType } from './event.type'
 import { Network } from "./network";
+import { Initialize, HandleTransaction, HandleBlock, HandleAlert } from "./handlers";
 
 interface DiContainer {
   resolve<T>(key: string): T
