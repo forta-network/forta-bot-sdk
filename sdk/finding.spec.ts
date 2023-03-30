@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { HandleTransaction } from ".";
+import { HandleTransaction } from "./handlers";
 import { Finding, FindingSeverity, FindingType } from "./finding";
 import { createTransactionEvent } from "./utils";
 
@@ -32,9 +32,9 @@ describe("finding", () => {
     type: FindingType.Info,
   });
 
-    it("should convert to string", () => {
-      // console.log(finding.toString());
-      // expect(finding.toString()).toBeString();
-      expect(true).toBeTrue();
-    })
+  it("should convert to string", () => {
+    // console.log(finding.toString());
+    // expect(finding.toString()).toBeString();
+    expect(true).toBeTrue();
+  });
 });
