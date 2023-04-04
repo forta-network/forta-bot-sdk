@@ -1,4 +1,4 @@
-**Forta Bot License 1.0**
+**Forta Detection Bot License 1.0**
 
 This Detection Bot License (“Agreement”) governs your use of the detection bot script and associated documentation files made available by each applicable Developer (as defined below) through the Forta Network (“Detection Bot”). The “Forta Network” means
 the collection of smart contracts found at [https://github.com/forta-network/forta-contracts](https://github.com/forta-network/forta-contracts) that are in production on the Polygon blockchain from time to time.
