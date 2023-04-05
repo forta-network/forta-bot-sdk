@@ -15,7 +15,8 @@ export enum FindingType {
   Exploit,
   Suspicious,
   Degraded,
-  Info
+  Info,
+  Scam
 }
 
 type FindingInput = {
