@@ -21,7 +21,9 @@ import {
   isPrivateFindings,
   getTransactionReceipt,
   getAlerts,
-  getChainId
+  getChainId,
+  getBotOwner,
+  getBotId
 } from "./utils"
 import {
   fetchJwt,
@@ -125,6 +127,8 @@ export {
   decodeJwt,
   verifyJwt,
   getChainId,
+  getBotOwner,
+  getBotId,
   BloomFilter,
   MOCK_JWT
  }
