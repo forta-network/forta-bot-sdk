@@ -21,6 +21,7 @@ import {
   isPrivateFindings,
   getTransactionReceipt,
   getAlerts,
+  getChainId
 } from "./utils"
 import {
   fetchJwt,
@@ -123,6 +124,7 @@ export {
   fetchJwt,
   decodeJwt,
   verifyJwt,
+  getChainId,
   BloomFilter,
   MOCK_JWT
  }
