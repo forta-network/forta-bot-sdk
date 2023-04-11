@@ -19,8 +19,6 @@ import { Log, Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
 import { ethers } from '.'
-import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlAlertResponse } from './graphql/forta'
-import axios from 'axios'
 
 let chainId: number | undefined;
 export const getChainId = async (): Promise<number> => {
@@ -45,21 +43,24 @@ export const getEthersBatchProvider = () => {
   return new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl())
 }
 
-const getFortaConfig: () => FortaConfig = () => {
-  let config = {}
+let fortaConfig: FortaConfig | undefined = undefined
+export const getFortaConfig: () => FortaConfig = () => {
+  if (fortaConfig) return fortaConfig
+  
+  fortaConfig = {}
   // try to read from global config
   const globalConfigPath = join(os.homedir(), '.forta', 'forta.config.json')
   if (fs.existsSync(globalConfigPath)) {
-    config = Object.assign(config, jsonc.parse(fs.readFileSync(globalConfigPath, 'utf8')))
+    fortaConfig = Object.assign(fortaConfig!, jsonc.parse(fs.readFileSync(globalConfigPath, 'utf8')))
   }
   // try to read from local project config
   const configFlagIndex = process.argv.indexOf('--config')
   const configFile = configFlagIndex == -1 ? undefined : process.argv[configFlagIndex + 1]
   const localConfigPath = join(process.cwd(), configFile || 'forta.config.json')
   if (fs.existsSync(localConfigPath)) {
-    config = Object.assign(config, jsonc.parse(fs.readFileSync(localConfigPath, 'utf8')))
+    fortaConfig = Object.assign(fortaConfig!, jsonc.parse(fs.readFileSync(localConfigPath, 'utf8')))
   }
-  return config
+  return fortaConfig!
 }
 
 export const getJsonRpcUrl = () => {
@@ -181,17 +182,4 @@ export const setPrivateFindings = (isPrivate: boolean) => {
 
 export const isPrivateFindings = () => {
   return IS_PRIVATE_FINDINGS
-}
-
-export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsResponse> => {
-  const response: RawGraphqlAlertResponse = await axios.post(FORTA_GRAPHQL_URL, getQueryFromAlertOptions(query), {headers: {"content-type": "application/json"}});
-
-  if(response.data && response.data.errors) throw Error(response.data.errors)
-
-  const pageInfo = response.data.data.alerts.pageInfo
-  const alerts: Alert[] = []
-  for (const alertData of response.data.data.alerts.alerts) {
-    alerts.push(Alert.fromObject(alertData))
-  }
-  return { alerts, pageInfo }
 }
