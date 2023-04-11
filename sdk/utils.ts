@@ -10,7 +10,6 @@ import {
   BlockEvent,
   EventType,
   FortaConfig,
-  Label,
   Network,
   Trace,
   TransactionEvent
@@ -22,6 +21,21 @@ import { Block } from './block'
 import { ethers } from '.'
 import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlAlertResponse } from './graphql/forta'
 import axios from 'axios'
+
+let chainId: number | undefined;
+export const getChainId = async (): Promise<number> => {
+  // if chain id provided by scanner i.e. in production
+  if (process.env.FORTA_CHAIN_ID) {
+    return parseInt(process.env.FORTA_CHAIN_ID)
+  }
+
+  // query from the ethers provider i.e. for developing locally
+  const provider = getEthersProvider()
+  if (!chainId) {
+    chainId = (await provider.getNetwork()).chainId
+  }
+  return chainId
+}
 
 export const getEthersProvider = () => {
   return new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
