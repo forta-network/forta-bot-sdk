@@ -27,6 +27,24 @@ def get_web3_provider():
     return web3Provider
 
 
+def get_bot_owner():
+    # if bot owner provided by scanner i.e. in production
+    if 'FORTA_BOT_OWNER' in os.environ:
+        return int(os.environ['FORTA_BOT_OWNER'])
+
+    # return a mock value for local development
+    return "0xMockOwner"
+
+
+def get_bot_id():
+    # if bot id provided by scanner i.e. in production
+    if 'FORTA_BOT_ID' in os.environ:
+        return int(os.environ['FORTA_BOT_ID'])
+
+    # return a mock value for local development
+    return "0xMockBotId"
+
+
 def get_forta_config():
     config = {}
     # try to read global config

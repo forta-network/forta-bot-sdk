@@ -43,6 +43,26 @@ export const getEthersBatchProvider = () => {
   return new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl())
 }
 
+export const getBotOwner = () => {
+  // if bot owner provided by scanner i.e. in production
+  if (process.env.FORTA_BOT_OWNER) {
+    return process.env.FORTA_BOT_OWNER
+  }
+
+  // return a mock value for local development
+  return "0xMockOwner"
+}
+
+export const getBotId = () => {
+  // if bot id provided by scanner i.e. in production
+  if (process.env.FORTA_BOT_ID) {
+    return process.env.FORTA_BOT_ID
+  }
+
+  // return a mock value for local development
+  return "0xMockBotId"
+}
+
 let fortaConfig: FortaConfig | undefined = undefined
 export const getFortaConfig: () => FortaConfig = () => {
   if (fortaConfig) return fortaConfig
