@@ -10,7 +10,15 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.24
+### 0.1.26
+
+- Added new FindingType value of Scam
+
+### [0.1.25](https://github.com/forta-network/forta-bot-sdk/commit/c7be73094383404df16e43eff1872be3f5daf119)
+
+- Added bot license
+
+### [0.1.24](https://github.com/forta-network/forta-bot-sdk/commit/a93f2d4c2eba458f7728a34c2afa990129d97cb4)
 
 - Increased max findings response size to 250kB
 - Updated label metadata field to be a map

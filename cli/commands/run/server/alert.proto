@@ -107,6 +107,7 @@ message Finding {
     SUSPICIOUS = 2;
     DEGRADED = 3;
     INFORMATION = 4;
+    SCAM = 5;
   }
 
   string protocol = 1;
