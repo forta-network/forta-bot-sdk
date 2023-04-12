@@ -13,5 +13,6 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=builder /app/dist ./src
 COPY package*.json ./
+COPY LICENSE.md ./
 RUN npm ci --production
 CMD [ "npm", "run", "start:prod" ]

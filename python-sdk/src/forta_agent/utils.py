@@ -6,10 +6,43 @@ from web3.auto import w3
 from web3 import Web3
 from .forta_graphql import AlertsResponse
 
+chain_id = None
+
+
+def get_chain_id():
+    # if chain id provided by scanner i.e. in production
+    if 'FORTA_CHAIN_ID' in os.environ:
+        return int(os.environ['FORTA_CHAIN_ID'])
+
+    # query from the web3 provider i.e. for developing locally
+    global chain_id
+    provider = get_web3_provider()
+    if chain_id is None:
+        chain_id = provider.eth.chain_id
+    return chain_id
+
 
 def get_web3_provider():
     from . import web3Provider
     return web3Provider
+
+
+def get_bot_owner():
+    # if bot owner provided by scanner i.e. in production
+    if 'FORTA_BOT_OWNER' in os.environ:
+        return int(os.environ['FORTA_BOT_OWNER'])
+
+    # return a mock value for local development
+    return "0xMockOwner"
+
+
+def get_bot_id():
+    # if bot id provided by scanner i.e. in production
+    if 'FORTA_BOT_ID' in os.environ:
+        return int(os.environ['FORTA_BOT_ID'])
+
+    # return a mock value for local development
+    return "0xMockBotId"
 
 
 def get_forta_config():
