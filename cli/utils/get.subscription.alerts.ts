@@ -1,7 +1,5 @@
 import { assertExists } from ".";
-import { Alert } from "../../sdk";
-import { AlertQueryOptions, AlertsResponse } from "../../sdk/graphql/forta";
-import { BotSubscription } from "../../sdk/initialize.response";
+import { Alert, AlertQueryOptions, AlertsResponse, BotSubscription, GetAlerts } from "../../sdk";
 
 // used by runLive to fetch alerts based on a bot's subscriptions
 export type GetSubscriptionAlerts = (
@@ -10,7 +8,7 @@ export type GetSubscriptionAlerts = (
 ) => Promise<Alert[]>;
 
 export function provideGetSubscriptionAlerts(
-  getAlerts: (q: AlertQueryOptions) => Promise<AlertsResponse>
+  getAlerts: GetAlerts
 ): GetSubscriptionAlerts {
   assertExists(getAlerts, "getAlerts");
 
@@ -54,7 +52,7 @@ async function runQuery(
   chainId: number,
   { botIds, alertIds }: { botIds: Set<string>; alertIds: Set<string> },
   createdSince: Date,
-  getAlerts: (q: AlertQueryOptions) => Promise<AlertsResponse>
+  getAlerts: GetAlerts
 ): Promise<Alert[]> {
   const alerts: Alert[] = [];
   let query: AlertQueryOptions;
