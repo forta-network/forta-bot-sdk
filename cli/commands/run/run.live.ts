@@ -1,5 +1,5 @@
 import { providers } from "ethers";
-import { BotSubscription } from "../../../sdk/initialize.response";
+import { BotSubscription } from "../../../sdk";
 import { assertExists, getBlockChainNetworkConfig } from "../../utils";
 import { GetAgentHandlers } from "../../utils/get.agent.handlers";
 import { GetSubscriptionAlerts } from "../../utils/get.subscription.alerts";
