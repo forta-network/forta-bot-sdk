@@ -17,8 +17,6 @@ import { Log, Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
 import { ethers } from "ethers"
-import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlAlertResponse } from './graphql/forta'
-import axios from 'axios'
 
 let chainId: number | undefined;
 export const getChainId = async (): Promise<number> => {
