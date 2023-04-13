@@ -20,17 +20,11 @@ import {
   setPrivateFindings,
   isPrivateFindings,
   getTransactionReceipt,
+  getAlerts,
   getChainId,
   getBotOwner,
   getBotId
 } from "./utils"
-import {
-  GetAlerts,
-  AlertQueryOptions,
-  AlertsResponse,
-  AlertCursor,
-  getAlerts
-} from "./alerts.api"
 import {
   fetchJwt,
   decodeJwt,
@@ -38,7 +32,7 @@ import {
   MOCK_JWT
 } from "./jwt"
 import awilixConfigureContainer from '../cli/di.container';
-import { InitializeResponse, BotSubscription } from "./initialize.response";
+import {InitializeResponse} from "./initialize.response";
 import { BloomFilter } from "./bloom.filter";
 import { FortaConfig } from "./forta.config";
 import { EventType } from './event.type'
@@ -79,12 +73,6 @@ export {
   TraceResult,
   EventType,
   Network,
-  GetAlerts,
-  AlertQueryOptions,
-  AlertsResponse,
-  AlertCursor,
-  InitializeResponse,
-  BotSubscription,
   getJsonRpcUrl,
   createTransactionEvent,
   createBlockEvent,

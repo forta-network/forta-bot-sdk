@@ -63,24 +63,21 @@ export const getBotId = () => {
   return "0xMockBotId"
 }
 
-let fortaConfig: FortaConfig | undefined = undefined
-export const getFortaConfig: () => FortaConfig = () => {
-  if (fortaConfig) return fortaConfig
-  
-  fortaConfig = {}
+const getFortaConfig: () => FortaConfig = () => {
+  let config = {}
   // try to read from global config
   const globalConfigPath = join(os.homedir(), '.forta', 'forta.config.json')
   if (fs.existsSync(globalConfigPath)) {
-    fortaConfig = Object.assign(fortaConfig!, jsonc.parse(fs.readFileSync(globalConfigPath, 'utf8')))
+    config = Object.assign(config, jsonc.parse(fs.readFileSync(globalConfigPath, 'utf8')))
   }
   // try to read from local project config
   const configFlagIndex = process.argv.indexOf('--config')
   const configFile = configFlagIndex == -1 ? undefined : process.argv[configFlagIndex + 1]
   const localConfigPath = join(process.cwd(), configFile || 'forta.config.json')
   if (fs.existsSync(localConfigPath)) {
-    fortaConfig = Object.assign(fortaConfig!, jsonc.parse(fs.readFileSync(localConfigPath, 'utf8')))
+    config = Object.assign(config, jsonc.parse(fs.readFileSync(localConfigPath, 'utf8')))
   }
-  return fortaConfig!
+  return config
 }
 
 export const getJsonRpcUrl = () => {
@@ -202,4 +199,17 @@ export const setPrivateFindings = (isPrivate: boolean) => {
 
 export const isPrivateFindings = () => {
   return IS_PRIVATE_FINDINGS
+}
+
+export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsResponse> => {
+  const response: RawGraphqlAlertResponse = await axios.post(FORTA_GRAPHQL_URL, getQueryFromAlertOptions(query), {headers: {"content-type": "application/json"}});
+
+  if(response.data && response.data.errors) throw Error(response.data.errors)
+
+  const pageInfo = response.data.data.alerts.pageInfo
+  const alerts: Alert[] = []
+  for (const alertData of response.data.data.alerts.alerts) {
+    alerts.push(Alert.fromObject(alertData))
+  }
+  return { alerts, pageInfo }
 }

@@ -11,9 +11,10 @@ import {
   BlockEvent,
   EventType,
   Finding,
+  Log,
   TransactionEvent
 } from "../../sdk"
-import { Trace } from '../../sdk'
+import { Trace } from '../../sdk/trace'
 import { JsonRpcBlock, JsonRpcTransaction } from './get.block.with.transactions'
 import { JsonRpcLog } from './get.transaction.receipt'
 

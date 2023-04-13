@@ -1,7 +1,7 @@
 import { Alert } from "../../sdk";
 import { Cache } from "flat-cache";
 import { assertExists } from ".";
-import { GetAlerts } from "../../sdk";
+import { AlertQueryOptions, AlertsResponse } from "../../sdk/graphql/forta";
 
 // used by runHandlersOnAlert to fetch a specific alert and process it
 export type GetAlert = (alertHash: string) => Promise<Alert>;
@@ -10,7 +10,7 @@ export const ONE_DAY_IN_MS = 86400000;
 export const LOOKBACK_PERIOD_DAYS = 90;
 
 export default function provideGetAlert(
-  getAlerts: GetAlerts,
+  getAlerts: (q: AlertQueryOptions) => Promise<AlertsResponse>,
   cache: Cache
 ) {
   assertExists(getAlerts, "getAlerts");

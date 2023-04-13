@@ -1,7 +1,7 @@
 import { AxiosStatic } from "axios"
 import { Cache } from "flat-cache"
 import { assertExists, assertIsNonEmptyString } from "."
-import { Trace } from "../../sdk"
+import { Trace } from "../../sdk/trace"
 
 export type GetTraceData = (blockNumberOrTxHash: number | string) => Promise<Trace[]>
 
