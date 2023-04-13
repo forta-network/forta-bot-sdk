@@ -1,4 +1,4 @@
-from .utils import get_alerts
+from .alerts_api import get_alerts
 
 
 def test_get_alerts_returns_more_than_one_alert():
