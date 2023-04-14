@@ -14,4 +14,6 @@ export interface FortaConfig {
   traceTransactionMethod?: string;
   keyfile?: string;
   keyfilePassword?: string;
+  alertsApiUrl?: string
+  fortaApiKey?: string
 }
