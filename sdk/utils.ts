@@ -4,36 +4,19 @@ import { join } from 'path'
 import { jsonc } from 'jsonc'
 import _ from 'lodash'
 import { Keccak } from 'sha3'
-import {
-  Alert,
-  AlertEvent,
-  BlockEvent,
-  EventType,
-  FortaConfig,
-  Network,
-  Trace,
-  TransactionEvent
-} from '.'
+import { Network } from './network'
+import { EventType } from './event.type'
+import { FortaConfig } from './forta.config'
+import { Alert} from './alert'
+import { AlertEvent } from './alert.event'
+import { BlockEvent } from './block.event'
+import { Trace } from './trace'
+import { TransactionEvent } from './transaction.event'
 import { Transaction } from './transaction'
 import { Log, Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
-import { ethers } from '.'
-
-let chainId: number | undefined;
-export const getChainId = async (): Promise<number> => {
-  // if chain id provided by scanner i.e. in production
-  if (process.env.FORTA_CHAIN_ID) {
-    return parseInt(process.env.FORTA_CHAIN_ID)
-  }
-
-  // query from the ethers provider i.e. for developing locally
-  const provider = getEthersProvider()
-  if (!chainId) {
-    chainId = (await provider.getNetwork()).chainId
-  }
-  return chainId
-}
+import { ethers } from "ethers"
 
 export const getEthersProvider = () => {
   return new ethers.providers.JsonRpcProvider(getJsonRpcUrl())

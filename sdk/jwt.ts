@@ -1,4 +1,4 @@
-import { ethers } from ".";
+import { ethers } from "ethers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import axios, { AxiosInstance } from "axios";
 import { assertExists } from "./utils";
