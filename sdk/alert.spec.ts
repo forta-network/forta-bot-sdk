@@ -2,9 +2,45 @@ import { Alert } from "./alert";
 
 describe("alert", () => {
   describe("no addressBloomFilter", () => {
+    const mockAlertSource = {           
+      transactionHash: "0x456",
+      block: {
+        timestamp: "2022-03-20T13:01:00Z",
+        chainId: 1,
+        hash: "0x789",
+        number: 10,
+      },
+      bot: {
+        id: "BOT-1",
+      }
+    }
+
     const mockAddress1 = "0x111", mockAddress2 = "0x112", mockAddress3 = "0x113", mockAddress4 = "0x114";
+    const mockAlertId = "ALERT-1";
+    const mockAlertHash = "0x123";
+    const mockAlertContracts = [{address: "0x321", name: "CONTRACT-1", projectId: "1"}]
+    const mockAlertName = "Mock Alert 1";
+    const mockChainId = 1;
+
+    
     const mockAlert = Alert.fromObject({
       addresses: [mockAddress1, mockAddress2, mockAddress3],
+      alertId: mockAlertId,
+      hash: mockAlertHash,
+      contracts: mockAlertContracts,
+      name: mockAlertName,
+      source: mockAlertSource,
+      chainId: mockChainId,
+    });
+
+    it("should returns Alert attributes", () => {
+      expect(mockAlert.addresses).toEqual([mockAddress1, mockAddress2, mockAddress3]);
+      expect(mockAlert.alertId).toEqual(mockAlertId);
+      expect(mockAlert.hash).toEqual(mockAlertHash);
+      expect(mockAlert.contracts).toEqual(mockAlertContracts);
+      expect(mockAlert.name).toEqual(mockAlertName);
+      expect(mockAlert.source).toEqual(mockAlertSource);
+      expect(mockAlert.chainId).toEqual(mockChainId);
     });
 
     it("should returns true when it contains a specific address", () => {
