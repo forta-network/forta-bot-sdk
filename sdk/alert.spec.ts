@@ -1,7 +1,29 @@
 import { Alert } from "./alert";
+import { FindingSeverity, FindingType } from "./finding";
+import { EntityType, Label } from "./label";
 
 describe("alert", () => {
   describe("no addressBloomFilter", () => {
+    const mockAddress1 = "0x111", mockAddress2 = "0x112", mockAddress3 = "0x113", mockAddress4 = "0x114";
+    const mockAlertId = "ALERT-1";
+    const mockAlertHash = "0x123";
+    const mockAlertContracts = [{address: "0x321", name: "CONTRACT-1", projectId: "1"}];
+    const mockAlertCreatedAt = new Date().toISOString();
+    const mockAlertDescription = "ALERT-1-DESCRIPTION";
+    const mockAlertFindingType = FindingType[FindingType.Scam];
+    const mockAlertName = "Mock Alert 1";
+    const mockAlertProtocol = "ethereum";
+    const mockAlertScanNodeCount = 2;
+    const mockAlertSeverity = FindingSeverity[FindingSeverity.Medium];
+    const mockAlertDocumentType = "Document";
+    const mockAlertRelatedAlerts = ["ALERT-2"];
+    const mockChainId = 1;
+    const mockAlertLabels = [Label.fromObject({
+      entityType: EntityType.Address,
+      entity: "Address",
+      label: "Address",
+      confidence: 1,
+    })];
     const mockAlertSource = {           
       transactionHash: "0x456",
       block: {
@@ -13,14 +35,14 @@ describe("alert", () => {
       bot: {
         id: "BOT-1",
       }
-    }
-
-    const mockAddress1 = "0x111", mockAddress2 = "0x112", mockAddress3 = "0x113", mockAddress4 = "0x114";
-    const mockAlertId = "ALERT-1";
-    const mockAlertHash = "0x123";
-    const mockAlertContracts = [{address: "0x321", name: "CONTRACT-1", projectId: "1"}]
-    const mockAlertName = "Mock Alert 1";
-    const mockChainId = 1;
+    };
+    const mockAlertMetadata = {
+      timestamp: new Date().toISOString(),
+    };
+    const mockAlertProjects = [{
+      id: "PROJECT-1",
+      name: "Project 1",
+    }];
 
     
     const mockAlert = Alert.fromObject({
@@ -28,9 +50,20 @@ describe("alert", () => {
       alertId: mockAlertId,
       hash: mockAlertHash,
       contracts: mockAlertContracts,
+      createdAt: mockAlertCreatedAt,
+      description: mockAlertDescription,
+      findingType: mockAlertFindingType,
       name: mockAlertName,
-      source: mockAlertSource,
+      protocol: mockAlertProtocol,
+      scanNodeCount: mockAlertScanNodeCount,
+      severity: mockAlertSeverity,
+      alertDocumentType: mockAlertDocumentType,
+      relatedAlerts: mockAlertRelatedAlerts,
       chainId: mockChainId,
+      labels: mockAlertLabels,
+      source: mockAlertSource,
+      metadata: mockAlertMetadata,
+      projects: mockAlertProjects,
     });
 
     it("should returns Alert attributes", () => {
@@ -38,9 +71,20 @@ describe("alert", () => {
       expect(mockAlert.alertId).toEqual(mockAlertId);
       expect(mockAlert.hash).toEqual(mockAlertHash);
       expect(mockAlert.contracts).toEqual(mockAlertContracts);
+      expect(mockAlert.createdAt).toEqual(mockAlertCreatedAt);
+      expect(mockAlert.description).toEqual(mockAlertDescription);
+      expect(mockAlert.findingType).toEqual(mockAlertFindingType);
       expect(mockAlert.name).toEqual(mockAlertName);
-      expect(mockAlert.source).toEqual(mockAlertSource);
+      expect(mockAlert.protocol).toEqual(mockAlertProtocol);
+      expect(mockAlert.scanNodeCount).toEqual(mockAlertScanNodeCount);
+      expect(mockAlert.severity).toEqual(mockAlertSeverity);
+      expect(mockAlert.alertDocumentType).toEqual(mockAlertDocumentType);
+      expect(mockAlert.relatedAlerts).toEqual(mockAlertRelatedAlerts);
       expect(mockAlert.chainId).toEqual(mockChainId);
+      expect(mockAlert.labels).toEqual(mockAlertLabels);
+      expect(mockAlert.source).toEqual(mockAlertSource);
+      expect(mockAlert.metadata).toEqual(mockAlertMetadata);
+      expect(mockAlert.projects).toEqual(mockAlertProjects);
     });
 
     it("should returns true when it contains a specific address", () => {
@@ -62,6 +106,10 @@ describe("alert", () => {
     
     const mockAlert = Alert.fromObject({
       addressBloomFilter: {k, m, bitset},
+    });
+
+    it("should returns addressBloomFilter", () => {
+      expect(mockAlert.addressBloomFilter).toEqual({k, m, bitset});
     });
 
     it("should returns true when it contains a specific address on addressBloomFilter", () => {
