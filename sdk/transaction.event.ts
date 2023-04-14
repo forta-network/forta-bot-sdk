@@ -2,7 +2,7 @@ import { EventType, Network } from "./index";
 import { Log } from "./receipt";
 import { Trace } from "./trace";
 import { Transaction } from "./transaction";
-import { ethers } from ".";
+import { ethers } from "ethers";
 import _ from "lodash";
 
 export interface TxEventBlock {
