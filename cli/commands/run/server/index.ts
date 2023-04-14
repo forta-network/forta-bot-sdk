@@ -1,8 +1,7 @@
 import { join } from 'path';
-import { assertIsNonEmptyString } from '../../../../sdk/utils';
 import { loadPackageDefinition, Server, ServerCredentials } from '@grpc/grpc-js';
 import { loadSync } from '@grpc/proto-loader';
-import { assertExists } from '../../../utils';
+import { assertExists, assertIsNonEmptyString } from '../../../utils';
 import AgentController from './agent.controller';
 
 // runs the production grpc server to listen for requests from scanner node
