@@ -2,7 +2,7 @@ import { Alert } from "./alert";
 import { AlertEvent } from "./alert.event";
 
 describe("alertEvent", () => {
-	const alertSource = {           
+	const mockAlertSource = {           
 		transactionHash: "0x456",
 		block: {
 			timestamp: "2022-03-20T13:01:00Z",
@@ -21,32 +21,32 @@ describe("alertEvent", () => {
 		alertId: "ALERT-1",
 		name: "Mock Alert 1",
 		hash: "0x123",
-		source: alertSource,
+		source: mockAlertSource,
 		chainId: 1,
 		addresses: [mockAddress1, mockAddress2, mockAddress3],
 	});
 		
-	const alertEvent = new AlertEvent(mockAlert)
+	const mockAlertEvent = new AlertEvent(mockAlert);
 
 	it("should returns AlertEvent attributes", () => {
-		expect(alertEvent.alertId).toEqual(mockAlert.alertId);
-		expect(alertEvent.name).toEqual(mockAlert.name);
-		expect(alertEvent.hash).toEqual(mockAlert.hash);
-		expect(alertEvent.alertHash).toEqual(mockAlert.hash);
-		expect(alertEvent.botId).toEqual(mockAlert.source?.bot?.id);
-		expect(alertEvent.transactionHash).toEqual(mockAlert.source?.transactionHash);
-		expect(alertEvent.blockHash).toEqual(mockAlert.source?.block?.hash);
-		expect(alertEvent.blockNumber).toEqual(mockAlert.source?.block?.number);
-		expect(alertEvent.chainId).toEqual(mockAlert.chainId);
+		expect(mockAlertEvent.alertId).toEqual(mockAlert.alertId);
+		expect(mockAlertEvent.name).toEqual(mockAlert.name);
+		expect(mockAlertEvent.hash).toEqual(mockAlert.hash);
+		expect(mockAlertEvent.alertHash).toEqual(mockAlert.hash);
+		expect(mockAlertEvent.botId).toEqual(mockAlert.source?.bot?.id);
+		expect(mockAlertEvent.transactionHash).toEqual(mockAlert.source?.transactionHash);
+		expect(mockAlertEvent.blockHash).toEqual(mockAlert.source?.block?.hash);
+		expect(mockAlertEvent.blockNumber).toEqual(mockAlert.source?.block?.number);
+		expect(mockAlertEvent.chainId).toEqual(mockAlert.chainId);
 	});
 
 	it("should returns true when it contains a specific address", () => {
-		expect(alertEvent.hasAddress(mockAddress1)).toBeTrue();
-		expect(alertEvent.hasAddress(mockAddress2)).toBeTrue();
-		expect(alertEvent.hasAddress(mockAddress3)).toBeTrue();
+		expect(mockAlertEvent.hasAddress(mockAddress1)).toBeTrue();
+		expect(mockAlertEvent.hasAddress(mockAddress2)).toBeTrue();
+		expect(mockAlertEvent.hasAddress(mockAddress3)).toBeTrue();
 	});
 
 	it("should returns false when it does not contain a specific address", () => {
-		expect(alertEvent.hasAddress(mockAddress4)).toBeFalse();
+		expect(mockAlertEvent.hasAddress(mockAddress4)).toBeFalse();
 	});
 });
