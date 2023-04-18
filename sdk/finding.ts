@@ -49,6 +49,8 @@ export class Finding {
       ...this,
       severity: FindingSeverity[this.severity],
       type: FindingType[this.type],
+      labels: this.labels.map(l => Object.assign(l, {
+        entityType: EntityType[l.entityType]}))
     }, null, 2)
   }
 

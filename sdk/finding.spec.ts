@@ -62,7 +62,12 @@ describe("finding", () => {
         from: mockTetherTransferEvent.args.from,
       },
       addresses: ["0x01", "0x02", "0x03"],
-      labels: findingInput.labels
+      labels: findingInput.labels.map(l => {
+        return {
+          ...l,
+          entityType: EntityType[l.entityType],
+        }
+      })
     }, null, 2);
 
     expect(finding.toString()).toEqual(expectedJSONString);
