@@ -1,10 +1,7 @@
 import sys
 import os
 from jsonc_parser.parser import JsoncParser
-import requests
-from web3.auto import w3
 from web3 import Web3
-from .forta_graphql import AlertsResponse
 
 chain_id = None
 
@@ -45,14 +42,21 @@ def get_bot_id():
     return "0xMockBotId"
 
 
+forta_config = None
+
+
 def get_forta_config():
-    config = {}
+    global forta_config
+    if (forta_config is not None):
+        return forta_config
+
+    forta_config = {}
     # try to read global config
     global_config_path = os.path.join(
         os.path.expanduser('~'), '.forta', 'forta.config.json')
     if os.path.isfile(global_config_path):
         global_config = JsoncParser.parse_file(global_config_path)
-        config = {**config, **global_config}
+        forta_config = {**forta_config, **global_config}
     # try to read local project config
     config_flag_index = sys.argv.index(
         '--config') if '--config' in sys.argv else -1
@@ -62,8 +66,8 @@ def get_forta_config():
         os.getcwd(), local_config_file if local_config_file else 'forta.config.json')
     if os.path.isfile(local_config_path):
         local_config = JsoncParser.parse_file(local_config_path)
-        config = {**config, **local_config}
-    return config
+        forta_config = {**forta_config, **local_config}
+    return forta_config
 
 
 def get_json_rpc_url():
@@ -120,26 +124,6 @@ def create_transaction_event(dict):
 def create_alert_event(dict):
     from .alert_event import AlertEvent  # avoid circular import
     return AlertEvent(dict)
-
-
-def get_alerts(dict):
-    from .forta_graphql import AlertQueryOptions
-    forta_api = "https://api.forta.network/graphql"
-    headers = {"content-type": "application/json"}
-    query_options = AlertQueryOptions(dict)
-    payload = query_options.get_query()
-
-    response = requests.request(
-        "POST", forta_api, json=payload, headers=headers)
-
-    if response.status_code == 200:
-        data = response.json().get('data')
-
-        if data:
-            return AlertsResponse(data.get('alerts'))
-    else:
-        message = response.text
-        raise Exception(message)
 
 
 def assert_non_empty_string_in_dict(dict, key):
