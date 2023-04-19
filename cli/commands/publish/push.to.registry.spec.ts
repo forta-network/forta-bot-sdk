@@ -42,7 +42,7 @@ describe("pushToRegistry", () => {
     try {
       await pushToRegistry(mockManifestRef, mockFromWallet as any)
     } catch (e) {
-      expect(e.message).toBe(`insufficient balance to deploy agent for ${mockFromWallet.address}`)
+      expect(e.message).toBe(`${mockFromWallet.address} has insufficient MATIC balance to deploy agent`)
       expect(mockFromWallet.connect).toHaveBeenCalledTimes(1)
       expect(mockFromWallet.connect).toHaveBeenCalledWith(mockEthersProvider)
     }

@@ -1,9 +1,8 @@
 import { BigNumber, ethers, providers, Wallet } from "ethers"
 import { EventFragment, Interface } from "ethers/lib/utils"
 import AgentRegistryAbi from "./agent.registry.abi.json"
+import { getTxOptions } from "./utils"
 
-const GAS_MULTIPLIER = 1.15
-const GAS_PRICE_MULTIPLIER = 1.5
 const FALLBACK_CREATE_AGENT_GAS_LIMIT = BigNumber.from(350_000)
 const FALLBACK_UPDATE_AGENT_GAS_LIMIT = BigNumber.from(95_000)
 const FALLBACK_ENABLE_AGENT_GAS_LIMIT = BigNumber.from(55_000)
@@ -60,7 +59,7 @@ export default class AgentRegistry {
     let gas = FALLBACK_CREATE_AGENT_GAS_LIMIT;
     try { gas = await contract.estimateGas.createAgent(agentId, from, reference, chainIds)}
     catch (e) { console.log(`unable to estimate gas for createAgent, using fallback gas limit (${gas})`) }
-    const txOptions = await this.getTxOptions(gas, fromWallet)
+    const txOptions = await getTxOptions(gas, fromWallet.connect(this.ethersAgentRegistryProvider))
     const tx = await contract.createAgent(agentId, from, reference, chainIds, txOptions)
     await tx.wait()
     return tx.hash
@@ -71,7 +70,7 @@ export default class AgentRegistry {
     let gas = FALLBACK_UPDATE_AGENT_GAS_LIMIT
     try { gas = await contract.estimateGas.updateAgent(agentId, reference, chainIds) }
     catch(e) { console.log(`unable to estimate gas for updateAgent, using fallback gas limit (${gas})`) }
-    const txOptions = await this.getTxOptions(gas, fromWallet)
+    const txOptions = await getTxOptions(gas, fromWallet.connect(this.ethersAgentRegistryProvider))
     const tx = await contract.updateAgent(agentId, reference, chainIds, txOptions)
     await tx.wait()
     return tx.hash
@@ -86,7 +85,7 @@ export default class AgentRegistry {
     let gas = FALLBACK_DISABLE_AGENT_GAS_LIMIT
     try { gas = await contract.estimateGas.disableAgent(agentId, 1)/* Permission.OWNER = 1 */ }
     catch(e) { console.log(`unable to estimate gas for disableAgent, using fallback gas limit (${gas})`) }
-    const txOptions = await this.getTxOptions(gas, fromWallet)
+    const txOptions = await getTxOptions(gas, fromWallet.connect(this.ethersAgentRegistryProvider))
     const tx = await contract.disableAgent(agentId, 1, txOptions)
     await tx.wait()
     return tx.hash
@@ -97,7 +96,7 @@ export default class AgentRegistry {
     let gas = FALLBACK_ENABLE_AGENT_GAS_LIMIT
     try { gas = await contract.estimateGas.enableAgent(agentId, 1)/* Permission.OWNER = 1 */ }
     catch(e) { console.log(`unable to estimate gas for enableAgent, using fallback gas limit (${gas})`) }
-    const txOptions = await this.getTxOptions(gas, fromWallet)
+    const txOptions = await getTxOptions(gas, fromWallet.connect(this.ethersAgentRegistryProvider))
     const tx = await contract.enableAgent(agentId, 1, txOptions)
     await tx.wait()
     return tx.hash
@@ -109,13 +108,5 @@ export default class AgentRegistry {
       AgentRegistryAbi,
       fromWallet ? fromWallet.connect(this.ethersAgentRegistryProvider) : this.ethersAgentRegistryProvider
     )
-  }
-
-  private async getTxOptions(gasLimit: ethers.BigNumber, fromWallet: Wallet) {
-    const gasPrice = await fromWallet.connect(this.ethersAgentRegistryProvider).getGasPrice()
-    return {
-      gasLimit: Math.round(gasLimit.toNumber() * GAS_MULTIPLIER),
-      gasPrice: Math.round(gasPrice.toNumber() * GAS_PRICE_MULTIPLIER)
-    }
   }
 }
