@@ -7,7 +7,7 @@ import { GetBlockWithTransactions } from "./get.block.with.transactions";
 import { JsonRpcLog } from "./get.transaction.receipt";
 import { GetLogsForBlock } from "./get.logs.for.block";
 
-export type RunHandlersOnBlock = (blockHashOrNumber: string | number) => Promise<Finding[]>
+export type RunHandlersOnBlock = (blockHashOrNumber: string | number, networkId?: number) => Promise<Finding[]>
 
 export function provideRunHandlersOnBlock(
   getAgentHandlers: GetAgentHandlers,
@@ -26,7 +26,7 @@ export function provideRunHandlersOnBlock(
   assertExists(createBlockEvent, 'createBlockEvent')
   assertExists(createTransactionEvent, 'createTransactionEvent')
 
-  return async function runHandlersOnBlock(blockHashOrNumber: string | number) {
+  return async function runHandlersOnBlock(blockHashOrNumber: string | number, networkIdArg?: number) {
     const { handleBlock, handleTransaction } = await getAgentHandlers()
     if (!handleBlock && !handleTransaction) {
       throw new Error("no block/transaction handler found")
@@ -34,7 +34,7 @@ export function provideRunHandlersOnBlock(
 
     console.log(`fetching block ${blockHashOrNumber}...`)
     const [networkId, block] = await Promise.all([
-      getNetworkId(),
+      networkIdArg != undefined ? Promise.resolve(networkIdArg) : getNetworkId(),
       getBlockWithTransactions(blockHashOrNumber)
     ]) 
 

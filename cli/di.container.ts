@@ -58,6 +58,8 @@ import { provideRunSequence } from './commands/run/run.sequence'
 import { provideRunHandlersOnAlert } from './utils/run.handlers.on.alert'
 import provideGetAlert from './utils/get.alert'
 import { provideGetSubscriptionAlerts } from './utils/get.subscription.alerts'
+import provideGetLatestBlockNumber from './utils/get.latest.block.number'
+import provideWithRetry from './utils/with.retry'
 
 export default function configureContainer(args: any = {}) {
   const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
@@ -204,7 +206,9 @@ export default function configureContainer(args: any = {}) {
     initKeyfile: asFunction(provideInitKeyfile),
     initConfig: asFunction(provideInitConfig),
 
+    withRetry: asFunction(provideWithRetry),
     getNetworkId: asFunction(provideGetNetworkId),
+    getLatestBlockNumber: asFunction(provideGetLatestBlockNumber),
     getBlockWithTransactions: asFunction(provideGetBlockWithTransactions),
     getTransactionReceipt: asFunction(provideGetTransactionReceipt),
     getLogsForBlock: asFunction(provideGetLogsForBlock),
