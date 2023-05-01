@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.26
+### 0.1.27
+
+- Fixed issue for parsing findings returned from Python bots
+
+### [0.1.26](https://github.com/forta-network/forta-bot-sdk/commit/ad0c35623b94ee5e2d8b21f88931cbb6313819ea)
 
 - Added new FindingType value of Scam
 
