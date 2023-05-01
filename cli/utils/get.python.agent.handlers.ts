@@ -19,6 +19,7 @@ export type GetPythonAgentHandlers = (pythonAgentPath: string) => Promise<{ hand
 
 const INITIALIZE_MARKER = "!*initialize*!"
 const FINDING_MARKER = "!*forta_finding*!:"
+const FINDING_END_MARKER = "-!*forta_finding*!-:"
 const INITIALIZE_METHOD_NAME = "initialize"
 const HANDLE_TRANSACTION_METHOD_NAME = 'handle_transaction'
 const HANDLE_BLOCK_METHOD_NAME = 'handle_block'
@@ -91,17 +92,17 @@ while True:
       hash = msgJson['hash']
       event = TransactionEvent(msgJson)
       findings = ${agentModule}.${HANDLE_TRANSACTION_METHOD_NAME}(event)
-      print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
+      print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}${FINDING_END_MARKER}')
     elif msgType == '${HANDLE_BLOCK_METHOD_NAME}':
       hash = msgJson['hash']
       event = BlockEvent(msgJson)
       findings = ${agentModule}.${HANDLE_BLOCK_METHOD_NAME}(event)
-      print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
+      print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}${FINDING_END_MARKER}')
     elif msgType == '${HANDLE_ALERT_METHOD_NAME}':
       hash = msgJson['hash']
       event = AlertEvent(msgJson)
       findings = ${agentModule}.${HANDLE_ALERT_METHOD_NAME}(event)
-      print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}')
+      print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}${FINDING_END_MARKER}')
   except Exception as e:
     print(e, file=sys.stderr)
 `
@@ -135,7 +136,9 @@ while True:
       const hashStartIndex = FINDING_MARKER.length
       const hashEndIndex = message.indexOf(':', hashStartIndex)
       const hash = message.substr(hashStartIndex, hashEndIndex-hashStartIndex)
-      const findingsJson = JSON.parse(message.substr(hashEndIndex+1)) as any[]
+      const findingsEndMarkerIndex = message.indexOf(FINDING_END_MARKER, hashEndIndex+1)
+      const findingsJsonString = message.substring(hashEndIndex+1, findingsEndMarkerIndex > 0 ? findingsEndMarkerIndex : undefined)
+      const findingsJson = JSON.parse(findingsJsonString) as any[]
       const findings = findingsJson.map(findingJson => Finding.fromObject(JSON.parse(findingJson)))
       const { resolve } = promiseCallbackMap[hash]
       resolve(findings)
