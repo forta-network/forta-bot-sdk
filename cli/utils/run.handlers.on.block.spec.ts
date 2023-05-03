@@ -47,20 +47,20 @@ describe("runHandlersOnBlock", () => {
     const txFindings = getFindingsArray(1, 1)
     const mockHandleBlock = jest.fn().mockReturnValue(blockFindings)
     const mockHandleTransaction = jest.fn().mockReturnValue(txFindings)
-    mockGetAgentHandlers.mockReturnValueOnce({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
+    mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock, handleTransaction: mockHandleTransaction })
     const mockNetworkId = 1
-    mockGetNetworkId.mockReturnValueOnce(mockNetworkId)
+    mockGetNetworkId.mockReturnValue(mockNetworkId)
     const mockTransaction = { hash: mockTxHash }
     const mockBlock = { hash: mockBlockHash, number: 7, transactions: [mockTransaction, mockTransaction] }
-    mockGetBlockWithTransactions.mockReturnValueOnce(mockBlock)
+    mockGetBlockWithTransactions.mockReturnValue(mockBlock)
     const mockBlockEvent = {}
-    mockCreateBlockEvent.mockReturnValueOnce(mockBlockEvent)
+    mockCreateBlockEvent.mockReturnValue(mockBlockEvent)
     const mockTrace = { transactionHash: mockTxHash, some: 'trace' }
-    mockGetTraceData.mockReturnValueOnce([mockTrace])
+    mockGetTraceData.mockReturnValue([mockTrace])
     const mockLog = { transactionHash: mockTxHash, some: 'log' }
-    mockGetLogsForBlock.mockReturnValueOnce([mockLog])
+    mockGetLogsForBlock.mockReturnValue([mockLog])
     const mockTxEvent = {}
-    mockCreateTransactionEvent.mockReturnValueOnce(mockTxEvent)
+    mockCreateTransactionEvent.mockReturnValue(mockTxEvent)
 
     const findings = await runHandlersOnBlock(mockBlockHash)
 
@@ -83,9 +83,14 @@ describe("runHandlersOnBlock", () => {
     expect(mockCreateTransactionEvent).toHaveBeenCalledWith(mockTransaction, mockBlock, mockNetworkId, [mockTrace], [mockLog])
     expect(mockHandleTransaction).toHaveBeenCalledTimes(2)
     expect(mockHandleTransaction).toHaveBeenCalledWith(mockTxEvent)
+
+    // if invoked with a network id parameter, should not invoke getNetworkId
+    mockGetNetworkId.mockReset()
+    await runHandlersOnBlock(mockBlockHash, mockNetworkId)
+    expect(mockGetNetworkId).toHaveBeenCalledTimes(0)
   })
 
-  it("throws an error if more than 10 findings when handling a block", async () => {
+  it("throws an error if more than 50 findings when handling a block", async () => {
     const findings = getFindingsArray(51, 10)
     try {
 

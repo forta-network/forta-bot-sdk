@@ -263,6 +263,7 @@ export default function configureContainer(args: any = {}) {
       return jsonRpcUrl
     }),
     ethersProvider: asFunction((jsonRpcUrl: string) =>  new ethers.providers.JsonRpcProvider(jsonRpcUrl)).singleton(),
+    ethersProviderSend: asValue((ethersProvider: ethers.providers.JsonRpcProvider) => ethersProvider.send.bind(ethersProvider)),// need to bind() so that "this" is defined
     ethersAgentRegistryProvider: asFunction((agentRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(agentRegistryJsonRpcUrl)).singleton(),
 
     ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig) => {

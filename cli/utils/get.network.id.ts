@@ -1,4 +1,3 @@
-import { providers } from "ethers";
 import { assertExists } from ".";
 import { WithRetry } from "./with.retry";
 
@@ -7,16 +6,16 @@ export type GetNetworkId = () => Promise<number>;
 
 export default function provideGetNetworkId(
   withRetry: WithRetry,
-  ethersProvider: providers.JsonRpcProvider
+  ethersProviderSend: (method: string, params: any[]) => Promise<any>
 ) {
   assertExists(withRetry, "withRetry");
-  assertExists(ethersProvider, "ethersProvider");
+  assertExists(ethersProviderSend, "ethersProviderSend");
 
   return async function getNetworkId() {
-    const networkId: string = await withRetry(
-      ethersProvider.send.bind(ethersProvider), // need to bind() so that "this" is defined
-      ["net_version", []]
-    );
+    const networkId: string = await withRetry(ethersProviderSend, [
+      "net_version",
+      [],
+    ]);
     return parseInt(networkId);
   };
 }
