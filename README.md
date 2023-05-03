@@ -10,7 +10,12 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.27
+### 0.1.28
+
+- Added retry logic for `runLive` command to improve reliability of running bot locally
+- Improved error handling for Python bots by showing stack traces
+
+### [0.1.27](https://github.com/forta-network/forta-bot-sdk/commit/8b285d8976ebea8c0da7f270b9db997ba4eb9a04)
 
 - Fixed issue for parsing findings returned from Python bots
 
