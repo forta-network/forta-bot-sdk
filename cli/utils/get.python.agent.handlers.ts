@@ -104,7 +104,7 @@ while True:
       findings = ${agentModule}.${HANDLE_ALERT_METHOD_NAME}(event)
       print(f'${FINDING_MARKER}{hash}:{json.dumps(findings, default=lambda f: f.toJson())}${FINDING_END_MARKER}')
   except Exception as e:
-    print(e, file=sys.stderr)
+    raise e
 `
   // write the wrapper script to file
   const randomInt = Math.floor(Math.random() * Date.now())
@@ -113,45 +113,41 @@ while True:
   PythonShell.checkSyntaxFile(pythonWrapperPath)
 
   const promiseCallbackMap: {[hash: string]: { resolve: (val: any) => void, reject: (err: any) => void } } = {}
-  const pythonWrapper = new PythonShell(pythonWrapperPath, { args: process.argv })
-    // set event listener for outputs (printed string messages)
-    .on("message", function (message: string) {
-      // use findingMarker/initializeMarker to distinguish between returned findings and regular log output
-      if (message.startsWith(INITIALIZE_MARKER)) {
-        const initializeResponseStartIndex = INITIALIZE_MARKER.length
-        const initializeResponseJson = message.substr(initializeResponseStartIndex)
-        let initializeResponse = undefined
-        if (initializeResponseJson.length) {
-          initializeResponse = JSON.parse(initializeResponseJson)
-        }
-        const { resolve } = promiseCallbackMap['init']
-        resolve(initializeResponse)
-        delete promiseCallbackMap['init']
-        return
-      } else if (!message.startsWith(FINDING_MARKER)) {
-        console.log(message)
-        return
+  const createPythonShell = () => new PythonShell(pythonWrapperPath, { args: process.argv })
+  // set event listener for outputs (printed string messages)
+  .on("message", function (message: string) {
+    // use findingMarker/initializeMarker to distinguish between returned findings and regular log output
+    if (message.startsWith(INITIALIZE_MARKER)) {
+      const initializeResponseStartIndex = INITIALIZE_MARKER.length
+      const initializeResponseJson = message.substr(initializeResponseStartIndex)
+      let initializeResponse = undefined
+      if (initializeResponseJson.length) {
+        initializeResponse = JSON.parse(initializeResponseJson)
       }
+      const { resolve } = promiseCallbackMap['init']
+      resolve(initializeResponse)
+      delete promiseCallbackMap['init']
+      return
+    } else if (!message.startsWith(FINDING_MARKER)) {
+      console.log(message)
+      return
+    }
 
-      const hashStartIndex = FINDING_MARKER.length
-      const hashEndIndex = message.indexOf(':', hashStartIndex)
-      const hash = message.substr(hashStartIndex, hashEndIndex-hashStartIndex)
-      const findingsEndMarkerIndex = message.indexOf(FINDING_END_MARKER, hashEndIndex+1)
-      const findingsJsonString = message.substring(hashEndIndex+1, findingsEndMarkerIndex > 0 ? findingsEndMarkerIndex : undefined)
-      const findingsJson = JSON.parse(findingsJsonString) as any[]
-      const findings = findingsJson.map(findingJson => Finding.fromObject(JSON.parse(findingJson)))
-      const { resolve } = promiseCallbackMap[hash]
-      resolve(findings)
-      delete promiseCallbackMap[hash]
-    })
-    .on("stderr", function (err) {
-      console.log(err)
-      const hash = Object.keys(promiseCallbackMap)[0]
-      if (hash && promiseCallbackMap[hash]) {
-        const { reject } = promiseCallbackMap[hash]
-        reject(new Error(`python: ${err}`))
-      }
-    })
+    const hashStartIndex = FINDING_MARKER.length
+    const hashEndIndex = message.indexOf(':', hashStartIndex)
+    const hash = message.substr(hashStartIndex, hashEndIndex-hashStartIndex)
+    const findingsEndMarkerIndex = message.indexOf(FINDING_END_MARKER, hashEndIndex+1)
+    const findingsJsonString = message.substring(hashEndIndex+1, findingsEndMarkerIndex > 0 ? findingsEndMarkerIndex : undefined)
+    const findingsJson = JSON.parse(findingsJsonString) as any[]
+    const findings = findingsJson.map(findingJson => Finding.fromObject(JSON.parse(findingJson)))
+    const { resolve } = promiseCallbackMap[hash]
+    resolve(findings)
+    delete promiseCallbackMap[hash]
+  })
+  .on("stderr", function (err) {
+    console.log(err)
+  })
+  let pythonShell = createPythonShell()
 
   return function handler(event: TransactionEvent | AlertEvent | BlockEvent | undefined) {
     return new Promise((resolve, reject) => {
@@ -170,10 +166,14 @@ while True:
         hash = event.hash
       }
 
+      // if the python shell exited (due to a crash for example), create a new shell
+      if (pythonShell.exitCode != undefined) {
+        pythonShell = createPythonShell()
+      }
       // store reference to promise callbacks (use hash as a key to invoke promise callback on completion)
       promiseCallbackMap[hash!] = { resolve, reject }
-      // send event as json string through stdin to python wrapper
-      pythonWrapper.send(JSON.stringify({ msgType, hash, ...event }))
+      // send event as json string through stdin to python shell
+      pythonShell.send(JSON.stringify({ msgType, hash, ...event }))
     })
   } as any
 }
