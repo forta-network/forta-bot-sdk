@@ -2,7 +2,7 @@
 import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
 
-type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile" | "logs" | "info" | "stake" | "unstake"
+type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile" | "logs" | "info" | "stake"
 export type CommandHandler = (args?: any) => Promise<void>
 
 async function executeCommand(cliCommandName: CommandName, cliArgs: any) {
@@ -86,7 +86,7 @@ yargs
     },
     (cliArgs: any) => executeCommand("push", cliArgs)
   )
-  .command('stake', 'Stake on your Forta Agent',
+  .command('stake', 'Stake on a Forta Agent',
     (yargs: Argv) => {
       yargs.option('agentId', {
         description: 'Specify an agent to stake on (defaults to this agent)',
@@ -94,15 +94,6 @@ yargs
       })
     },
     (cliArgs: any) => executeCommand("stake", cliArgs)
-  )
-  .command('unstake', 'Unstake on your Forta Agent',
-    (yargs: Argv) => {
-      yargs.option('agentId', {
-        description: 'Specify an agent to unstake (defaults to this agent)',
-        type: 'string',
-      })
-    },
-    (cliArgs: any) => executeCommand("unstake", cliArgs)
   )
   .command('disable', 'Disables the Forta Agent',
     (yargs: Argv) => {},
