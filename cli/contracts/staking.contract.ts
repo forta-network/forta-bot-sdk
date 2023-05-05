@@ -11,7 +11,11 @@ export default class StakingContract {
     private stakingContractAddress: string
   ) {}
 
-  async stakeBot(fromWallet: Wallet, agentId: string, amount: BigNumber) {
+  async activeStakeFor(agentId: string) {
+    return this.getContract().activeStakeFor(AGENT_SUBJECT_TYPE, agentId);
+  }
+
+  async depositStake(fromWallet: Wallet, agentId: string, amount: BigNumber) {
     const contract = this.getContract(fromWallet);
     let gas = FALLBACK_DEPOSIT_GAS_LIMIT;
     try {
