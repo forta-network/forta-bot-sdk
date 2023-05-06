@@ -58,6 +58,9 @@ import { provideRunSequence } from './commands/run/run.sequence'
 import { provideRunHandlersOnAlert } from './utils/run.handlers.on.alert'
 import provideGetAlert from './utils/get.alert'
 import { provideGetSubscriptionAlerts } from './utils/get.subscription.alerts'
+import provideStake from './commands/stake'
+import FortToken from './contracts/fort.token'
+import StakingContract from './contracts/staking.contract'
 import provideGetLatestBlockNumber from './utils/get.latest.block.number'
 import provideWithRetry from './utils/with.retry'
 
@@ -110,6 +113,7 @@ export default function configureContainer(args: any = {}) {
     disable: asFunction(provideDisable),
     enable: asFunction(provideEnable),
     keyfile: asFunction(provideKeyfile),
+    stake: asFunction(provideStake),
 
     runProdServer: asFunction(provideRunServer),
     runTransaction: asFunction(provideRunTransaction),
@@ -135,8 +139,8 @@ export default function configureContainer(args: any = {}) {
     }).singleton(),
     agentName: asFunction((packageJson: any) => packageJson.name).singleton(),
     description: asFunction((packageJson: any) => packageJson.description).singleton(),
-    agentId: asFunction((fortaConfig: FortaConfig, agentName: string) => {
-      return fortaConfig.agentId || keccak256(agentName)
+    agentId: asFunction((args: any, fortaConfig: FortaConfig, agentName: string) => {
+      return args.agentId || fortaConfig.agentId || keccak256(agentName)
     }).singleton(),
     chainIds: asFunction((packageJson: any) => {
       const { chainIds } = packageJson
@@ -254,6 +258,14 @@ export default function configureContainer(args: any = {}) {
       }
       return url
     }),
+    fortToken: asClass(FortToken),
+    fortTokenAddress: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.fortTokenAddress || "0x9ff62d1FC52A907B6DCbA8077c2DDCA6E6a9d3e1"
+    }),
+    stakingContract: asClass(StakingContract),
+    stakingContractAddress: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.stakingContractAddress || "0xd2863157539b1D11F39ce23fC4834B62082F6874"
+    }),
 
     jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       const jsonRpcUrl = fortaConfig.jsonRpcUrl || "https://cloudflare-eth.com/"
@@ -265,6 +277,7 @@ export default function configureContainer(args: any = {}) {
     ethersProvider: asFunction((jsonRpcUrl: string) =>  new ethers.providers.JsonRpcProvider(jsonRpcUrl)).singleton(),
     ethersProviderSend: asFunction((ethersProvider: ethers.providers.JsonRpcProvider) => ethersProvider.send.bind(ethersProvider)),// need to bind() so that "this" is defined
     ethersAgentRegistryProvider: asFunction((agentRegistryJsonRpcUrl: string) => new ethers.providers.JsonRpcProvider(agentRegistryJsonRpcUrl)).singleton(),
+    ethersPolygonProvider: asFunction((ethersAgentRegistryProvider: ethers.providers.JsonRpcProvider) => ethersAgentRegistryProvider),
 
     ipfsGatewayUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.ipfsGatewayUrl || "https://ipfs.forta.network"
