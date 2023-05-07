@@ -144,8 +144,15 @@ while True:
     resolve(findings)
     delete promiseCallbackMap[hash]
   })
-  .on("stderr", function (err) {
+  .on("stderr", (err) => {
     console.log(err)
+  })
+  .on("pythonError",(err) => {
+    const hash = Object.keys(promiseCallbackMap)[0]
+    if (hash && promiseCallbackMap[hash]) {
+      const { reject } = promiseCallbackMap[hash]
+      reject(err)
+    }
   })
   let pythonShell = createPythonShell()
 
