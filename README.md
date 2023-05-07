@@ -10,7 +10,12 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.28
+### 0.1.29
+
+- Added new `stake` CLI command to stake on a detection bot
+- Fixed Python error handling to also reject NodeJS promise
+
+### [0.1.28](https://github.com/forta-network/forta-bot-sdk/commit/2b8286e0c03d44ea75a1a3dbc5ed8b8c3e976584)
 
 - Added retry logic for CLI `run` command to improve reliability of running bots locally
 - Improved error handling for Python bots by showing stack traces
