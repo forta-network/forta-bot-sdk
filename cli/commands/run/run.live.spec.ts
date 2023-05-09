@@ -131,8 +131,7 @@ describe("runLive", () => {
     );
     expect(mockGetSubscriptionAlerts).toHaveBeenCalledTimes(1);
     expect(mockGetSubscriptionAlerts).toHaveBeenCalledWith(
-      mockInitializeResponse.alertConfig.subscriptions,
-      new Date(systemTime.getTime() - 60000)
+      mockInitializeResponse.alertConfig.subscriptions
     );
     expect(mockRunHandlersOnAlert).toHaveBeenCalledTimes(1);
     expect(mockRunHandlersOnAlert).toHaveBeenCalledWith(mockAlert);

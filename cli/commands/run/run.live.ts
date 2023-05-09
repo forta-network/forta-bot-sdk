@@ -75,10 +75,7 @@ export function provideRunLive(
         ) {
           const queryStartTime = new Date();
           console.log("querying alerts...");
-          const alerts = await getSubscriptionAlerts(
-            botSubscriptions,
-            lastAlertFetchTimestamp || new Date(Date.now() - ONE_MIN_IN_MS)
-          );
+          const alerts = await getSubscriptionAlerts(botSubscriptions);
           console.log(`found ${alerts.length} alerts`);
           lastAlertFetchTimestamp = queryStartTime;
           for (const alert of alerts) {

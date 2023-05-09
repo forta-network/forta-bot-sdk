@@ -2,6 +2,7 @@ import { Alert } from "../../sdk";
 import {
   provideGetSubscriptionAlerts,
   GetSubscriptionAlerts,
+  TEN_MINUTES_IN_MS,
 } from "./get.subscription.alerts";
 
 describe("getSubscriptionAlerts", () => {
@@ -45,10 +46,7 @@ describe("getSubscriptionAlerts", () => {
     getSubscriptionAlerts = provideGetSubscriptionAlerts(mockGetAlerts);
   });
 
-  it("invokes getAlerts query and returns alerts", async () => {
-    const systemTime = new Date();
-    jest.useFakeTimers("modern").setSystemTime(systemTime);
-    const mockCreatedSince = new Date();
+  it("invokes getAlerts query and returns de-duped alerts", async () => {
     const mockEndCursor = "some cursor";
     mockGetAlerts
       .mockReturnValueOnce({
@@ -71,10 +69,7 @@ describe("getSubscriptionAlerts", () => {
         },
       });
 
-    const alerts = await getSubscriptionAlerts(
-      mockSubscriptions,
-      mockCreatedSince
-    );
+    const alerts = await getSubscriptionAlerts(mockSubscriptions);
 
     expect(alerts.length).toEqual(3);
     expect(alerts.includes(mockAlert)).toBeTrue();
@@ -84,23 +79,36 @@ describe("getSubscriptionAlerts", () => {
     expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot1", "0xbot2"],
       alertIds: ["ALERT-1", "ALERT-2"],
-      createdSince: 0,
-      first: 1000,
+      createdSince: TEN_MINUTES_IN_MS,
+      first: 5000,
     });
     expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot1", "0xbot2"],
       alertIds: ["ALERT-1", "ALERT-2"],
-      createdSince: 0,
-      first: 1000,
+      createdSince: TEN_MINUTES_IN_MS,
+      first: 5000,
       startingCursor: mockEndCursor,
     });
     expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot3"],
       alertIds: ["ALERT-3", "ALERT-4"],
-      createdSince: 0,
+      createdSince: TEN_MINUTES_IN_MS,
       chainId: 137,
-      first: 1000,
+      first: 5000,
     });
-    jest.useRealTimers();
   });
+
+  it("alerts seen before should be filtered out", async () => {
+    mockGetAlerts.mockReturnValue({
+      alerts: [mockAlert],
+      pageInfo: {
+        hasNextPage: false,
+      },
+    })
+
+    const alerts = await getSubscriptionAlerts(mockSubscriptions);
+
+    expect(alerts).toBeEmpty()
+    expect(mockGetAlerts).toHaveBeenCalledTimes(2)
+  })
 });
