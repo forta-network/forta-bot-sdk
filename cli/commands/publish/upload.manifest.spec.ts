@@ -25,11 +25,29 @@ describe("uploadManifest", () => {
       "shards": 1,
       "target": 1
     },
+    1: {
+      "shards": "5",
+      "target": "10"
+    },
+    "137": {
+      "shards": "2",
+      "targets": 3
+    }
+  } as any
+  const formattedMockChainSettings = {
+    "default": {
+      "shards": 1,
+      "target": 1
+    },
     "1": {
       "shards": 5,
       "target": 10
+    },
+    "137": {
+      "shards": 2,
+      "targets": 3
     }
-  } 
+  }
 
   const resetMocks = () => {
     mockFilesystem.existsSync.mockReset()
@@ -95,7 +113,7 @@ describe("uploadManifest", () => {
       repository: mockRepository,
       chainIds: mockChainIds,
       publishedFrom: `Forta CLI ${mockCliVersion}`,
-      chainSettings: mockChainSettings
+      chainSettings: formattedMockChainSettings
     }
     const mockManifestRef = "manifestRef"
     mockAddToIpfs.mockReturnValueOnce(mockManifestRef)
