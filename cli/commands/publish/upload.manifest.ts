@@ -79,7 +79,7 @@ export default function provideUploadManifest(
       repository,
       chainIds,
       publishedFrom: `Forta CLI ${cliVersion}`,
-      chainSettings,
+      chainSettings: formatChainSettings(chainSettings),
     }
 
     // sign agent manifest
@@ -92,4 +92,23 @@ export default function provideUploadManifest(
 
     return manifestReference
   }
+}
+
+function formatChainSettings(chainSettings: ChainSettings): ChainSettings {
+  const formattedChainSettings = Object.assign({}, chainSettings)
+  for (const key of Object.keys(chainSettings)) {
+    // make sure keys are not numbers
+    if (typeof key === 'number') {
+      delete formattedChainSettings[key]
+      formattedChainSettings[`${key}`] = chainSettings[key]
+    }
+    // make sure shards and targets are numbers
+    if (typeof chainSettings[key].shards === 'string') {
+      formattedChainSettings[`${key}`].shards = parseInt(chainSettings[key].shards as any)
+    }
+    if (typeof chainSettings[key].target === 'string') {
+      formattedChainSettings[`${key}`].target = parseInt(chainSettings[key].target as any)
+    }
+  }
+  return formattedChainSettings
 }
