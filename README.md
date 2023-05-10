@@ -10,7 +10,12 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.29
+### 0.1.30
+
+- Expanded alert query lookback window when running handleAlert locally
+- Improved sharding configuration validation
+
+### [0.1.29](https://github.com/forta-network/forta-bot-sdk/commit/b2c0bb3b951a3afdd25fb39f42c1e4164fa7e291)
 
 - Added new `stake` CLI command to stake on a detection bot
 - Fixed Python error handling to also reject NodeJS promise
