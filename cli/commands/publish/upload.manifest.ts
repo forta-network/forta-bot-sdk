@@ -40,7 +40,7 @@ export default function provideUploadManifest(
   repository: string,
   cliVersion: string,
   chainIds: number[],
-  chainSettings: ChainSettings
+  chainSettings?: ChainSettings
 ): UploadManifest {
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
@@ -94,7 +94,9 @@ export default function provideUploadManifest(
   }
 }
 
-function formatChainSettings(chainSettings: ChainSettings): ChainSettings {
+function formatChainSettings(chainSettings?: ChainSettings): ChainSettings | undefined {
+  if (!chainSettings) return undefined;
+
   const formattedChainSettings = Object.assign({}, chainSettings)
   for (const key of Object.keys(chainSettings)) {
     // make sure keys are not numbers
