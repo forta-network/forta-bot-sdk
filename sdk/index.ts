@@ -32,6 +32,13 @@ import {
   getAlerts
 } from "./alerts.api"
 import {
+  GetLabels,
+  LabelQueryOptions,
+  LabelsResponse,
+  LabelCursor,
+  getLabels
+} from './labels.api'
+import {
   fetchJwt,
   decodeJwt,
   verifyJwt,
@@ -83,6 +90,10 @@ export {
   AlertQueryOptions,
   AlertsResponse,
   AlertCursor,
+  GetLabels,
+  LabelQueryOptions,
+  LabelsResponse,
+  LabelCursor,
   InitializeResponse,
   BotSubscription,
   getJsonRpcUrl,
@@ -98,6 +109,7 @@ export {
   configureContainer,
   getTransactionReceipt,
   getAlerts,
+  getLabels,
   fetchJwt,
   decodeJwt,
   verifyJwt,
