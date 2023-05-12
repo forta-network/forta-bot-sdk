@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.30
+### 0.1.31
+
+- Fixed issue when publishing bot manifest without speciyfing chain settings
+
+### [0.1.30](https://github.com/forta-network/forta-bot-sdk/commit/3858fbfce91c794df39888819f60eb3dd654ea00)
 
 - Expanded alert query lookback window when running handleAlert locally
 - Improved sharding configuration validation
