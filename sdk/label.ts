@@ -14,6 +14,19 @@ export const ENTITY_TYPE_STRING_TO_ENUM = {
   URL: EntityType.Url,
 };
 
+export type LabelSource = {
+  alertHash?: string;
+  alertId?: string;
+  bot?: {
+    id: string;
+    image: string;
+    imageHash: string;
+    manifest: string;
+  };
+  chainId?: number;
+  id?: string;
+};
+
 type LabelInput = {
   entityType: EntityType;
   entity: string;
@@ -21,6 +34,9 @@ type LabelInput = {
   confidence: number;
   remove?: boolean;
   metadata?: { [key: string]: string };
+  source?: LabelSource;
+  createdAt?: string;
+  id?: string;
 };
 
 export class Label {
@@ -30,7 +46,10 @@ export class Label {
     readonly label: string,
     readonly confidence: number,
     readonly remove: boolean,
-    readonly metadata: { [key: string]: string }
+    readonly metadata: { [key: string]: string },
+    readonly source?: LabelSource,
+    readonly id?: string,
+    readonly createdAt?: string
   ) {}
 
   static fromObject({
@@ -40,6 +59,9 @@ export class Label {
     confidence,
     remove = false,
     metadata = {},
+    source,
+    id,
+    createdAt,
   }: LabelInput) {
     if (typeof entityType == "string") {
       entityType = ENTITY_TYPE_STRING_TO_ENUM[entityType];
@@ -56,6 +78,16 @@ export class Label {
       }
       metadata = metadataMap;
     }
-    return new Label(entityType, entity, label, confidence, remove, metadata);
+    return new Label(
+      entityType,
+      entity,
+      label,
+      confidence,
+      remove,
+      metadata,
+      source,
+      id,
+      createdAt
+    );
   }
 }

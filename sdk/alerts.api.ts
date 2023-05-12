@@ -1,15 +1,15 @@
 import axios from "axios";
 import { Alert } from "./alert";
-import { getFortaConfig } from "./utils";
+import { getFortaApiHeaders, getFortaApiURL } from "./utils";
 
-export type GetAlerts = (query: AlertQueryOptions) => Promise<AlertsResponse>
+export type GetAlerts = (query: AlertQueryOptions) => Promise<AlertsResponse>;
 export const getAlerts: GetAlerts = async (
   query: AlertQueryOptions
 ): Promise<AlertsResponse> => {
   const response: RawGraphqlAlertResponse = await axios.post(
-    getAlertsApiURL(),
+    getFortaApiURL(),
     getQueryFromAlertOptions(query),
-    getAlertsApiHeaders()
+    getFortaApiHeaders()
   );
 
   if (response.data && response.data.errors) throw Error(response.data.errors);
@@ -77,36 +77,6 @@ interface RawGraphqlAlertResponse {
     errors: any;
   };
 }
-
-const getAlertsApiURL = () => {
-  // if alerts api url provided by scanner i.e. in production
-  if (process.env.FORTA_PUBLIC_API_PROXY_HOST) {
-    return `http://${process.env.FORTA_PUBLIC_API_PROXY_HOST}${
-      process.env.FORTA_PUBLIC_API_PROXY_PORT
-        ? `:${process.env.FORTA_PUBLIC_API_PROXY_PORT}`
-        : ""
-    }/graphql`;
-  }
-
-  // use hardcoded value for local development
-  let { alertsApiUrl } = getFortaConfig();
-  if (!alertsApiUrl) return "https://api.forta.network/graphql";
-  return alertsApiUrl;
-};
-
-const getAlertsApiHeaders = () => {
-  const headers: any = { "content-type": "application/json" };
-
-  // use the api key from forta config if available (only for local development)
-  let { fortaApiKey } = getFortaConfig();
-  if (fortaApiKey) {
-    headers["Authorization"] = `Bearer ${fortaApiKey}`;
-  }
-
-  return {
-    headers,
-  };
-};
 
 const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
   return {

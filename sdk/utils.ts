@@ -201,3 +201,33 @@ export const setPrivateFindings = (isPrivate: boolean) => {
 export const isPrivateFindings = () => {
   return IS_PRIVATE_FINDINGS
 }
+
+export const getFortaApiURL = () => {
+  // if forta api url provided by scanner i.e. in production
+  if (process.env.FORTA_PUBLIC_API_PROXY_HOST) {
+    return `http://${process.env.FORTA_PUBLIC_API_PROXY_HOST}${
+      process.env.FORTA_PUBLIC_API_PROXY_PORT
+        ? `:${process.env.FORTA_PUBLIC_API_PROXY_PORT}`
+        : ""
+    }/graphql`;
+  }
+
+  // use hardcoded value for local development
+  let { fortaApiUrl } = getFortaConfig();
+  if (!fortaApiUrl) return "https://api.forta.network/graphql";
+  return fortaApiUrl;
+};
+
+export const getFortaApiHeaders = () => {
+  const headers: any = { "content-type": "application/json" };
+
+  // use the api key from forta config if available (only for local development)
+  let { fortaApiKey } = getFortaConfig();
+  if (fortaApiKey) {
+    headers["Authorization"] = `Bearer ${fortaApiKey}`;
+  }
+
+  return {
+    headers,
+  };
+};
