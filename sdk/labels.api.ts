@@ -15,8 +15,8 @@ export function provideGetLabels(axios: AxiosInstance): GetLabels {
       getFortaApiHeaders()
     );
 
-    if (response.data && response.data.errors)
-      throw Error(response.data.errors);
+    if (response.data?.errors?.length)
+      throw Error(response.data.errors[0].message);
 
     const pageInfo = response.data.data.labels.pageInfo;
     const labels: Label[] = [];

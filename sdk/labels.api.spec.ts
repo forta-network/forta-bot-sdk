@@ -52,7 +52,9 @@ describe("getLabels", () => {
   });
 
   it("throws error if GraphQL API returns error", async () => {
-    mockAxios.post.mockReturnValueOnce({ data: { errors: "some error" } });
+    mockAxios.post.mockReturnValueOnce({
+      data: { errors: [{ message: "some error" }] },
+    });
 
     try {
       await getLabels({});
