@@ -1,41 +1,40 @@
-import axios from "axios";
+import { AxiosInstance } from "axios";
 import { EntityType, Label, LabelSource } from "./label";
-import { getFortaApiHeaders, getFortaApiURL } from "./utils";
+import { assertExists, getFortaApiHeaders, getFortaApiURL } from "./utils";
 
 export type GetLabels = (query: LabelQueryOptions) => Promise<LabelsResponse>;
-export const getLabels: GetLabels = async (
-  query: LabelQueryOptions
-): Promise<LabelsResponse> => {
-  if (!query.entities && !query.labels && !query.sourceIds) {
-    throw new Error(
-      "label query must specify at least one of: entities, labels or sourceIds"
+export function provideGetLabels(axios: AxiosInstance): GetLabels {
+  assertExists(axios, "axios");
+
+  return async function getLabels(
+    query: LabelQueryOptions
+  ): Promise<LabelsResponse> {
+    const response: RawGraphqlLabelResponse = await axios.post(
+      getFortaApiURL(),
+      getQueryFromLabelOptions(query),
+      getFortaApiHeaders()
     );
-  }
 
-  const response: RawGraphqlLabelResponse = await axios.post(
-    getFortaApiURL(),
-    getQueryFromLabelOptions(query),
-    getFortaApiHeaders()
-  );
+    if (response.data && response.data.errors)
+      throw Error(response.data.errors);
 
-  if (response.data && response.data.errors) throw Error(response.data.errors);
-
-  const pageInfo = response.data.data.labels.pageInfo;
-  const labels: Label[] = [];
-  for (const labelData of response.data.data.labels.labels) {
-    const { label, id, createdAt, source } = labelData;
-    labels.push(
-      Label.fromObject({
-        ...label,
-        metadata: label.metadata ?? {},
-        id,
-        createdAt,
-        source,
-      })
-    );
-  }
-  return { labels, pageInfo };
-};
+    const pageInfo = response.data.data.labels.pageInfo;
+    const labels: Label[] = [];
+    for (const labelData of response.data.data.labels.labels) {
+      const { label, id, createdAt, source } = labelData;
+      labels.push(
+        Label.fromObject({
+          ...label,
+          metadata: label.metadata ?? {},
+          id,
+          createdAt,
+          source,
+        })
+      );
+    }
+    return { labels, pageInfo };
+  };
+}
 
 export interface LabelQueryOptions {
   entities?: string[];
@@ -96,7 +95,7 @@ interface RawGraphqlLabelResponse {
   };
 }
 
-const getQueryFromLabelOptions = (options: LabelQueryOptions) => {
+export const getQueryFromLabelOptions = (options: LabelQueryOptions) => {
   return {
     operationName: "fetchLabels",
     query: `

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { ethers } from "ethers"
 import { Finding, FindingSeverity, FindingType } from "./finding"
 import { Label, EntityType } from "./label"
@@ -36,7 +37,7 @@ import {
   LabelQueryOptions,
   LabelsResponse,
   LabelCursor,
-  getLabels
+  provideGetLabels
 } from './labels.api'
 import {
   fetchJwt,
@@ -59,6 +60,8 @@ type ConfigureContainer = (args?: object) => DiContainer
 const configureContainer: ConfigureContainer = (args: object = {}) => {
   return awilixConfigureContainer(args)
 }
+
+const getLabels = provideGetLabels(axios)
 
 export {
   FortaConfig,
