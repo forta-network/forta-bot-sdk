@@ -12,13 +12,16 @@ def get_labels(dict):
     response = requests.request(
         "POST", forta_api_url, json=payload, headers=headers)
 
-    if response.status_code == 200:
-        data = response.json().get('data')
-        if data:
-            return LabelsResponse(data.get('labels'))
-    else:
-        message = response.text
-        raise Exception(message)
+    if response.status_code != 200:
+        raise Exception(response.text)
+
+    json_response = response.json()
+    errors = json_response.get('errors')
+    if errors is not None and len(errors) > 0:
+        raise Exception(errors[0].get('message'))
+
+    data = json_response.get('data')
+    return LabelsResponse(data.get('labels'))
 
 
 class LabelQueryOptions:

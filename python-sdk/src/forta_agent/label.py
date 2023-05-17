@@ -25,7 +25,7 @@ class Label:
             'metadata') is not None else {}
         # if metadata is array, convert to map
         if hasattr(self.metadata, "__len__"):
-            self.metadata = self.metadata_array_to_map()
+            self.metadata_array_to_map()
         self.id = dict.get('id')
         self.source = LabelSource(dict.get('source')) if dict.get(
             'source') is not None else None
