@@ -1,12 +1,11 @@
-import os
 import requests
 from .alert import Alert
-from .utils import get_forta_config
+from .utils import get_forta_api_headers, get_forta_api_url
 
 
 def get_alerts(dict):
-    alerts_api_url = get_alerts_api_url()
-    headers = get_alerts_api_headers()
+    alerts_api_url = get_forta_api_url()
+    headers = get_forta_api_headers()
     query_options = AlertQueryOptions(dict)
     payload = query_options.get_query()
 
@@ -20,26 +19,6 @@ def get_alerts(dict):
     else:
         message = response.text
         raise Exception(message)
-
-
-def get_alerts_api_url():
-    if 'FORTA_PUBLIC_API_PROXY_HOST' in os.environ:
-        return f'http://{os.environ["FORTA_PUBLIC_API_PROXY_HOST"]}{":"+os.environ["FORTA_PUBLIC_API_PROXY_PORT"] if "FORTA_PUBLIC_API_PROXY_PORT" in os.environ else ""}/graphql'
-
-    config = get_forta_config()
-    if "alertsApiUrl" not in config:
-        return "https://api.forta.network/graphql"
-    return config.get("alertsApiUrl")
-
-
-def get_alerts_api_headers():
-    headers = {"content-type": "application/json"}
-
-    config = get_forta_config()
-    if "fortaApiKey" in config:
-        headers["Authorization"] = f'Bearer {config.get("fortaApiKey")}'
-
-    return headers
 
 
 class AlertCursor:

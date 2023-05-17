@@ -82,6 +82,26 @@ def get_json_rpc_url():
     return config.get("jsonRpcUrl")
 
 
+def get_forta_api_url():
+    if 'FORTA_PUBLIC_API_PROXY_HOST' in os.environ:
+        return f'http://{os.environ["FORTA_PUBLIC_API_PROXY_HOST"]}{":"+os.environ["FORTA_PUBLIC_API_PROXY_PORT"] if "FORTA_PUBLIC_API_PROXY_PORT" in os.environ else ""}/graphql'
+
+    config = get_forta_config()
+    if "fortaApiUrl" not in config:
+        return "https://api.forta.network/graphql"
+    return config.get("fortaApiUrl")
+
+
+def get_forta_api_headers():
+    headers = {"content-type": "application/json"}
+
+    config = get_forta_config()
+    if "fortaApiKey" in config:
+        headers["Authorization"] = f'Bearer {config.get("fortaApiKey")}'
+
+    return headers
+
+
 def get_transaction_receipt(tx_hash):
     from .receipt import Receipt  # avoid circular import
     web3_provider = get_web3_provider()
