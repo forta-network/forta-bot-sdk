@@ -1,3 +1,4 @@
+import axios from "axios";
 import { ethers } from "ethers"
 import { Finding, FindingSeverity, FindingType } from "./finding"
 import { Label, EntityType } from "./label"
@@ -32,6 +33,13 @@ import {
   getAlerts
 } from "./alerts.api"
 import {
+  GetLabels,
+  LabelQueryOptions,
+  LabelsResponse,
+  LabelCursor,
+  provideGetLabels
+} from './labels.api'
+import {
   fetchJwt,
   decodeJwt,
   verifyJwt,
@@ -52,6 +60,8 @@ type ConfigureContainer = (args?: object) => DiContainer
 const configureContainer: ConfigureContainer = (args: object = {}) => {
   return awilixConfigureContainer(args)
 }
+
+const getLabels = provideGetLabels(axios)
 
 export {
   FortaConfig,
@@ -83,6 +93,10 @@ export {
   AlertQueryOptions,
   AlertsResponse,
   AlertCursor,
+  GetLabels,
+  LabelQueryOptions,
+  LabelsResponse,
+  LabelCursor,
   InitializeResponse,
   BotSubscription,
   getJsonRpcUrl,
@@ -98,6 +112,7 @@ export {
   configureContainer,
   getTransactionReceipt,
   getAlerts,
+  getLabels,
   fetchJwt,
   decodeJwt,
   verifyJwt,
