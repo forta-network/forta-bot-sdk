@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.31
+### 0.1.32
+
+- Added `getLabels` method to query the Forta API for labels
+
+### [0.1.31](https://github.com/forta-network/forta-bot-sdk/commit/7a6e0b9f1b66b8d23d47e50f4fbba28a965735bf)
 
 - Fixed issue when publishing bot manifest without speciyfing chain settings
 
