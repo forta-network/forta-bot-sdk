@@ -24,7 +24,7 @@ class Label:
         self.metadata = dict.get('metadata') if dict.get(
             'metadata') is not None else {}
         # if metadata is array, convert to map
-        if hasattr(self.metadata, "__len__"):
+        if type(self.metadata) is list:
             self.metadata_array_to_map()
         self.id = dict.get('id')
         self.source = LabelSource(dict.get('source')) if dict.get(
