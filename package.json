@@ -1,6 +1,6 @@
 {
   "name": "forta-agent",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "license": "MIT",
   "description": "Forta Agent SDK and CLI tool",
   "homepage": "https://forta.org/",
