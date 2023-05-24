@@ -17,13 +17,8 @@ export default function provideUpload(
   return async function upload() {
     assertIsNonEmptyString(args.imageRef, 'imageRef')
 
-    let privateKey;
-    if (args.privateKey) {
-      privateKey = args.privateKey
-    } else {
-      const creds = await getCredentials()
-      privateKey = creds.privateKey
-    }
+    const creds = await getCredentials()
+    const privateKey = creds.privateKey
 
     const manifestReference = await uploadManifest(args.imageRef, privateKey)
 
