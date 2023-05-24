@@ -1,5 +1,5 @@
 import { CommandHandler } from '../..'
-import { assertExists } from '../../utils'
+import { assertExists, assertIsNonEmptyString } from '../../utils'
 import { AppendToFile } from '../../utils/append.to.file'
 import { UploadManifest } from '../publish/upload.manifest'
 import { GetCredentials } from '../../utils/get.credentials'
@@ -15,10 +15,7 @@ export default function provideUpload(
   assertExists(args, 'args')
 
   return async function upload() {
-    if (!args.imageRef) {
-      console.error('--imageRef not provided - aborting')
-      return
-    }
+    assertIsNonEmptyString(args.imageRef, 'imageRef')
 
     let privateKey;
     if (args.privateKey) {
