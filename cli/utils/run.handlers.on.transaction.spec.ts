@@ -74,8 +74,8 @@ describe("runHandlersOnTransaction", () => {
     expect(mockHandleTransaction).toHaveBeenCalledWith(mockTxEvent)
   })
 
-  it("throws an error if more than 10 findings when executing transaction handler", async () => {
-    const findings = getFindingsArray(11, 4)
+  it("throws an error if more than 50 findings when executing transaction handler", async () => {
+    const findings = getFindingsArray(51, 4)
 
     try {
       const mockHandleTransaction = jest.fn().mockReturnValue(findings)
@@ -97,12 +97,12 @@ describe("runHandlersOnTransaction", () => {
 
       fail()
     } catch(err) {
-      expect(err.message).toBe(`Cannot return more than 10 findings per request (received ${findings.length})`)
+      expect(err.message).toBe(`Cannot return more than 50 findings per request (received ${findings.length})`)
     }
   })
 
-  it("throws an error if more than 50kB of findings found when executing transaction handler", async () => {
-    const findings = getFindingsArray(1, 1024 * 50)
+  it("throws an error if more than 250kB of findings found when executing transaction handler", async () => {
+    const findings = getFindingsArray(1, 1024 * 250)
     const byteLength = Buffer.byteLength(JSON.stringify(findings));
     try {
       const mockHandleTransaction = jest.fn().mockReturnValue(findings)
@@ -124,7 +124,7 @@ describe("runHandlersOnTransaction", () => {
 
       fail()
     } catch(err) {
-      expect(err.message).toBe(`Cannot return more than 50kB of findings per request (received ${byteLength} bytes)`)
+      expect(err.message).toBe(`Cannot return more than 250kB of findings per request (received ${byteLength} bytes)`)
     }
   })
 

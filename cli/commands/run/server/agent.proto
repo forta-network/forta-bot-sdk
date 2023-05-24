@@ -44,6 +44,7 @@ message CombinerBotSubscription {
   string botId = 1;
   string alertId = 2;
   repeated string alertIds = 3;
+  uint64 chainId = 4;
 }
 
 message EvaluateTxRequest {
@@ -284,6 +285,15 @@ message AlertEvent {
       SourceAlertEvent sourceEvent = 4;
     }
 
+    message Label {
+      string label = 1;
+      float confidence = 2;
+      string entity = 3;
+      string entityType = 4;
+      bool remove = 5;
+      repeated string metadata = 6;
+    }
+
     // Unique string to identify this class of finding,
     // primarily used to group similar findings for the end user
     string alertId = 1;
@@ -304,6 +314,9 @@ message AlertEvent {
     string findingType = 13;
     repeated string relatedAlerts = 14;
     uint64 chainId = 15;
+    repeated Label labels = 16;
+    bool truncated = 17;
+    BloomFilter addressBloomFilter = 18;
   }
 
   Alert alert = 1;

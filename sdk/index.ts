@@ -1,3 +1,4 @@
+import axios from "axios";
 import { ethers } from "ethers"
 import { Finding, FindingSeverity, FindingType } from "./finding"
 import { Label, EntityType } from "./label"
@@ -20,8 +21,24 @@ import {
   setPrivateFindings,
   isPrivateFindings,
   getTransactionReceipt,
-  getAlerts,
+  getChainId,
+  getBotOwner,
+  getBotId
 } from "./utils"
+import {
+  GetAlerts,
+  AlertQueryOptions,
+  AlertsResponse,
+  AlertCursor,
+  getAlerts
+} from "./alerts.api"
+import {
+  GetLabels,
+  LabelQueryOptions,
+  LabelsResponse,
+  LabelCursor,
+  provideGetLabels
+} from './labels.api'
 import {
   fetchJwt,
   decodeJwt,
@@ -29,7 +46,12 @@ import {
   MOCK_JWT
 } from "./jwt"
 import awilixConfigureContainer from '../cli/di.container';
-import {InitializeResponse} from "./initialize.response";
+import { InitializeResponse, BotSubscription } from "./initialize.response";
+import { BloomFilter } from "./bloom.filter";
+import { FortaConfig } from "./forta.config";
+import { EventType } from './event.type'
+import { Network } from "./network";
+import { Initialize, HandleTransaction, HandleBlock, HandleAlert } from "./handlers";
 
 interface DiContainer {
   resolve<T>(key: string): T
@@ -39,46 +61,7 @@ const configureContainer: ConfigureContainer = (args: object = {}) => {
   return awilixConfigureContainer(args)
 }
 
-interface FortaConfig {
-  agentId?: string
-  jsonRpcUrl?: string
-  ipfsGatewayUrl?: string
-  ipfsGatewayAuth?: string
-  imageRepositoryUrl?: string
-  imageRepositoryUsername?: string
-  imageRepositoryPassword?: string
-  agentRegistryContractAddress?: string
-  agentRegistryJsonRpcUrl?: string
-  debug?: boolean
-  traceRpcUrl?: string
-  traceBlockMethod?: string
-  traceTransactionMethod?: string
-  keyfile?: string
-  keyfilePassword?: string
-}
-
-type Initialize = () => Promise<InitializeResponse | void>
-type HandleTransaction = (txEvent: TransactionEvent) => Promise<Finding[]>
-type HandleBlock = (blockEvent: BlockEvent) => Promise<Finding[]>
-type HandleAlert = (alertEvent: AlertEvent) => Promise<Finding[]>
-
-enum EventType {
-  BLOCK = 0,
-  REORG = 1,
-}
-
-enum Network {
-  MAINNET = 1,
-  ROPSTEN = 3,
-  RINKEBY = 4,
-  GOERLI = 5,
-  POLYGON = 137,
-  BSC = 56,
-  AVALANCHE = 43114,
-  ARBITRUM = 42161,
-  OPTIMISM = 10,
-  FANTOM = 250,
-}
+const getLabels = provideGetLabels(axios)
 
 export {
   FortaConfig,
@@ -106,6 +89,16 @@ export {
   TraceResult,
   EventType,
   Network,
+  GetAlerts,
+  AlertQueryOptions,
+  AlertsResponse,
+  AlertCursor,
+  GetLabels,
+  LabelQueryOptions,
+  LabelsResponse,
+  LabelCursor,
+  InitializeResponse,
+  BotSubscription,
   getJsonRpcUrl,
   createTransactionEvent,
   createBlockEvent,
@@ -119,8 +112,13 @@ export {
   configureContainer,
   getTransactionReceipt,
   getAlerts,
+  getLabels,
   fetchJwt,
   decodeJwt,
   verifyJwt,
+  getChainId,
+  getBotOwner,
+  getBotId,
+  BloomFilter,
   MOCK_JWT
  }

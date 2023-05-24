@@ -1,10 +1,22 @@
 import sys
 import os
 from jsonc_parser.parser import JsoncParser
-import requests
-from web3.auto import w3
 from web3 import Web3
-from .forta_graphql import AlertsResponse
+
+chain_id = None
+
+
+def get_chain_id():
+    # if chain id provided by scanner i.e. in production
+    if 'FORTA_CHAIN_ID' in os.environ:
+        return int(os.environ['FORTA_CHAIN_ID'])
+
+    # query from the web3 provider i.e. for developing locally
+    global chain_id
+    provider = get_web3_provider()
+    if chain_id is None:
+        chain_id = provider.eth.chain_id
+    return chain_id
 
 
 def get_web3_provider():
@@ -12,14 +24,39 @@ def get_web3_provider():
     return web3Provider
 
 
+def get_bot_owner():
+    # if bot owner provided by scanner i.e. in production
+    if 'FORTA_BOT_OWNER' in os.environ:
+        return int(os.environ['FORTA_BOT_OWNER'])
+
+    # return a mock value for local development
+    return "0xMockOwner"
+
+
+def get_bot_id():
+    # if bot id provided by scanner i.e. in production
+    if 'FORTA_BOT_ID' in os.environ:
+        return int(os.environ['FORTA_BOT_ID'])
+
+    # return a mock value for local development
+    return "0xMockBotId"
+
+
+forta_config = None
+
+
 def get_forta_config():
-    config = {}
+    global forta_config
+    if (forta_config is not None):
+        return forta_config
+
+    forta_config = {}
     # try to read global config
     global_config_path = os.path.join(
         os.path.expanduser('~'), '.forta', 'forta.config.json')
     if os.path.isfile(global_config_path):
         global_config = JsoncParser.parse_file(global_config_path)
-        config = {**config, **global_config}
+        forta_config = {**forta_config, **global_config}
     # try to read local project config
     config_flag_index = sys.argv.index(
         '--config') if '--config' in sys.argv else -1
@@ -29,8 +66,8 @@ def get_forta_config():
         os.getcwd(), local_config_file if local_config_file else 'forta.config.json')
     if os.path.isfile(local_config_path):
         local_config = JsoncParser.parse_file(local_config_path)
-        config = {**config, **local_config}
-    return config
+        forta_config = {**forta_config, **local_config}
+    return forta_config
 
 
 def get_json_rpc_url():
@@ -43,6 +80,26 @@ def get_json_rpc_url():
     if not str(config.get("jsonRpcUrl")).startswith("http"):
         raise Exception("jsonRpcUrl must begin with http(s)")
     return config.get("jsonRpcUrl")
+
+
+def get_forta_api_url():
+    if 'FORTA_PUBLIC_API_PROXY_HOST' in os.environ:
+        return f'http://{os.environ["FORTA_PUBLIC_API_PROXY_HOST"]}{":"+os.environ["FORTA_PUBLIC_API_PROXY_PORT"] if "FORTA_PUBLIC_API_PROXY_PORT" in os.environ else ""}/graphql'
+
+    config = get_forta_config()
+    if "fortaApiUrl" not in config:
+        return "https://api.forta.network/graphql"
+    return config.get("fortaApiUrl")
+
+
+def get_forta_api_headers():
+    headers = {"content-type": "application/json"}
+
+    config = get_forta_config()
+    if "fortaApiKey" in config:
+        headers["Authorization"] = f'Bearer {config.get("fortaApiKey")}'
+
+    return headers
 
 
 def get_transaction_receipt(tx_hash):
@@ -87,26 +144,6 @@ def create_transaction_event(dict):
 def create_alert_event(dict):
     from .alert_event import AlertEvent  # avoid circular import
     return AlertEvent(dict)
-
-
-def get_alerts(dict):
-    from .forta_graphql import AlertQueryOptions
-    forta_api = "https://api.forta.network/graphql"
-    headers = {"content-type": "application/json"}
-    query_options = AlertQueryOptions(dict)
-    payload = query_options.get_query()
-
-    response = requests.request(
-        "POST", forta_api, json=payload, headers=headers)
-
-    if response.status_code == 200:
-        data = response.json().get('data')
-
-        if data:
-            return AlertsResponse(data.get('alerts'))
-    else:
-        message = response.text
-        raise Exception(message)
 
 
 def assert_non_empty_string_in_dict(dict, key):

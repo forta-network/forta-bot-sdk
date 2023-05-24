@@ -1,4 +1,25 @@
+import requests
 from .alert import Alert
+from .utils import get_forta_api_headers, get_forta_api_url
+
+
+def get_alerts(dict):
+    alerts_api_url = get_forta_api_url()
+    headers = get_forta_api_headers()
+    query_options = AlertQueryOptions(dict)
+    payload = query_options.get_query()
+
+    response = requests.request(
+        "POST", alerts_api_url, json=payload, headers=headers)
+
+    if response.status_code == 200:
+        data = response.json().get('data')
+        if data:
+            return AlertsResponse(data.get('alerts'))
+    else:
+        message = response.text
+        raise Exception(message)
+
 
 class AlertCursor:
     def __init__(self, dict):
@@ -84,6 +105,19 @@ class AlertQueryOptions:
                     findingType
                     relatedAlerts
                     chainId
+                    labels {
+                        label
+                        confidence
+                        entity
+                        entityType
+                        remove
+                        metadata
+                    }
+                    addressBloomFilter {
+                        bitset
+                        k
+                        m
+                    }
                 }
                 pageInfo {
                     hasNextPage
@@ -96,16 +130,21 @@ class AlertQueryOptions:
           }
           """
         query_variables = vars(self)
-        filtered_query_variables = {k:v for k,v in query_variables.items() if v is not None}
+        filtered_query_variables = {
+            k: v for k, v in query_variables.items() if v is not None}
         return dict(query=query, variables={"input": filtered_query_variables})
 
 
 class AlertsResponse:
     def __init__(self, dict):
-        self.alerts = list(map(lambda t: Alert(t), dict.get('alerts', []))) if dict.get('alerts') is not None else []
-        self.page_info = PageInfo(dict.get('pageInfo')) if dict.get('pageInfo') is not None else None
+        self.alerts = list(map(lambda t: Alert(t), dict.get(
+            'alerts', []))) if dict.get('alerts') is not None else []
+        self.page_info = PageInfo(dict.get('pageInfo')) if dict.get(
+            'pageInfo') is not None else None
+
 
 class PageInfo:
-    def __init__(self,dict):
+    def __init__(self, dict):
         self.has_next_page = dict.get('hasNextPage')
-        self.end_cursor = AlertCursor(dict.get('endCursor')) if dict.get('endCursor') is not None else None
+        self.end_cursor = AlertCursor(dict.get('endCursor')) if dict.get(
+            'endCursor') is not None else None

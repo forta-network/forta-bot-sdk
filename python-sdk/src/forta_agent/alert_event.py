@@ -40,3 +40,6 @@ class AlertEvent:
     @property
     def chain_id(self):
         return self.alert.chain_id
+
+    def has_address(self, address):
+        return self.alert.has_address(address)

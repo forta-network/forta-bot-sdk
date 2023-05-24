@@ -11,10 +11,9 @@ import {
   BlockEvent,
   EventType,
   Finding,
-  Log,
   TransactionEvent
 } from "../../sdk"
-import { Trace } from '../../sdk/trace'
+import { Trace } from '../../sdk'
 import { JsonRpcBlock, JsonRpcTransaction } from './get.block.with.transactions'
 import { JsonRpcLog } from './get.transaction.receipt'
 
@@ -54,8 +53,22 @@ export const assertFindings = (findings: Finding[]) => {
   const byteLength = Buffer.byteLength(JSON.stringify(findings));
   const kilobyte = 1024;
 
-  if(byteLength > kilobyte * 50) throw Error(`Cannot return more than 50kB of findings per request (received ${byteLength} bytes)`)
-  if(findings.length > 10) throw Error(`Cannot return more than 10 findings per request (received ${findings.length})`)
+  if(byteLength > kilobyte * 250) throw Error(`Cannot return more than 250kB of findings per request (received ${byteLength} bytes)`)
+  if(findings.length > 50) throw Error(`Cannot return more than 50 findings per request (received ${findings.length})`)
+}
+
+export const assertIsValidChainSettings = (chainSettings?: any) => {
+  if(!chainSettings) {
+    return 
+  }
+  for(let key in chainSettings) {
+    if(key == "default") {
+      continue 
+    }
+    if(isNaN(parseInt(key))) {
+      throw new Error("keys in chainSettings must be numerical string or default")
+    }
+  }
 }
 
 export const isValidTimeRange = (earliestTimestamp: Date, latestTimestamp: Date): boolean => {

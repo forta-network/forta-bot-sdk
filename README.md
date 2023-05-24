@@ -10,7 +10,74 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.18
+### 0.1.32
+
+- Added `getLabels` method to query the Forta API for labels
+
+### [0.1.31](https://github.com/forta-network/forta-bot-sdk/commit/7a6e0b9f1b66b8d23d47e50f4fbba28a965735bf)
+
+- Fixed issue when publishing bot manifest without speciyfing chain settings
+
+### [0.1.30](https://github.com/forta-network/forta-bot-sdk/commit/3858fbfce91c794df39888819f60eb3dd654ea00)
+
+- Expanded alert query lookback window when running handleAlert locally
+- Improved sharding configuration validation
+
+### [0.1.29](https://github.com/forta-network/forta-bot-sdk/commit/b2c0bb3b951a3afdd25fb39f42c1e4164fa7e291)
+
+- Added new `stake` CLI command to stake on a detection bot
+- Fixed Python error handling to also reject NodeJS promise
+
+### [0.1.28](https://github.com/forta-network/forta-bot-sdk/commit/2b8286e0c03d44ea75a1a3dbc5ed8b8c3e976584)
+
+- Added retry logic for CLI `run` command to improve reliability of running bots locally
+- Improved error handling for Python bots by showing stack traces
+
+### [0.1.27](https://github.com/forta-network/forta-bot-sdk/commit/8b285d8976ebea8c0da7f270b9db997ba4eb9a04)
+
+- Fixed issue for parsing findings returned from Python bots
+
+### [0.1.26](https://github.com/forta-network/forta-bot-sdk/commit/ad0c35623b94ee5e2d8b21f88931cbb6313819ea)
+
+- Added new FindingType value of Scam
+
+### [0.1.25](https://github.com/forta-network/forta-bot-sdk/commit/c7be73094383404df16e43eff1872be3f5daf119)
+
+- Added bot license
+
+### [0.1.24](https://github.com/forta-network/forta-bot-sdk/commit/a93f2d4c2eba458f7728a34c2afa990129d97cb4)
+
+- Increased max findings response size to 250kB
+- Updated label metadata field to be a map
+
+### [0.1.23](https://github.com/forta-network/forta-bot-sdk/commit/2b6763bb4df5bcdbb22b29e5ec0bea062d4acd44)
+
+- Added metadata field to Labels
+
+### [0.1.22](https://github.com/forta-network/forta-bot-sdk/commit/4b624a2b2917da47439dfb356ab2f50566be29e3)
+
+- Updated `run` command to wait 60 seconds between alert queries for bots using `handleAlert` locally
+
+### [0.1.21](https://github.com/forta-network/forta-bot-sdk/commit/4b6a795b98c211b3e48253aec383405a4b676f41)
+
+- Added support for address bloom filters on AlertEvent
+- Updated CLI errors to return a non-zero exit code
+- Changed Alert interface into a class
+- Increased maximum number of findings returned in a response to 50
+
+### [0.1.20](https://github.com/forta-network/forta-bot-sdk/commit/32d296e4d3fc28a6a55ff820cfdaa4a04b01c668)
+
+- Fixed labels parsing when querying for alerts
+
+### [0.1.19](https://github.com/forta-network/forta-bot-sdk/commit/7c28f8f5d043f61fa17db60784f00d894f777eb7)
+
+- Added support for running shards i.e. multiple bot instances
+- Added labels to alerts
+- Updated handleAlert subscriptions to allow specifying filter by chainId
+- Updated grpc controller to ensure initialize handler only invoked once
+- Updated grpc proto definition
+
+### [0.1.18](https://github.com/forta-network/forta-bot-sdk/commit/87268d3034bd79498a0690708cbfe2aaa851f00d)
 
 - Updated grpc proto definition to add `alert.chainId` field
 

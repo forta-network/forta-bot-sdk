@@ -24,10 +24,11 @@
     "disable": "forta-agent disable",
     "enable": "forta-agent enable",
     "keyfile": "forta-agent keyfile",
+    "stake": "forta-agent stake",
     "test": "jest"
   },
   "dependencies": {
-    "forta-agent": "^0.1.18"
+    "forta-agent": "^0.1.32"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",

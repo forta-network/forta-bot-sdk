@@ -38,4 +38,8 @@ export class AlertEvent {
   get chainId() {
     return this.alert.chainId;
   }
+
+  public hasAddress(address: string) {
+    return this.alert.hasAddress(address);
+  }
 }

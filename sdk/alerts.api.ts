@@ -1,65 +1,87 @@
-import { Alert } from '../alert'
+import axios from "axios";
+import { Alert } from "./alert";
+import { getFortaApiHeaders, getFortaApiURL } from "./utils";
 
-export const FORTA_GRAPHQL_URL = "https://api.forta.network/graphql";
+export type GetAlerts = (query: AlertQueryOptions) => Promise<AlertsResponse>;
+export const getAlerts: GetAlerts = async (
+  query: AlertQueryOptions
+): Promise<AlertsResponse> => {
+  const response: RawGraphqlAlertResponse = await axios.post(
+    getFortaApiURL(),
+    getQueryFromAlertOptions(query),
+    getFortaApiHeaders()
+  );
 
-interface AlertCursor {
-    alertId: string,
-    blockNumber: number
-}
+  if (response.data && response.data.errors) throw Error(response.data.errors);
+
+  const pageInfo = response.data.data.alerts.pageInfo;
+  const alerts: Alert[] = [];
+  for (const alertData of response.data.data.alerts.alerts) {
+    alerts.push(Alert.fromObject(alertData));
+  }
+  return { alerts, pageInfo };
+};
+
 export interface AlertQueryOptions {
-    botIds?: string[], // filter results by bot ids
-    addresses?: string[], // filter results based on addresses involved in alerts
-    alertHash?: string,
-    alertName?: string,
-    alertId?: string,
-    alertIds?: string[],
-    chainId?: number,
-    createdSince?: number,
-    createdBefore?: number,
-    first?: number, // indicates max number of results,
-    startingCursor?: AlertCursor, // query results after the specified cursor
-    projectId?: string, 
-    scanNodeConfirmations?: { // filter results by number of scan nodes confirming the alert 
-        gte: number,
-        lte: number
-    },
-    severities?: string[], // filter results by severity levels,
-    transactionHash?: string,
-    blockSortDirection?: "desc" | "asc", // set sorting order by block number
-    blockDateRange?: {
-        startDate: Date,
-        endDate: Date
-    }
-    blockNumberRange?: {
-        startBlockNumber: number,
-        endBlockNumber: number
-    }
+  botIds?: string[]; // filter results by bot ids
+  addresses?: string[]; // filter results based on addresses involved in alerts
+  alertHash?: string;
+  alertName?: string;
+  alertId?: string;
+  alertIds?: string[];
+  chainId?: number;
+  createdSince?: number;
+  createdBefore?: number;
+  first?: number; // indicates max number of results,
+  startingCursor?: AlertCursor; // query results after the specified cursor
+  projectId?: string;
+  scanNodeConfirmations?: {
+    // filter results by number of scan nodes confirming the alert
+    gte: number;
+    lte: number;
+  };
+  severities?: string[]; // filter results by severity levels,
+  transactionHash?: string;
+  blockSortDirection?: "desc" | "asc"; // set sorting order by block number
+  blockDateRange?: {
+    startDate: Date;
+    endDate: Date;
+  };
+  blockNumberRange?: {
+    startBlockNumber: number;
+    endBlockNumber: number;
+  };
 }
 
 export interface AlertsResponse {
-    alerts: Alert[],
-    pageInfo: {
-        hasNextPage: boolean,
-        endCursor?: {
-            alertId: string,
-            blockNumber: number
-        }
-    }
+  alerts: Alert[];
+  pageInfo: {
+    hasNextPage: boolean;
+    endCursor?: {
+      alertId: string;
+      blockNumber: number;
+    };
+  };
 }
 
-export interface RawGraphqlAlertResponse {
+export interface AlertCursor {
+  alertId: string;
+  blockNumber: number;
+}
+
+interface RawGraphqlAlertResponse {
+  data: {
     data: {
-        data: {
-            alerts: AlertsResponse
-        },
-        errors: any
-    }
+      alerts: AlertsResponse;
+    };
+    errors: any;
+  };
 }
 
-export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
-    return {
-        "operationName": "fetchAlerts",
-        "query" : `
+const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
+  return {
+    operationName: "fetchAlerts",
+    query: `
             query fetchAlerts(
                 $bots: [String], 
                 $addresses: [String], 
@@ -154,6 +176,19 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                             findingType
                             relatedAlerts
                             chainId
+                            labels {
+                                label
+                                confidence
+                                entity
+                                entityType
+                                remove
+                                metadata
+                            }
+                            addressBloomFilter {
+                                bitset
+                                k
+                                m
+                            }
                         }
                         pageInfo {
                             hasNextPage
@@ -165,27 +200,32 @@ export const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                     }
             }
         `,
-        "variables": {
-            bots: options.botIds,
-            addresses: options.addresses,
-            after: options.startingCursor,
-            alertId: options.alertId,
-            chainId: options.chainId,
-            first: options.first,
-            projectId: options.projectId,
-            scanNodeConfirmations: options.scanNodeConfirmations,
-            severities: options.severities,
-            transactionHash: options.transactionHash,
-            blockSortDirection: options.blockSortDirection,
-            createdSince: options.createdSince,
-            createdBefore: options.createdBefore,
-            blockDateRange: options.blockDateRange ?
-                { startDate: options.blockDateRange.startDate.toISOString().split('T')[0], endDate: options.blockDateRange.endDate.toISOString().split('T')[0]} :
-                undefined,
-            blockNumberRange: options.blockNumberRange,
-            alertIds: options.alertIds,
-            alertHash: options.alertHash,
-            alertName: options.alertName
-        } 
-    }
-}
+    variables: {
+      bots: options.botIds,
+      addresses: options.addresses,
+      after: options.startingCursor,
+      alertId: options.alertId,
+      chainId: options.chainId,
+      first: options.first,
+      projectId: options.projectId,
+      scanNodeConfirmations: options.scanNodeConfirmations,
+      severities: options.severities,
+      transactionHash: options.transactionHash,
+      blockSortDirection: options.blockSortDirection,
+      createdSince: options.createdSince,
+      createdBefore: options.createdBefore,
+      blockDateRange: options.blockDateRange
+        ? {
+            startDate: options.blockDateRange.startDate
+              .toISOString()
+              .split("T")[0],
+            endDate: options.blockDateRange.endDate.toISOString().split("T")[0],
+          }
+        : undefined,
+      blockNumberRange: options.blockNumberRange,
+      alertIds: options.alertIds,
+      alertHash: options.alertHash,
+      alertName: options.alertName,
+    },
+  };
+};

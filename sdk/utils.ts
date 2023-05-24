@@ -4,23 +4,34 @@ import { join } from 'path'
 import { jsonc } from 'jsonc'
 import _ from 'lodash'
 import { Keccak } from 'sha3'
-import {
-  Alert,
-  AlertEvent,
-  BlockEvent,
-  EventType,
-  FortaConfig,
-  Network,
-  Trace,
-  TransactionEvent
-} from '.'
+import { Network } from './network'
+import { EventType } from './event.type'
+import { FortaConfig } from './forta.config'
+import { Alert} from './alert'
+import { AlertEvent } from './alert.event'
+import { BlockEvent } from './block.event'
+import { Trace } from './trace'
+import { TransactionEvent } from './transaction.event'
 import { Transaction } from './transaction'
 import { Log, Receipt } from './receipt'
 import { TxEventBlock } from './transaction.event'
 import { Block } from './block'
-import { ethers } from '.'
-import { AlertQueryOptions, AlertsResponse, FORTA_GRAPHQL_URL, getQueryFromAlertOptions, RawGraphqlAlertResponse } from './graphql/forta'
-import axios from 'axios'
+import { ethers } from "ethers"
+
+let chainId: number | undefined;
+export const getChainId = async (): Promise<number> => {
+  // if chain id provided by scanner i.e. in production
+  if (process.env.FORTA_CHAIN_ID) {
+    return parseInt(process.env.FORTA_CHAIN_ID)
+  }
+
+  // query from the ethers provider i.e. for developing locally
+  const provider = getEthersProvider()
+  if (!chainId) {
+    chainId = (await provider.getNetwork()).chainId
+  }
+  return chainId
+}
 
 export const getEthersProvider = () => {
   return new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
@@ -30,21 +41,44 @@ export const getEthersBatchProvider = () => {
   return new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl())
 }
 
-const getFortaConfig: () => FortaConfig = () => {
-  let config = {}
+export const getBotOwner = () => {
+  // if bot owner provided by scanner i.e. in production
+  if (process.env.FORTA_BOT_OWNER) {
+    return process.env.FORTA_BOT_OWNER
+  }
+
+  // return a mock value for local development
+  return "0xMockOwner"
+}
+
+export const getBotId = () => {
+  // if bot id provided by scanner i.e. in production
+  if (process.env.FORTA_BOT_ID) {
+    return process.env.FORTA_BOT_ID
+  }
+
+  // return a mock value for local development
+  return "0xMockBotId"
+}
+
+let fortaConfig: FortaConfig | undefined = undefined
+export const getFortaConfig: () => FortaConfig = () => {
+  if (fortaConfig) return fortaConfig
+  
+  fortaConfig = {}
   // try to read from global config
   const globalConfigPath = join(os.homedir(), '.forta', 'forta.config.json')
   if (fs.existsSync(globalConfigPath)) {
-    config = Object.assign(config, jsonc.parse(fs.readFileSync(globalConfigPath, 'utf8')))
+    fortaConfig = Object.assign(fortaConfig!, jsonc.parse(fs.readFileSync(globalConfigPath, 'utf8')))
   }
   // try to read from local project config
   const configFlagIndex = process.argv.indexOf('--config')
   const configFile = configFlagIndex == -1 ? undefined : process.argv[configFlagIndex + 1]
   const localConfigPath = join(process.cwd(), configFile || 'forta.config.json')
   if (fs.existsSync(localConfigPath)) {
-    config = Object.assign(config, jsonc.parse(fs.readFileSync(localConfigPath, 'utf8')))
+    fortaConfig = Object.assign(fortaConfig!, jsonc.parse(fs.readFileSync(localConfigPath, 'utf8')))
   }
-  return config
+  return fortaConfig!
 }
 
 export const getJsonRpcUrl = () => {
@@ -168,10 +202,32 @@ export const isPrivateFindings = () => {
   return IS_PRIVATE_FINDINGS
 }
 
-export const getAlerts = async (query: AlertQueryOptions): Promise<AlertsResponse> => {
-  const response: RawGraphqlAlertResponse = await axios.post(FORTA_GRAPHQL_URL, getQueryFromAlertOptions(query), {headers: {"content-type": "application/json"}});
+export const getFortaApiURL = () => {
+  // if forta api url provided by scanner i.e. in production
+  if (process.env.FORTA_PUBLIC_API_PROXY_HOST) {
+    return `http://${process.env.FORTA_PUBLIC_API_PROXY_HOST}${
+      process.env.FORTA_PUBLIC_API_PROXY_PORT
+        ? `:${process.env.FORTA_PUBLIC_API_PROXY_PORT}`
+        : ""
+    }/graphql`;
+  }
 
-  if(response.data && response.data.errors) throw Error(response.data.errors)
+  // use hardcoded value for local development
+  let { fortaApiUrl } = getFortaConfig();
+  if (!fortaApiUrl) return "https://api.forta.network/graphql";
+  return fortaApiUrl;
+};
 
-  return response.data.data.alerts
-}
+export const getFortaApiHeaders = () => {
+  const headers: any = { "content-type": "application/json" };
+
+  // use the api key from forta config if available (only for local development)
+  let { fortaApiKey } = getFortaConfig();
+  if (fortaApiKey) {
+    headers["Authorization"] = `Bearer ${fortaApiKey}`;
+  }
+
+  return {
+    headers,
+  };
+};

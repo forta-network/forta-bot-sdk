@@ -2,16 +2,19 @@ import { provideRunLive, RunLive } from "./run.live";
 
 describe("runLive", () => {
   let runLive: RunLive;
-  const mockEthersProvider = {
-    getBlockNumber: jest.fn(),
-    getNetwork: jest.fn(),
-  } as any;
+  const mockGetNetworkId = jest.fn();
+  const mockGetLatestBlockNumber = jest.fn();
   const mockGetAgentHandlers = jest.fn();
   const mockGetSubscriptionAlerts = jest.fn();
   const mockRunHandlersOnBlock = jest.fn();
   const mockRunHandlersOnAlert = jest.fn();
   const mockSleep = jest.fn();
   const mockShouldContinuePolling = jest.fn();
+  const mockInitializeResponse = {
+    alertConfig: {
+      subscriptions: [{ botId: "0x123", alertId: "ALERT-1" }],
+    },
+  };
   const latestBlockNumber = 1000;
   const systemTime = new Date();
 
@@ -20,19 +23,20 @@ describe("runLive", () => {
     mockGetSubscriptionAlerts.mockReset();
     mockRunHandlersOnBlock.mockReset();
     mockRunHandlersOnAlert.mockReset();
-    mockEthersProvider.getBlockNumber.mockReset();
-    mockEthersProvider.getNetwork.mockReset();
+    mockGetLatestBlockNumber.mockReset();
+    mockGetNetworkId.mockReset();
     mockSleep.mockReset();
     mockShouldContinuePolling.mockReset();
   };
 
-  const blockChainNetwork = { chainId: 1 };
+  const mockNetworkId = 1;
 
   beforeAll(() => {
     runLive = provideRunLive(
       mockGetAgentHandlers,
       mockGetSubscriptionAlerts,
-      mockEthersProvider,
+      mockGetNetworkId,
+      mockGetLatestBlockNumber,
       mockRunHandlersOnBlock,
       mockRunHandlersOnAlert,
       mockSleep
@@ -65,26 +69,24 @@ describe("runLive", () => {
     mockShouldContinuePolling
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(false);
-    mockEthersProvider.getBlockNumber.mockReturnValueOnce(latestBlockNumber);
-    mockEthersProvider.getNetwork.mockReturnValueOnce(blockChainNetwork);
+    mockGetLatestBlockNumber.mockReturnValueOnce(latestBlockNumber);
+    mockGetNetworkId.mockReturnValueOnce(mockNetworkId);
 
     await runLive(mockShouldContinuePolling);
 
-    expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledTimes(1);
-    expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledWith();
+    expect(mockGetLatestBlockNumber).toHaveBeenCalledTimes(1);
+    expect(mockGetLatestBlockNumber).toHaveBeenCalledWith();
     expect(mockRunHandlersOnBlock).toHaveBeenCalledTimes(1);
-    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(latestBlockNumber);
+    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(
+      latestBlockNumber,
+      mockNetworkId
+    );
     expect(mockSleep).toHaveBeenCalledTimes(0);
     expect(mockGetSubscriptionAlerts).toHaveBeenCalledTimes(0);
     expect(mockRunHandlersOnAlert).toHaveBeenCalledTimes(0);
   });
 
   it("processes new blocks on following iterations", async () => {
-    const mockInitializeResponse = {
-      alertConfig: {
-        subscriptions: [{ botId: "0x123", alertId: "ALERT-1" }],
-      },
-    };
     mockGetAgentHandlers.mockReturnValue({
       handleTransaction: jest.fn(),
       handleAlert: jest.fn(),
@@ -101,24 +103,35 @@ describe("runLive", () => {
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(false);
-    mockEthersProvider.getBlockNumber
+    mockGetLatestBlockNumber
       .mockReturnValueOnce(latestBlockNumber)
       .mockReturnValueOnce(latestBlockNumber + 3);
-    mockEthersProvider.getNetwork.mockReturnValueOnce(blockChainNetwork);
+    mockGetNetworkId.mockReturnValueOnce(mockNetworkId);
 
     await runLive(mockShouldContinuePolling);
 
-    expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledTimes(2);
-    expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledWith();
+    expect(mockGetLatestBlockNumber).toHaveBeenCalledTimes(2);
+    expect(mockGetLatestBlockNumber).toHaveBeenCalledWith();
     expect(mockRunHandlersOnBlock).toHaveBeenCalledTimes(4);
-    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(latestBlockNumber);
-    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(latestBlockNumber + 1);
-    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(latestBlockNumber + 2);
-    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(latestBlockNumber + 3);
-    expect(mockGetSubscriptionAlerts).toHaveBeenCalledTimes(2);
+    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(
+      latestBlockNumber,
+      mockNetworkId
+    );
+    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(
+      latestBlockNumber + 1,
+      mockNetworkId
+    );
+    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(
+      latestBlockNumber + 2,
+      mockNetworkId
+    );
+    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(
+      latestBlockNumber + 3,
+      mockNetworkId
+    );
+    expect(mockGetSubscriptionAlerts).toHaveBeenCalledTimes(1);
     expect(mockGetSubscriptionAlerts).toHaveBeenCalledWith(
-      mockInitializeResponse.alertConfig.subscriptions,
-      systemTime
+      mockInitializeResponse.alertConfig.subscriptions
     );
     expect(mockRunHandlersOnAlert).toHaveBeenCalledTimes(1);
     expect(mockRunHandlersOnAlert).toHaveBeenCalledWith(mockAlert);
@@ -133,17 +146,20 @@ describe("runLive", () => {
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(false);
-    mockEthersProvider.getBlockNumber
+    mockGetLatestBlockNumber
       .mockReturnValueOnce(latestBlockNumber)
       .mockReturnValueOnce(latestBlockNumber);
-    mockEthersProvider.getNetwork.mockReturnValueOnce(blockChainNetwork);
+    mockGetNetworkId.mockReturnValueOnce(mockNetworkId);
 
     await runLive(mockShouldContinuePolling);
 
-    expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledTimes(2);
-    expect(mockEthersProvider.getBlockNumber).toHaveBeenCalledWith();
+    expect(mockGetLatestBlockNumber).toHaveBeenCalledTimes(2);
+    expect(mockGetLatestBlockNumber).toHaveBeenCalledWith();
     expect(mockRunHandlersOnBlock).toHaveBeenCalledTimes(1);
-    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(latestBlockNumber);
+    expect(mockRunHandlersOnBlock).toHaveBeenCalledWith(
+      latestBlockNumber,
+      mockNetworkId
+    );
     expect(mockSleep).toHaveBeenCalledTimes(1);
     expect(mockSleep).toHaveBeenCalledWith(15000);
   });

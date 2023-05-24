@@ -1,19 +1,25 @@
+import { Alert } from "../../sdk";
 import {
   provideGetSubscriptionAlerts,
   GetSubscriptionAlerts,
+  TEN_MINUTES_IN_MS,
 } from "./get.subscription.alerts";
 
 describe("getSubscriptionAlerts", () => {
   let getSubscriptionAlerts: GetSubscriptionAlerts;
   const mockGetAlerts = jest.fn();
-  const mockAlert = {
+  const mockAlert = Alert.fromObject({
     hash: "0x123",
     alertId: "ALERT-1",
-  };
-  const mockAlert2 = {
+  });
+  const mockAlert2 = Alert.fromObject({
     hash: "0x456",
     alertId: "ALERT-2",
-  };
+  });
+  const mockAlert3 = Alert.fromObject({
+    hash: "0x789",
+    alertId: "ALERT-3",
+  });
   const mockSubscriptions = [
     {
       botId: "0xbot1",
@@ -22,6 +28,11 @@ describe("getSubscriptionAlerts", () => {
     {
       botId: "0xbot2",
       alertId: "ALERT-2",
+    },
+    {
+      botId: "0xbot3",
+      alertIds: ["ALERT-3", "ALERT-4"],
+      chainId: 137,
     },
   ];
 
@@ -35,10 +46,7 @@ describe("getSubscriptionAlerts", () => {
     getSubscriptionAlerts = provideGetSubscriptionAlerts(mockGetAlerts);
   });
 
-  it("invokes getAlerts query and returns alerts", async () => {
-    const systemTime = new Date();
-    jest.useFakeTimers("modern").setSystemTime(systemTime);
-    const mockCreatedSince = new Date();
+  it("invokes getAlerts query and returns de-duped alerts", async () => {
     const mockEndCursor = "some cursor";
     mockGetAlerts
       .mockReturnValueOnce({
@@ -53,28 +61,54 @@ describe("getSubscriptionAlerts", () => {
         pageInfo: {
           hasNextPage: false,
         },
+      })
+      .mockReturnValueOnce({
+        alerts: [mockAlert3],
+        pageInfo: {
+          hasNextPage: false,
+        },
       });
 
-    const alerts = await getSubscriptionAlerts(
-      mockSubscriptions,
-      mockCreatedSince
-    );
+    const alerts = await getSubscriptionAlerts(mockSubscriptions);
 
-    expect(alerts).toStrictEqual([mockAlert, mockAlert2]);
-    expect(mockGetAlerts).toHaveBeenCalledTimes(2);
-    expect(mockGetAlerts).toHaveBeenNthCalledWith(1, {
+    expect(alerts.length).toEqual(3);
+    expect(alerts.includes(mockAlert)).toBeTrue();
+    expect(alerts.includes(mockAlert2)).toBeTrue();
+    expect(alerts.includes(mockAlert3)).toBeTrue();
+    expect(mockGetAlerts).toHaveBeenCalledTimes(3);
+    expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot1", "0xbot2"],
       alertIds: ["ALERT-1", "ALERT-2"],
-      createdSince: 0,
-      first: 100,
+      createdSince: TEN_MINUTES_IN_MS,
+      first: 5000,
     });
-    expect(mockGetAlerts).toHaveBeenNthCalledWith(2, {
+    expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot1", "0xbot2"],
       alertIds: ["ALERT-1", "ALERT-2"],
-      createdSince: 0,
-      first: 100,
+      createdSince: TEN_MINUTES_IN_MS,
+      first: 5000,
       startingCursor: mockEndCursor,
     });
-    jest.useRealTimers();
+    expect(mockGetAlerts).toHaveBeenCalledWith({
+      botIds: ["0xbot3"],
+      alertIds: ["ALERT-3", "ALERT-4"],
+      createdSince: TEN_MINUTES_IN_MS,
+      chainId: 137,
+      first: 5000,
+    });
   });
+
+  it("alerts seen before should be filtered out", async () => {
+    mockGetAlerts.mockReturnValue({
+      alerts: [mockAlert],
+      pageInfo: {
+        hasNextPage: false,
+      },
+    })
+
+    const alerts = await getSubscriptionAlerts(mockSubscriptions);
+
+    expect(alerts).toBeEmpty()
+    expect(mockGetAlerts).toHaveBeenCalledTimes(2)
+  })
 });

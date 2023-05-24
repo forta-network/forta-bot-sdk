@@ -29,7 +29,7 @@ export default function providePushToRegistry(
     const agentExists = agent.created
     // verify wallet has some balance to pay transaction fee
     if (fromWalletBalance.eq(0)) {
-      throw new Error(`insufficient balance to deploy agent for ${walletAddress}`)
+      throw new Error(`${walletAddress} has insufficient MATIC balance to deploy agent`)
     }
 
     if (!agentExists) {

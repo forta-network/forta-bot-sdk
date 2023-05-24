@@ -43,6 +43,13 @@ message Signature {
   string signer = 3;
 }
 
+message BloomFilter {
+  string k = 1;
+  string m = 2;
+  string bitset = 3;
+  uint32 itemCount = 4;
+}
+
 message Alert {
   string id = 1;
   AlertType type = 2;
@@ -53,6 +60,8 @@ message Alert {
   map<string, string> tags = 7;
   ScannerInfo scanner = 8;
   TrackingTimestamps timestamps = 9;
+  bool truncated = 10;
+  BloomFilter addressBloomFilter = 11;
 }
 
 message SignedAlert {
@@ -79,6 +88,7 @@ message Label {
   reserved 5;
   bool remove = 6;
   string label = 7;
+  repeated string metadata = 8;
 }
 
 message Finding {
@@ -97,6 +107,7 @@ message Finding {
     SUSPICIOUS = 2;
     DEGRADED = 3;
     INFORMATION = 4;
+    SCAM = 5;
   }
 
   string protocol = 1;

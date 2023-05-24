@@ -11,7 +11,7 @@ describe("AgentController", () => {
   const mockHandleAlert = jest.fn()
   const mockGetAgentHandlers = jest.fn()
   const mockCallback = jest.fn()
-  const mockFinding = { some: 'finding' }
+  const mockFinding = () => ({ some: 'finding', labels: [ {metadata: {key: 'value'}}] })
   const systemTime = new Date()
 
   const generateBlockRequest = () => ({
@@ -53,7 +53,8 @@ describe("AgentController", () => {
     request: {
       event: {
         alert: {
-          hash: "0x123"
+          hash: "0x123",
+          labels: []
         }
       }
     }
@@ -137,6 +138,7 @@ describe("AgentController", () => {
     mockHandleBlock.mockReset()
     mockHandleTransaction.mockReset()
     mockHandleAlert.mockReset()
+    mockInitialize.mockReset()
   }
 
   beforeEach(() => resetMocks())
@@ -159,6 +161,8 @@ describe("AgentController", () => {
   })
 
   describe("Initialize", () => {
+    agentController = new AgentController(mockGetAgentHandlers)
+
     it("invokes callback with bot subscription", async () => {
       mockInitialize.mockReturnValue({
         status: "SUCCESS",
@@ -167,11 +171,24 @@ describe("AgentController", () => {
         }
       })
       mockGetAgentHandlers.mockReturnValue({initialize: mockInitialize})
-      agentController = new AgentController(mockGetAgentHandlers)
 
       await agentController.initializeAgentHandlers()
       await agentController.Initialize({}, mockCallback)
 
+      expect(mockInitialize).toHaveBeenCalledTimes(1)
+      expect(mockCallback).toHaveBeenCalledTimes(1)
+      expect(mockCallback).toHaveBeenCalledWith(null, {
+        status: "SUCCESS",
+        alertConfig: {
+          subscriptions: [{botId: "0x123"}]
+        }
+      })
+    })
+
+    it("only invokes bot initialize method once", async () => {
+      await agentController.Initialize({}, mockCallback)
+
+      expect(mockInitialize).toHaveBeenCalledTimes(0)
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
         status: "SUCCESS",
@@ -228,8 +245,7 @@ describe("AgentController", () => {
     })
 
     it("invokes callback with success response and findings from block handlers", async () => {
-      const mockFinding = { some: 'finding' }
-      mockHandleBlock.mockReturnValue([mockFinding])
+      mockHandleBlock.mockReturnValue([mockFinding()])
       mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
       agentController = new AgentController(mockGetAgentHandlers)
       await agentController.initializeAgentHandlers()
@@ -239,7 +255,7 @@ describe("AgentController", () => {
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
         status: "SUCCESS",
-        findings: [mockFinding],
+        findings: agentController.formatFindings([mockFinding()]),
         metadata: {
           timestamp: systemTime.toISOString(),
         },
@@ -277,8 +293,8 @@ describe("AgentController", () => {
       })
     })
 
-    it("throws an error if more than 10 findings when handling a block", async () => {
-        const findings = (new Array(11)).fill(mockFinding)
+    it("throws an error if more than 50 findings when handling a block", async () => {
+        const findings = (new Array(51)).fill(mockFinding())
         mockHandleBlock.mockReturnValue(findings)
         mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
         agentController = new AgentController(mockGetAgentHandlers)
@@ -297,8 +313,8 @@ describe("AgentController", () => {
 
     })
 
-    it("throws an error if more than 50kB of findings fetched when handling a block", async () => {
-      const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 50) })
+    it("throws an error if more than 250kB of findings fetched when handling a block", async () => {
+      const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 250) })
       mockHandleBlock.mockReturnValue(findings)
       mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
       agentController = new AgentController(mockGetAgentHandlers)
@@ -365,7 +381,7 @@ describe("AgentController", () => {
     })
 
     it("invokes callback with success response and findings from transaction handlers", async () => {
-      mockHandleTransaction.mockReturnValue([mockFinding])
+      mockHandleTransaction.mockReturnValue([mockFinding()])
       mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
       agentController = new AgentController(mockGetAgentHandlers)
       await agentController.initializeAgentHandlers()
@@ -375,7 +391,7 @@ describe("AgentController", () => {
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
         status: "SUCCESS",
-        findings: [mockFinding],
+        findings: agentController.formatFindings([mockFinding()]),
         metadata: {
           timestamp: systemTime.toISOString(),
         },
@@ -452,8 +468,8 @@ describe("AgentController", () => {
       expect(txEvent.contractAddress).toStrictEqual(formatAddress(mockTxRequest.request.event.contractAddress))
     })
   
-    it("throws an error if more than 10 findings when handling a transaction", async () => {
-        const findings = (new Array(21)).fill(mockFinding)
+    it("throws an error if more than 50 findings when handling a transaction", async () => {
+        const findings = (new Array(51)).fill(mockFinding())
         mockHandleTransaction.mockReturnValue(findings)
         mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
         agentController = new AgentController(mockGetAgentHandlers)
@@ -471,8 +487,8 @@ describe("AgentController", () => {
         })
     })
 
-    it("throws an error if more than 50kB of findings fetched when handling a transaction", async () => {
-      const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 50) })
+    it("throws an error if more than 250kB of findings fetched when handling a transaction", async () => {
+      const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 250) })
       mockHandleTransaction.mockReturnValue(findings)
       mockGetAgentHandlers.mockReturnValue({ handleTransaction: mockHandleTransaction })
       agentController = new AgentController(mockGetAgentHandlers)
@@ -540,8 +556,7 @@ describe("AgentController", () => {
     })
 
     it("invokes callback with success response and findings from alert handlers", async () => {
-      const mockFinding = { some: 'finding' }
-      mockHandleAlert.mockReturnValue([mockFinding])
+      mockHandleAlert.mockReturnValue([mockFinding()])
       mockGetAgentHandlers.mockReturnValue({ handleAlert: mockHandleAlert })
       agentController = new AgentController(mockGetAgentHandlers)
       await agentController.initializeAgentHandlers()
@@ -551,7 +566,7 @@ describe("AgentController", () => {
       expect(mockCallback).toHaveBeenCalledTimes(1)
       expect(mockCallback).toHaveBeenCalledWith(null, {
         status: "SUCCESS",
-        findings: [mockFinding],
+        findings: agentController.formatFindings([mockFinding()]),
         metadata: {
           timestamp: systemTime.toISOString(),
         },
@@ -562,8 +577,8 @@ describe("AgentController", () => {
       expect(alertEvent).toBeInstanceOf(AlertEvent)
     })
 
-    it("throws an error if more than 10 findings when handling an alert", async () => {
-      const findings = (new Array(11)).fill(mockFinding)
+    it("throws an error if more than 50 findings when handling an alert", async () => {
+      const findings = (new Array(51)).fill(mockFinding())
       mockHandleAlert.mockReturnValue(findings)
       mockGetAgentHandlers.mockReturnValue({ handleAlert: mockHandleAlert })
       agentController = new AgentController(mockGetAgentHandlers)
@@ -582,8 +597,8 @@ describe("AgentController", () => {
 
     })
 
-    it("throws an error if more than 50kB of findings fetched when handling an alert", async () => {
-      const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 50) })
+    it("throws an error if more than 250kB of findings fetched when handling an alert", async () => {
+      const findings = (new Array(1)).fill({ some: 'f'.repeat(1024 * 250) })
       mockHandleBlock.mockReturnValue(findings)
       mockGetAgentHandlers.mockReturnValue({ handleBlock: mockHandleBlock })
       agentController = new AgentController(mockGetAgentHandlers)
@@ -602,4 +617,17 @@ describe("AgentController", () => {
     })
   })
 
+  describe("formatFindings", () => {
+    it("should correctly format findings", () => {
+      const findings = [mockFinding()]
+
+      const formattedFindings = agentController.formatFindings(findings)
+
+      expect(formattedFindings.length).toEqual(1)
+      expect(formattedFindings[0].labels.length).toEqual(1)
+      expect(Array.isArray(formattedFindings[0].labels[0].metadata)).toBeTrue()
+      expect(formattedFindings[0].labels[0].metadata.length).toEqual(1)
+      expect(formattedFindings[0].labels[0].metadata[0]).toBe('key=value')
+    })
+  })
 })

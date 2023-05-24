@@ -1,5 +1,7 @@
 class Alert:
     def __init__(self, dict):
+        from .label import Label
+        from .bloom_filter import BloomFilter
         self.addresses = dict.get('addresses')
         self.alert_id = dict.get('alertId')
         self.contracts = list(map(lambda t: Contract(t), dict.get(
@@ -20,6 +22,17 @@ class Alert:
         self.alert_document_type = dict.get('alertDocumentType')
         self.related_alerts = dict.get('relatedAlerts')
         self.chain_id = dict.get('chainId')
+        self.labels = list(map(lambda t: Label(t), dict.get(
+            'labels', []))) if dict.get('labels') is not None else []
+        self.address_filter = BloomFilter(dict.get('addressBloomFilter')) if dict.get(
+            'addressBloomFilter') is not None else None
+
+    def has_address(self, address):
+        if self.address_filter is not None:
+            return self.address_filter.has(address)
+        elif self.addresses is not None:
+            return address in self.addresses
+        return False
 
 
 class Source:
