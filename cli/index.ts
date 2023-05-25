@@ -129,14 +129,7 @@ yargs
     },
     (cliArgs: any) => executeCommand("logs", cliArgs)
   )
-  .command('upload', 'Upload bot manifest to IPFS',
-    (yargs: Argv) => {
-      yargs
-      .option('imageRef', {
-        description: 'Docker image reference for the bot',
-        type: 'string'
-      })
-    },
+  .command('upload', 'Upload the Forta Agent to the image registry and IPFS',
     (cliArgs: any) => executeCommand("upload", cliArgs)
   )
   .strict()
