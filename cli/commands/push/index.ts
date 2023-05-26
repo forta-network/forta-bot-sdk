@@ -21,9 +21,9 @@ export default function providePush(
   return async function push() {
     const imageReference = await uploadImage()
 
-    let logMessage = `${new Date().toUTCString()}: successfully pushed image with reference ${imageReference}`
+    const logMessage = `successfully pushed image with reference ${imageReference}`
     console.log(logMessage)
-    appendToFile(logMessage, 'publish.log')
+    appendToFile(`${new Date().toUTCString()}: ${logMessage}`, 'publish.log')
 
     if (!args.manifest) {
       return;
@@ -31,9 +31,7 @@ export default function providePush(
 
     const { privateKey } = await getCredentials()
     const manifestReference = await uploadManifest(imageReference, privateKey)
-
-    logMessage = `${new Date().toUTCString()}: successfully uploaded manifest with reference ${manifestReference}`
-    console.log(logMessage)
-    appendToFile(logMessage, 'publish.log')
+    console.log(manifestReference)
+    appendToFile(`${new Date().toUTCString()}: successfully uploaded manifest with reference ${manifestReference}`, 'publish.log')
   } 
 }
