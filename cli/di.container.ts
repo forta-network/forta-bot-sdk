@@ -12,7 +12,6 @@ import provideInit from "./commands/init"
 import provideRun from "./commands/run"
 import providePublish from "./commands/publish"
 import providePush from './commands/push'
-import provideUpload from './commands/upload'
 import provideDisable from './commands/disable'
 import provideEnable from './commands/enable'
 import provideKeyfile from './commands/keyfile'
@@ -111,7 +110,6 @@ export default function configureContainer(args: any = {}) {
     logs: asFunction(provideLogs),
     publish: asFunction(providePublish),
     push: asFunction(providePush),
-    upload: asFunction(provideUpload),
     disable: asFunction(provideDisable),
     enable: asFunction(provideEnable),
     keyfile: asFunction(provideKeyfile),

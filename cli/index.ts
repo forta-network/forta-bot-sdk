@@ -2,7 +2,7 @@
 import yargs, { Argv } from 'yargs';
 import configureContainer from './di.container';
 
-type CommandName = "init" | "run" | "publish" | "push" | "upload" | "disable" | "enable" | "keyfile" | "logs" | "info" | "stake"
+type CommandName = "init" | "run" | "publish" | "push" | "disable" | "enable" | "keyfile" | "logs" | "info" | "stake"
 
 export type CommandHandler = (args?: any) => Promise<void>
 
@@ -84,6 +84,10 @@ yargs
         description: 'Specify a config file (default: forta.config.json)',
         type: 'string',
       })
+      .option('manifest', {
+        description: 'Uploads the manifest after pushing the image',
+        type: 'boolean'
+      })
     },
     (cliArgs: any) => executeCommand("push", cliArgs)
   )
@@ -128,9 +132,6 @@ yargs
       })
     },
     (cliArgs: any) => executeCommand("logs", cliArgs)
-  )
-  .command('upload', 'Upload the Forta Agent to the image registry and IPFS',
-    (cliArgs: any) => executeCommand("upload", cliArgs)
   )
   .strict()
   .argv
