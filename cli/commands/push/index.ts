@@ -22,9 +22,6 @@ export default function providePush(
     const imageReference = await uploadImage()
 
     let logMessage = `${new Date().toUTCString()}: successfully pushed image with reference ${imageReference}`
-    if (args.refOnly) {
-      logMessage = imageReference
-    }
     console.log(logMessage)
     appendToFile(logMessage, 'publish.log')
 
