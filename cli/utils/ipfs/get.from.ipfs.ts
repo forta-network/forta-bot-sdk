@@ -16,6 +16,7 @@ export interface IpfsManifestData {
     agentIdHash: string,
     timestamp: string,
     repository: string,
+    chainIds: number[],
     publishedFrom: string,
     documentation: string
 }

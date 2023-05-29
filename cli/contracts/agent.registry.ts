@@ -1,4 +1,4 @@
-import { BigNumber, ethers, providers, Wallet } from "ethers"
+import { BigNumber, ethers, providers, Signer } from "ethers"
 import { EventFragment, Interface } from "ethers/lib/utils"
 import AgentRegistryAbi from "./agent.registry.abi.json"
 import { getTxOptions } from "./utils"
@@ -53,8 +53,8 @@ export default class AgentRegistry {
     return agent.created
   }
   
-  async createAgent(fromWallet: Wallet, agentId: string, reference: string, chainIds: number[]) {
-    const from = fromWallet.address
+  async createAgent(fromWallet: Signer, agentId: string, reference: string, chainIds: number[]) {
+    const from = await fromWallet.getAddress()
     const contract = this.getContract(fromWallet)
     let gas = FALLBACK_CREATE_AGENT_GAS_LIMIT;
     try { gas = await contract.estimateGas.createAgent(agentId, from, reference, chainIds)}
@@ -65,7 +65,7 @@ export default class AgentRegistry {
     return tx.hash
   }
 
-  async updateAgent(fromWallet: Wallet, agentId: string, reference: string, chainIds: number[]) {
+  async updateAgent(fromWallet: Signer, agentId: string, reference: string, chainIds: number[]) {
     const contract = this.getContract(fromWallet)
     let gas = FALLBACK_UPDATE_AGENT_GAS_LIMIT
     try { gas = await contract.estimateGas.updateAgent(agentId, reference, chainIds) }
@@ -80,7 +80,7 @@ export default class AgentRegistry {
     return this.getContract().isEnabled(agentId)
   }
 
-  async disableAgent(fromWallet: Wallet, agentId: string) {
+  async disableAgent(fromWallet: Signer, agentId: string) {
     const contract = this.getContract(fromWallet)
     let gas = FALLBACK_DISABLE_AGENT_GAS_LIMIT
     try { gas = await contract.estimateGas.disableAgent(agentId, 1)/* Permission.OWNER = 1 */ }
@@ -91,7 +91,7 @@ export default class AgentRegistry {
     return tx.hash
   }
 
-  async enableAgent(fromWallet: Wallet, agentId: string) {
+  async enableAgent(fromWallet: Signer, agentId: string) {
     const contract = this.getContract(fromWallet)
     let gas = FALLBACK_ENABLE_AGENT_GAS_LIMIT
     try { gas = await contract.estimateGas.enableAgent(agentId, 1)/* Permission.OWNER = 1 */ }
@@ -102,7 +102,7 @@ export default class AgentRegistry {
     return tx.hash
   }
 
-  private getContract(fromWallet?: Wallet) {
+  private getContract(fromWallet?: Signer) {
     return new ethers.Contract(
       this.agentRegistryContractAddress,
       AgentRegistryAbi,
