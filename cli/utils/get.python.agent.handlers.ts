@@ -152,6 +152,10 @@ while True:
     if (hash && promiseCallbackMap[hash]) {
       const { reject } = promiseCallbackMap[hash]
       reject(err)
+      // we exit the nodejs process on python exceptions so that the scan node can properly
+      // manage the lifecycle of the bot container i.e. re-initialize before feeding data again
+      // (we exit the python child process on exceptions because thats the only way to print python error stack traces from the child process)
+      process.exit(pythonShell.exitCode)
     }
   })
   let pythonShell = createPythonShell()
