@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.32
+### 0.1.33
+
+- Updated Python child process behaviour to exit on exceptions
+
+### [0.1.32](https://github.com/forta-network/forta-bot-sdk/commit/4ded00448c991cef8dbbcead5a67e4492c8b4c93)
 
 - Added `getLabels` method to query the Forta API for labels
 
