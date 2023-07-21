@@ -138,7 +138,9 @@ export default function configureContainer(args: any = {}) {
       }
     }).singleton(),
     agentName: asFunction((packageJson: any) => packageJson.name).singleton(),
+    agentDisplayName: asFunction((packageJson: any) => packageJson.displayName).singleton(),
     description: asFunction((packageJson: any) => packageJson.description).singleton(),
+    longDescription: asFunction((packageJson: any) => packageJson.longDescription).singleton(),
     agentId: asFunction((args: any, fortaConfig: FortaConfig, agentName: string) => {
       return args.agentId || fortaConfig.agentId || keccak256(agentName)
     }).singleton(),
@@ -167,6 +169,8 @@ export default function configureContainer(args: any = {}) {
       }
       return undefined
     }).singleton(),
+    licenseUrl: asFunction((packageJson: any) => packageJson.licenseUrl).singleton(),
+    promoUrl: asFunction((packageJson: any) => packageJson.promoUrl).singleton(),
     keyfileName: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.keyfile
     }),

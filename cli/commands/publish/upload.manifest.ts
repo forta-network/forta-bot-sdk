@@ -16,7 +16,9 @@ export type ChainSettings = { [id: string]: ChainSetting }
 type Manifest = {
   from: string,
   name: string,
+  displayName?: string,
   description: string,
+  longDescription?: string,
   agentId: string,
   agentIdHash: string,
   version: string,
@@ -24,23 +26,29 @@ type Manifest = {
   imageReference: string,
   documentation: string,
   repository?: string,
+  licenseUrl?: string,
+  promoUrl?: string,
   chainIds: number[],
   publishedFrom: string,
   chainSettings?: ChainSettings
 }
 
 export default function provideUploadManifest(
-  filesystem: typeof fs,
-  addToIpfs: AddToIpfs,
-  agentName: string,
-  description: string,
-  agentId: string,
-  version: string,
-  documentation: string,
-  repository: string,
-  cliVersion: string,
-  chainIds: number[],
-  chainSettings?: ChainSettings
+ filesystem: typeof fs,
+ addToIpfs: AddToIpfs,
+ agentName: string,
+ agentDisplayName: string,
+ description: string,
+ longDescription: string,
+ agentId: string,
+ version: string,
+ documentation: string,
+ repository: string,
+ licenseUrl: string,
+ promoUrl: string,
+ cliVersion: string,
+ chainIds: number[],
+ chainSettings?: ChainSettings
 ): UploadManifest {
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
@@ -69,6 +77,8 @@ export default function provideUploadManifest(
     const manifest: Manifest = {
       from: new Wallet(privateKey).address,
       name: agentName,
+      displayName: agentDisplayName,
+      longDescription: longDescription,
       description,
       agentId: agentName,
       agentIdHash: agentId,
@@ -77,6 +87,8 @@ export default function provideUploadManifest(
       imageReference,
       documentation: documentationReference,
       repository,
+      licenseUrl: licenseUrl,
+      promoUrl: promoUrl,
       chainIds,
       publishedFrom: `Forta CLI ${cliVersion}`,
       chainSettings: formatChainSettings(chainSettings),

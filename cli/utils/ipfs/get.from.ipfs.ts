@@ -9,13 +9,18 @@ export interface IpfsData {
 
 export interface IpfsManifestData {
     name: string,
+    displayName: string,
     from: string,
+    description: string,
+    longDescription: string
     agentId: string,
     version: string,
     imageReference: string,
     agentIdHash: string,
     timestamp: string,
     repository: string,
+    licenseUrl: string,
+    promoUrl: string,
     chainIds: number[],
     publishedFrom: string,
     documentation: string
