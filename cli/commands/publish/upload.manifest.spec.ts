@@ -11,11 +11,15 @@ describe("uploadManifest", () => {
   } as any
   const mockAddToIpfs = jest.fn()
   const mockAgentName = "agentName"
+  const mockAgentDisplayName = "agent name"
   const mockDescription = "some description"
+  const mockLongDescription = "some long description"
   const mockAgentId = "0xagentId"
   const mockVersion = "0.1"
   const mockDocumentation = "README.md"
   const mockRepository = "github.com/myrepository"
+  const mockLicenseUrl = "github.com/myrepository"
+  const mockPromoUrl = "github.com/myrepository"
   const mockImageRef = "123abc"
   const mockPrivateKey = "0xabcd"
   const mockCliVersion = "0.2"
@@ -56,7 +60,8 @@ describe("uploadManifest", () => {
 
   beforeAll(() => {
     uploadManifest = provideUploadManifest(
-      mockFilesystem, mockAddToIpfs, mockAgentName, mockDescription, mockAgentId, mockVersion, mockDocumentation, mockRepository, mockCliVersion, mockChainIds, mockChainSettings
+     mockFilesystem, mockAddToIpfs, mockAgentName, mockAgentDisplayName,
+     mockDescription, mockLongDescription, mockAgentId, mockVersion, mockDocumentation, mockRepository, mockLicenseUrl, mockPromoUrl, mockCliVersion, mockChainIds, mockChainSettings
     )
   })
 
@@ -103,7 +108,9 @@ describe("uploadManifest", () => {
     const mockManifest = {
       from: new Wallet(mockPrivateKey).address,
       name: mockAgentName,
+      displayName: mockAgentDisplayName,
       description: mockDescription,
+      longDescription: mockLongDescription,
       agentId: mockAgentName,
       agentIdHash: mockAgentId,
       version: mockVersion,
@@ -111,6 +118,8 @@ describe("uploadManifest", () => {
       imageReference: mockImageRef,
       documentation: mockDocumentationRef,
       repository: mockRepository,
+      licenseUrl: mockLicenseUrl,
+      promoUrl: mockPromoUrl,
       chainIds: mockChainIds,
       publishedFrom: `Forta CLI ${mockCliVersion}`,
       chainSettings: formattedMockChainSettings
@@ -129,7 +138,7 @@ describe("uploadManifest", () => {
     expect(mockFilesystem.readFileSync).toHaveBeenCalledWith(mockDocumentation, 'utf8')
     expect(mockAddToIpfs).toHaveBeenCalledTimes(2)
     expect(mockAddToIpfs).toHaveBeenNthCalledWith(1, mockDocumentationFile)
-    const signingKey = new ethers.utils.SigningKey(mockPrivateKey)
+    const signingKey = new ethers.utils.SigningKey(mockPrivateKey)
     const signature = ethers.utils.joinSignature(signingKey.signDigest(keccak256(JSON.stringify(mockManifest))))
     expect(mockAddToIpfs).toHaveBeenNthCalledWith(2, JSON.stringify({ manifest: mockManifest, signature }))
     jest.useRealTimers()
