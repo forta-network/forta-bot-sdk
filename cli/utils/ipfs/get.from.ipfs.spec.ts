@@ -6,7 +6,6 @@ const mockIpfsData = {
   "manifest": {
     "from": "0x123456",
     "name": "Compound Liquidatable Positions Monitor",
-    "displayName": "Compound Liquidatable Positions Monitor",
     "agentId": "Compound Liquidatable Positions Monitor",
     "description": "Test description",
     "longDescription": "Test long description",

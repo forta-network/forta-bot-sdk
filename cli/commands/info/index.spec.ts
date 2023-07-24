@@ -51,7 +51,6 @@ describe("info", () => {
         "manifest": {
             "from": "0x123456",
             "name": "Compound Liquidatable Positions Monitor",
-            "displayName": "Compound Liquidatable Positions Monitor",
             "description": "Compound Liquidatable Positions Monitor description",
             "longDescription": "Compound Liquidatable Positions Monitor long description",
             "agentId": "Compound Liquidatable Positions Monitor",

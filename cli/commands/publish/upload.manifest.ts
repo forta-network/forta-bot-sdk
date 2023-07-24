@@ -16,7 +16,6 @@ export type ChainSettings = { [id: string]: ChainSetting }
 type Manifest = {
   from: string,
   name: string,
-  displayName?: string,
   description: string,
   longDescription?: string,
   agentId: string,
@@ -76,8 +75,7 @@ export default function provideUploadManifest(
     // create agent manifest
     const manifest: Manifest = {
       from: new Wallet(privateKey).address,
-      name: agentName,
-      displayName: agentDisplayName,
+      name: agentDisplayName ?? agentName,
       description,
       longDescription: longDescription,
       agentId: agentName,

@@ -108,7 +108,6 @@ describe("uploadManifest", () => {
     const mockManifest = {
       from: new Wallet(mockPrivateKey).address,
       name: mockAgentName,
-      displayName: mockAgentDisplayName,
       description: mockDescription,
       longDescription: mockLongDescription,
       agentId: mockAgentName,

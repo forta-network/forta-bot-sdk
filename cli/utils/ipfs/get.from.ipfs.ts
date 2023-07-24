@@ -9,7 +9,6 @@ export interface IpfsData {
 
 export interface IpfsManifestData {
     name: string,
-    displayName: string,
     from: string,
     description: string,
     longDescription: string
