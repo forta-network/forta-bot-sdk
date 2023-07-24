@@ -10,8 +10,8 @@ describe("uploadManifest", () => {
     statSync: jest.fn()
   } as any
   const mockAddToIpfs = jest.fn()
-  const mockAgentName = "agentName"
-  const mockAgentDisplayName = "agent name"
+  const mockAgentName = "agent name"
+  const mockAgentDisplayName = "agent display name"
   const mockDescription = "some description"
   const mockLongDescription = "some long description"
   const mockAgentId = "0xagentId"
@@ -107,7 +107,7 @@ describe("uploadManifest", () => {
     mockAddToIpfs.mockReturnValueOnce(mockDocumentationRef)
     const mockManifest = {
       from: new Wallet(mockPrivateKey).address,
-      name: mockAgentName,
+      name: mockAgentDisplayName,
       description: mockDescription,
       longDescription: mockLongDescription,
       agentId: mockAgentName,
