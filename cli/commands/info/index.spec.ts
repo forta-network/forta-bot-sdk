@@ -48,24 +48,28 @@ describe("info", () => {
     }
 
     const mockIpfsManifest = {
-        "manifest":{
-            "from":"0x123456",
-            "name":"Compound Liquidatable Positions Monitor",
-            "agentId":"Compound Liquidatable Positions Monitor",
-            "agentIdHash":"0x3c61101f1d349661298a58ba59a58fbce5a3626c5c7af10b091796969e0d6c59",
-            "version":"0.0.1",
-            "timestamp":"Fri, 20 May 2022 15:54:56 GMT",
-            "imageReference":"bafybeib5kmox5r2wpre3tgkfgfr76tm4qascagmqvod2wcojxrqmgyxfp4@sha256:2fcfede6f821f4f14e745598fd71b2201471517acd345f7b8f0cd424d35b441a",
-            "documentation":"QmQXZvBdZ4eMtCefNXYMRwQ7UJbgW74EqrMv9wS9hoSXV7",
-            "repository":"https://github.com/arbitraryexecution/compound-monitoring/tree/main/liquidation-monitor",
-            "projects":[
-               "compound_v2"
+        "manifest": {
+            "from": "0x123456",
+            "name": "Compound Liquidatable Positions Monitor",
+            "description": "Compound Liquidatable Positions Monitor description",
+            "longDescription": "Compound Liquidatable Positions Monitor long description",
+            "agentId": "Compound Liquidatable Positions Monitor",
+            "agentIdHash": "0x3c61101f1d349661298a58ba59a58fbce5a3626c5c7af10b091796969e0d6c59",
+            "version": "0.0.1",
+            "timestamp": "Fri, 20 May 2022 15:54:56 GMT",
+            "imageReference": "bafybeib5kmox5r2wpre3tgkfgfr76tm4qascagmqvod2wcojxrqmgyxfp4@sha256:2fcfede6f821f4f14e745598fd71b2201471517acd345f7b8f0cd424d35b441a",
+            "documentation": "QmQXZvBdZ4eMtCefNXYMRwQ7UJbgW74EqrMv9wS9hoSXV7",
+            "repository": "https://github.com/arbitraryexecution/compound-monitoring/tree/main/liquidation-monitor",
+            "licenseUrl": "https://github.com/arbitraryexecution/compound-monitoring/tree/main/liquidation-monitor",
+            "promoUrl": "https://github.com/arbitraryexecution/compound-monitoring/tree/main/liquidation-monitor",
+            "projects": [
+                "compound_v2"
             ],
-            "chainIds":[
-               1
+            "chainIds": [
+                1
             ],
-            "publishedFrom":"Forta Explorer 0.0.2"
-         } as IpfsManifestData
+            "publishedFrom": "Forta Explorer 0.0.2"
+        } as IpfsManifestData
      } as IpfsData
 
      const mockLogOne: PolyscanLog = {
