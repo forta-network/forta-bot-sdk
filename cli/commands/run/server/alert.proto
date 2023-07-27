@@ -91,6 +91,43 @@ message Label {
   repeated string metadata = 8;
 }
 
+message Source {
+  message TransactionSource {
+    uint64 chainId = 1;
+    string hash = 2;
+  }
+
+  message BlockSource {
+    uint64 chainId = 1;
+    string hash = 2;
+    uint64 number = 3;
+  }
+
+  message URLSource {
+    string url = 1;
+  }
+
+  message ChainSource {
+    uint64 chainId = 1;
+  }
+
+  message AlertSource {
+    string id = 1;
+  }
+
+  message CustomSource {
+    string name = 1;
+    string value = 2;
+  }
+
+  repeated TransactionSource transactions = 1;
+  repeated BlockSource blocks = 2;
+  repeated URLSource urls = 3;
+  repeated ChainSource chains = 4;
+  repeated AlertSource alerts = 5;
+  repeated CustomSource customSources = 6;
+}
+
 message Finding {
   enum Severity {
     UNKNOWN = 0;
@@ -117,10 +154,12 @@ message Finding {
   string alertId = 5;
   string name = 6;
   string description = 7;
-  string everestId = 8;
+  reserved 8;
   bool private = 9;
   repeated string addresses = 10;
   map<string, double> indicators = 11;
   repeated Label labels = 12;
   repeated string relatedAlerts = 13;
+  string uniqueKey = 14;
+  Source source = 15;
 }
