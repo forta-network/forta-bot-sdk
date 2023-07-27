@@ -38,6 +38,7 @@ class Finding:
         self.metadata = dict.get('metadata')
         self.addresses = dict.get('addresses')
         self.labels = list(map(lambda l: l if isinstance(l, Label) else Label(l), dict.get('labels', [])))
+        self.unique_key = dict.get('unique_key')
 
     def toJson(self):
         d = dict(self.__dict__, **{

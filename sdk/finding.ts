@@ -28,7 +28,8 @@ type FindingInput = {
   type: FindingType,
   metadata?: { [key: string]: string},
   addresses?: string[],
-  labels?: Label[]
+  labels?: Label[],
+  uniqueKey?: string,
 }
 
 export class Finding {
@@ -41,7 +42,8 @@ export class Finding {
     readonly type: FindingType,
     readonly metadata: { [key: string]: string},
     readonly addresses: string[],
-    readonly labels: Label[]
+    readonly labels: Label[],
+    readonly uniqueKey: string,
   ) {}
 
   toString() {
@@ -67,7 +69,8 @@ export class Finding {
     type,
     metadata = {},
     addresses = [],
-    labels = []
+    labels = [],
+    uniqueKey = '',
   }: FindingInput) {
     assertIsNonEmptyString(name, 'name')
     assertIsNonEmptyString(description, 'description')
@@ -78,6 +81,6 @@ export class Finding {
     // TODO assert metadata keys and values are strings
 
     labels = labels.map(l => l instanceof Label ? l : Label.fromObject(l))
-    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses, labels)
+    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses, labels, uniqueKey)
   }
 }
