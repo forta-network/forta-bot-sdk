@@ -22,8 +22,9 @@ export enum FindingType {
 type FindingSourceChain = {
   chainId: number
 }
-type FindingSources = {
-  chainSource: FindingSourceChain
+
+type FindingSource = {
+  chainSource?: FindingSourceChain
 }
 
 type FindingInput = {
@@ -37,7 +38,7 @@ type FindingInput = {
   addresses?: string[],
   labels?: Label[],
   uniqueKey?: string,
-  chainId?: number
+  source?: FindingSource
 }
 
 export class Finding {
@@ -52,7 +53,7 @@ export class Finding {
    readonly addresses: string[],
    readonly labels: Label[],
    readonly uniqueKey: string,
-   readonly sources: FindingSources,
+   readonly source: FindingSource,
   ) {}
 
   toString() {
@@ -80,7 +81,7 @@ export class Finding {
     addresses = [],
     labels = [],
     uniqueKey = '',
-    chainId = -1,
+    source = {},
   }: FindingInput) {
     assertIsNonEmptyString(name, 'name')
     assertIsNonEmptyString(description, 'description')
@@ -91,9 +92,7 @@ export class Finding {
     // TODO assert metadata keys and values are strings
 
     labels = labels.map(l => l instanceof Label ? l : Label.fromObject(l))
-    const sources = {chainSource: {chainId: chainId}}
 
-
-    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses, labels, uniqueKey, sources)
+    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses, labels, uniqueKey, source)
   }
 }
