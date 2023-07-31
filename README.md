@@ -10,7 +10,12 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.33
+### 0.1.34
+
+- Added new optional fields `uniqueKey` and `source` to findings
+- Added support for new bot manifest fields: `longDescription`, `licenseUrl`, `promoUrl`
+
+### [0.1.33](https://github.com/forta-network/forta-bot-sdk/commit/5bf0498a5e8146dd12c1c8f94c09ab48d89bd9c3)
 
 - Updated Python child process behaviour to exit on exceptions
 
