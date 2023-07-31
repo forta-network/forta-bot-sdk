@@ -67,7 +67,7 @@ describe("finding", () => {
           ...l,
           entityType: EntityType[l.entityType],
         }
-      })
+      },), uniqueKey: "", source: {}
     }, null, 2);
 
     expect(finding.toString()).toEqual(expectedJSONString);

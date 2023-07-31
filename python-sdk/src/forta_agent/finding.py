@@ -22,6 +22,16 @@ class FindingType(IntEnum):
     Scam = 5
 
 
+class FindingChainSource:
+    def __init__(self, dict):
+        self.chain_id = dict['chain_id']
+
+
+class FindingSource:
+    def __init__(self, dict):
+        self.chain_source = dict['chain_source']
+
+
 class Finding:
     def __init__(self, dict):
         assert_non_empty_string_in_dict(dict, 'name')
@@ -38,6 +48,8 @@ class Finding:
         self.metadata = dict.get('metadata')
         self.addresses = dict.get('addresses')
         self.labels = list(map(lambda l: l if isinstance(l, Label) else Label(l), dict.get('labels', [])))
+        self.unique_key = dict.get('unique_key')
+        self.source = dict.get('source')
 
     def toJson(self):
         d = dict(self.__dict__, **{

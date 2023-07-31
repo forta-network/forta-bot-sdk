@@ -1,5 +1,5 @@
-import { EntityType, Label } from "./label"
-import { assertIsFromEnum, assertIsNonEmptyString } from "./utils"
+import {EntityType, Label} from "./label"
+import {assertIsFromEnum, assertIsNonEmptyString} from "./utils"
 
 export enum FindingSeverity {
   Unknown,
@@ -19,6 +19,14 @@ export enum FindingType {
   Scam
 }
 
+type FindingSourceChain = {
+  chainId: number
+}
+
+type FindingSource = {
+  chainSource?: FindingSourceChain
+}
+
 type FindingInput = {
   name: string,
   description: string,
@@ -26,22 +34,26 @@ type FindingInput = {
   protocol?: string,
   severity: FindingSeverity,
   type: FindingType,
-  metadata?: { [key: string]: string},
+  metadata?: { [key: string]: string },
   addresses?: string[],
-  labels?: Label[]
+  labels?: Label[],
+  uniqueKey?: string,
+  source?: FindingSource
 }
 
 export class Finding {
   private constructor(
-    readonly name: string,
-    readonly description: string,
-    readonly alertId: string,
-    readonly protocol: string,
-    readonly severity: FindingSeverity,
-    readonly type: FindingType,
-    readonly metadata: { [key: string]: string},
-    readonly addresses: string[],
-    readonly labels: Label[]
+   readonly name: string,
+   readonly description: string,
+   readonly alertId: string,
+   readonly protocol: string,
+   readonly severity: FindingSeverity,
+   readonly type: FindingType,
+   readonly metadata: { [key: string]: string },
+   readonly addresses: string[],
+   readonly labels: Label[],
+   readonly uniqueKey: string,
+   readonly source: FindingSource,
   ) {}
 
   toString() {
@@ -67,7 +79,9 @@ export class Finding {
     type,
     metadata = {},
     addresses = [],
-    labels = []
+    labels = [],
+    uniqueKey = '',
+    source = {},
   }: FindingInput) {
     assertIsNonEmptyString(name, 'name')
     assertIsNonEmptyString(description, 'description')
@@ -78,6 +92,7 @@ export class Finding {
     // TODO assert metadata keys and values are strings
 
     labels = labels.map(l => l instanceof Label ? l : Label.fromObject(l))
-    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses, labels)
+
+    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses, labels, uniqueKey, source)
   }
 }
