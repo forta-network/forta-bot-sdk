@@ -29,7 +29,7 @@ class FindingChainSource:
 
 class FindingSource:
     def __init__(self, dict):
-        self.chain_source = dict['chain_source']
+        self.chains = dict['chains']
 
 
 class Finding:
