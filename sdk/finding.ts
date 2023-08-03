@@ -24,7 +24,7 @@ type FindingSourceChain = {
 }
 
 type FindingSource = {
-  chainSource?: FindingSourceChain
+  chains?: FindingSourceChain[]
 }
 
 type FindingInput = {
