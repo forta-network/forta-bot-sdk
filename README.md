@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.35
+### 0.1.36
+
+- Updated type definition for FindingSource
+
+### [0.1.35](https://github.com/forta-network/forta-bot-sdk/commit/49c41ad653211cf13e5b9a8e1ce77d1ea3c17843)
 
 - Updated starter project templates
 
