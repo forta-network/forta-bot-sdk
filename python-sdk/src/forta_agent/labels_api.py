@@ -34,7 +34,8 @@ class LabelQueryOptions:
         self.createdSince = dict.get('created_since')
         self.createdBefore = dict.get('created_before')
         self.first = dict.get('first')
-        self.after = dict.get('starting_cursor')
+        self.after = LabelCursor(dict.get('starting_cursor')) if dict.get(
+            'starting_cursor') is not None else None
 
     def get_query(self):
         query = """
