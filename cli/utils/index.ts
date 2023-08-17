@@ -53,8 +53,8 @@ export const assertFindings = (findings: Finding[]) => {
   const byteLength = Buffer.byteLength(JSON.stringify(findings));
   const kilobyte = 1024;
 
-  if(byteLength > kilobyte * 250) throw Error(`Cannot return more than 250kB of findings per request (received ${byteLength} bytes)`)
-  if(findings.length > 50) throw Error(`Cannot return more than 50 findings per request (received ${findings.length})`)
+  if(byteLength > kilobyte * 10000) throw Error(`Cannot return more than 10MB of findings per request (received ${byteLength} bytes)`)
+  if(findings.length > 1000) throw Error(`Cannot return more than 1000 findings per request (received ${findings.length})`)
 }
 
 export const assertIsValidChainSettings = (chainSettings?: any) => {
