@@ -34,7 +34,11 @@ class LabelQueryOptions:
         self.createdSince = dict.get('created_since')
         self.createdBefore = dict.get('created_before')
         self.first = dict.get('first')
-        self.after = dict.get('starting_cursor')
+        starting_cursor = dict.get('starting_cursor')
+        if starting_cursor is not None:
+            self.after = {
+                'pageToken': starting_cursor.page_token if isinstance(starting_cursor, LabelCursor) else starting_cursor.get('page_token')
+            }
 
     def get_query(self):
         query = """
