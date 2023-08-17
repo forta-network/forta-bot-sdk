@@ -10,7 +10,12 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.36
+### 0.1.37
+
+- Fixed Python pagination issue when using `get_labels`
+- Improved error message for alerts API errors
+
+### [0.1.36](https://github.com/forta-network/forta-bot-sdk/commit/e076f9f41b05be36479a7a8b1d96cea9ffbde3fe)
 
 - Updated type definition for FindingSource
 
