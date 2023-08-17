@@ -12,7 +12,7 @@ export const getAlerts: GetAlerts = async (
     getFortaApiHeaders()
   );
 
-  if (response.data && response.data.errors) throw Error(response.data.errors);
+  if (response.data && response.data.errors) throw Error(JSON.stringify(response.data.errors));
 
   const pageInfo = response.data.data.alerts.pageInfo;
   const alerts: Alert[] = [];
