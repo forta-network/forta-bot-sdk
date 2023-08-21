@@ -47,13 +47,15 @@ class Finding:
         self.type = dict['type']
         self.metadata = dict.get('metadata')
         self.addresses = dict.get('addresses')
-        self.labels = list(map(lambda l: l if isinstance(l, Label) else Label(l), dict.get('labels', [])))
+        self.labels = list(map(lambda l: l if isinstance(
+            l, Label) else Label(l), dict.get('labels', [])))
         self.unique_key = dict.get('unique_key')
         self.source = dict.get('source')
 
     def toJson(self):
         d = dict(self.__dict__, **{
             'alertId': self.alert_id,
-            'labels': list(map(lambda l: l.toDict(), self.labels))
+            'labels': list(map(lambda l: l.toDict(), self.labels)),
+            'uniqueKey': self.unique_key
         })
         return json.dumps({k: v for k, v in d.items() if v or k == 'type' or k == 'severity'})
