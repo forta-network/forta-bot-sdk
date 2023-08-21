@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.37
+### 0.1.38
+
+- Fix Python `Finding.unique_key` parsing
+
+### [0.1.37](https://github.com/forta-network/forta-bot-sdk/commit/19db8d78ed8c4a0f07e37e9eddabab20f14b3d6e)
 
 - Increase grpc response size limits
 - Fix Python pagination issue when querying `get_labels`
