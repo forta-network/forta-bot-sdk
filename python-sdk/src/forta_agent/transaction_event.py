@@ -5,7 +5,9 @@ from .network import Network
 from .transaction import Transaction
 from .receipt import Log
 from .trace import Trace
-
+from eth_abi.abi import ABICodec
+from web3._utils.abi import build_strict_registry
+from web3._utils.events import get_event_data
 
 class TxEventBlock:
     def __init__(self, dict):
@@ -63,6 +65,7 @@ class TransactionEvent:
     def filter_log(self, abi, contract_address=''):
         abi = abi if isinstance(abi, list) else [abi]
         abi = [json.loads(abi_item) for abi_item in abi]
+        abi = [abi_item for abi_item in abi if abi_item['type'] == 'event']
         logs = self.logs
         # filter logs by contract address, if provided
         if (contract_address):
@@ -72,22 +75,15 @@ class TransactionEvent:
                 address.lower(): True for address in contract_address}
             logs = filter(lambda log: log.address.lower()
                           in contract_address_map, logs)
-        # determine which event names to filter
-        event_names = []
-        for abi_item in abi:
-            if abi_item['type'] == "event":
-                event_names.append(abi_item['name'])
+        # codec for decoding the topics
+        codec = ABICodec(build_strict_registry())
         # parse logs
         results = []
-        from . import web3Provider
-        contract = web3Provider.eth.contract(
-            "0x0000000000000000000000000000000000000000", abi=abi)
         for log in logs:
             log.topics = [HexBytes(topic) for topic in log.topics]
-            for event_name in event_names:
+            for abi_item in abi:
                 try:
-                    results.append(
-                        contract.events[event_name]().processLog(log))
+                    results.append(get_event_data(codec, abi_item, log))
                 except:
                     continue  # TODO see if theres a better way to handle 'no matching event' error
         return results
