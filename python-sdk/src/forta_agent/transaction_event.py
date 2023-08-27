@@ -8,6 +8,9 @@ from .trace import Trace
 from eth_abi.abi import ABICodec
 from web3._utils.abi import build_strict_registry
 from web3._utils.events import get_event_data
+from web3.exceptions import LogTopicError, MismatchedABI
+from web3.types import ABIEvent
+
 
 class TxEventBlock:
     def __init__(self, dict):
@@ -65,7 +68,7 @@ class TransactionEvent:
     def filter_log(self, abi, contract_address=''):
         abi = abi if isinstance(abi, list) else [abi]
         abi = [json.loads(abi_item) for abi_item in abi]
-        abi = [abi_item for abi_item in abi if abi_item['type'] == 'event']
+        abi = [ABIEvent(abi_item) for abi_item in abi if abi_item['type'] == 'event']
         logs = self.logs
         # filter logs by contract address, if provided
         if (contract_address):
@@ -84,8 +87,10 @@ class TransactionEvent:
             for abi_item in abi:
                 try:
                     results.append(get_event_data(codec, abi_item, log))
-                except:
-                    continue  # TODO see if theres a better way to handle 'no matching event' error
+                except MismatchedABI: # topic and event don't match
+                    continue
+                except LogTopicError: # topic and event match, but the args are not split between topic and data as expected ("indexed" issue)
+                    continue
         return results
 
     def filter_function(self, abi, contract_address=''):
