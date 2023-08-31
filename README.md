@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.38
+### 0.1.39
+
+- Reduce the size of queries made when fetching alerts for bots using `handleAlert`
+
+### [0.1.38](https://github.com/forta-network/forta-bot-sdk/commit/e7da73ac1e1c0a16999f42d740f5d5a060c7cb52)
 
 - Fix Python `Finding.unique_key` parsing
 
