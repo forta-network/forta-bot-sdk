@@ -32,7 +32,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "forta-agent": "^0.1.38"
+    "forta-agent": "^0.1.39"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",
