@@ -1,4 +1,4 @@
-import { Alert } from "../../sdk";
+import { Alert, BotSubscription } from "../../sdk";
 import {
   provideGetSubscriptionAlerts,
   GetSubscriptionAlerts,
@@ -20,7 +20,7 @@ describe("getSubscriptionAlerts", () => {
     hash: "0x789",
     alertId: "ALERT-3",
   });
-  const mockSubscriptions = [
+  const mockSubscriptions: BotSubscription[] = [
     {
       botId: "0xbot1",
       alertId: "ALERT-1",
@@ -31,6 +31,7 @@ describe("getSubscriptionAlerts", () => {
     },
     {
       botId: "0xbot3",
+      alertId: "ALERT-5",
       alertIds: ["ALERT-3", "ALERT-4"],
       chainId: 137,
     },
@@ -57,6 +58,12 @@ describe("getSubscriptionAlerts", () => {
         },
       })
       .mockReturnValueOnce({
+        alerts: [mockAlert],
+        pageInfo: {
+          hasNextPage: false,
+        },
+      })
+      .mockReturnValueOnce({
         alerts: [mockAlert2],
         pageInfo: {
           hasNextPage: false,
@@ -75,23 +82,29 @@ describe("getSubscriptionAlerts", () => {
     expect(alerts.includes(mockAlert)).toBeTrue();
     expect(alerts.includes(mockAlert2)).toBeTrue();
     expect(alerts.includes(mockAlert3)).toBeTrue();
-    expect(mockGetAlerts).toHaveBeenCalledTimes(3);
+    expect(mockGetAlerts).toHaveBeenCalledTimes(4);
     expect(mockGetAlerts).toHaveBeenCalledWith({
-      botIds: ["0xbot1", "0xbot2"],
-      alertIds: ["ALERT-1", "ALERT-2"],
+      botIds: ["0xbot1"],
+      alertIds: ["ALERT-1"],
       createdSince: TEN_MINUTES_IN_MS,
       first: 5000,
     });
     expect(mockGetAlerts).toHaveBeenCalledWith({
-      botIds: ["0xbot1", "0xbot2"],
-      alertIds: ["ALERT-1", "ALERT-2"],
+      botIds: ["0xbot1"],
+      alertIds: ["ALERT-1"],
       createdSince: TEN_MINUTES_IN_MS,
       first: 5000,
       startingCursor: mockEndCursor,
     });
     expect(mockGetAlerts).toHaveBeenCalledWith({
+      botIds: ["0xbot2"],
+      alertIds: ["ALERT-2"],
+      createdSince: TEN_MINUTES_IN_MS,
+      first: 5000,
+    });
+    expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot3"],
-      alertIds: ["ALERT-3", "ALERT-4"],
+      alertIds: ["ALERT-5", "ALERT-3", "ALERT-4"],
       createdSince: TEN_MINUTES_IN_MS,
       chainId: 137,
       first: 5000,
@@ -104,11 +117,11 @@ describe("getSubscriptionAlerts", () => {
       pageInfo: {
         hasNextPage: false,
       },
-    })
+    });
 
     const alerts = await getSubscriptionAlerts(mockSubscriptions);
 
-    expect(alerts).toBeEmpty()
-    expect(mockGetAlerts).toHaveBeenCalledTimes(2)
-  })
+    expect(alerts).toBeEmpty();
+    expect(mockGetAlerts).toHaveBeenCalledTimes(3);
+  });
 });
