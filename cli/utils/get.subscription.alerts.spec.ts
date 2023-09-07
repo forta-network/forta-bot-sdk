@@ -87,27 +87,27 @@ describe("getSubscriptionAlerts", () => {
       botIds: ["0xbot1"],
       alertIds: ["ALERT-1"],
       createdSince: TEN_MINUTES_IN_MS,
-      first: 5000,
+      first: 1000,
     });
     expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot1"],
       alertIds: ["ALERT-1"],
       createdSince: TEN_MINUTES_IN_MS,
-      first: 5000,
+      first: 1000,
       startingCursor: mockEndCursor,
     });
     expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot2"],
       alertIds: ["ALERT-2"],
       createdSince: TEN_MINUTES_IN_MS,
-      first: 5000,
+      first: 1000,
     });
     expect(mockGetAlerts).toHaveBeenCalledWith({
       botIds: ["0xbot3"],
       alertIds: ["ALERT-5", "ALERT-3", "ALERT-4"],
       createdSince: TEN_MINUTES_IN_MS,
       chainId: 137,
-      first: 5000,
+      first: 1000,
     });
   });
 

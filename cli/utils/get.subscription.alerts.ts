@@ -59,7 +59,7 @@ async function runQuery(
     query = {
       botIds: [botId],
       createdSince: TEN_MINUTES_IN_MS,
-      first: 5000,
+      first: 1000,
       startingCursor: response?.pageInfo.endCursor,
     };
     if (chainId) {
