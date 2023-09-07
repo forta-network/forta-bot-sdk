@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.39
+### 0.1.40
+
+- Reduce the page size of queries made when fetching alerts for bots using `handleAlert`
+
+### [0.1.39](https://github.com/forta-network/forta-bot-sdk/commit/c63a9fab8f4867da192a08e69f6ad06750c78d76)
 
 - Reduce the size of queries made when fetching alerts for bots using `handleAlert`
 
