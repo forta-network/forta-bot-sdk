@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.40
+### 0.1.41
+
+- Add retry logic when querying alerts for bots that use `handleAlert`
+
+### [0.1.40](https://github.com/forta-network/forta-bot-sdk/commit/ce2ff7ab4a243bbd9bcc02922f1d18b446ca761c)
 
 - Reduce the page size of queries made when fetching alerts for bots using `handleAlert`
 
