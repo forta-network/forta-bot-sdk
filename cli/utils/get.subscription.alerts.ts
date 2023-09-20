@@ -53,31 +53,45 @@ async function runQuery(
   const alerts: Alert[] = [];
   let query: AlertQueryOptions;
   let response: AlertsResponse | undefined;
+  let pageSize = 1000;
+  let shouldRetryFromError = false;
 
   do {
-    const { chainId, botId, alertId, alertIds } = subscription;
-    query = {
-      botIds: [botId],
-      createdSince: TEN_MINUTES_IN_MS,
-      first: 1000,
-      startingCursor: response?.pageInfo.endCursor,
-    };
-    if (chainId) {
-      query.chainId = chainId;
-    }
-    if (alertId) {
-      query.alertIds = [alertId];
-    }
-    if (alertIds?.length) {
-      if (query.alertIds?.length) {
-        query.alertIds.push(...alertIds);
+    try {
+      const { chainId, botId, alertId, alertIds } = subscription;
+      query = {
+        botIds: [botId],
+        createdSince: TEN_MINUTES_IN_MS,
+        first: pageSize,
+        startingCursor: response?.pageInfo.endCursor,
+      };
+      if (chainId) {
+        query.chainId = chainId;
+      }
+      if (alertId) {
+        query.alertIds = [alertId];
+      }
+      if (alertIds?.length) {
+        if (query.alertIds?.length) {
+          query.alertIds.push(...alertIds);
+        } else {
+          query.alertIds = alertIds;
+        }
+      }
+      response = await getAlerts(query);
+      shouldRetryFromError = false;
+      alerts.push(...response.alerts);
+    } catch (e) {
+      // if alerts API returned 500, its likely due to response size being over 10MB AWS gateway limit
+      if (e.response?.status === 500) {
+        // reduce the page size in order to reduce the response size and try again
+        pageSize = Math.round(pageSize / 2);
+        shouldRetryFromError = pageSize > 50; // retry up to 4 times
       } else {
-        query.alertIds = alertIds;
+        throw e;
       }
     }
-    response = await getAlerts(query);
-    alerts.push(...response.alerts);
-  } while (response.pageInfo?.hasNextPage);
+  } while (shouldRetryFromError || response?.pageInfo?.hasNextPage);
 
   return alerts;
 }
