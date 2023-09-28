@@ -4,7 +4,7 @@ import { assertExists, assertIsNonEmptyString, assertIsValidChainSettings, kecca
 import { AddToIpfs } from "../../utils/add.to.ipfs"
 
 // uploads signed agent manifest to ipfs and returns ipfs reference
-export type UploadManifest = (imageReference: string, privateKey: string) => Promise<string>
+export type UploadManifest = (imageReference: string | undefined, privateKey: string) => Promise<string>
 
 export type ChainSetting = {
   shards: number;
@@ -22,14 +22,15 @@ type Manifest = {
   agentIdHash: string,
   version: string,
   timestamp: string,
-  imageReference: string,
+  imageReference?: string,
   documentation: string,
   repository?: string,
   licenseUrl?: string,
   promoUrl?: string,
   chainIds: number[],
   publishedFrom: string,
-  chainSettings?: ChainSettings
+  chainSettings?: ChainSettings,
+  external?: boolean
 }
 
 export default function provideUploadManifest(
@@ -47,7 +48,8 @@ export default function provideUploadManifest(
  promoUrl: string,
  cliVersion: string,
  chainIds: number[],
- chainSettings?: ChainSettings
+ external: boolean,
+ chainSettings?: ChainSettings,
 ): UploadManifest {
   assertExists(filesystem, 'filesystem')
   assertExists(addToIpfs, 'addToIpfs')
@@ -60,7 +62,7 @@ export default function provideUploadManifest(
   assertExists(chainIds, 'chainIds')
   assertIsValidChainSettings(chainSettings)
 
-  return async function uploadManifest(imageReference: string, privateKey: string) {
+  return async function uploadManifest(imageReference: string | undefined, privateKey: string) {
     // upload documentation to ipfs
     if (!filesystem.existsSync(documentation)) {
       throw new Error(`documentation file ${documentation} not found`)
@@ -85,10 +87,11 @@ export default function provideUploadManifest(
       imageReference,
       documentation: documentationReference,
       repository,
-      licenseUrl: licenseUrl,
-      promoUrl: promoUrl,
+      licenseUrl,
+      promoUrl,
       chainIds,
       publishedFrom: `Forta CLI ${cliVersion}`,
+      external,
       chainSettings: formatChainSettings(chainSettings),
     }
 
