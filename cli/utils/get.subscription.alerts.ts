@@ -85,8 +85,8 @@ async function runQuery(
       // if alerts API returned 500, its likely due to response size being over 10MB AWS gateway limit
       if (e.response?.status === 500) {
         // reduce the page size in order to reduce the response size and try again
-        pageSize = Math.round(pageSize / 2);
-        shouldRetryFromError = pageSize > 50; // retry up to 4 times
+        pageSize = Math.floor(pageSize / 2);
+        shouldRetryFromError = pageSize > 1;
       } else {
         throw e;
       }
