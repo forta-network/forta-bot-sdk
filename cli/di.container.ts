@@ -171,6 +171,7 @@ export default function configureContainer(args: any = {}) {
     }).singleton(),
     licenseUrl: asFunction((packageJson: any) => packageJson.licenseUrl).singleton(),
     promoUrl: asFunction((packageJson: any) => packageJson.promoUrl).singleton(),
+    external: asFunction((packageJson: any) => packageJson.external === true).singleton(),
     keyfileName: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.keyfile
     }),
