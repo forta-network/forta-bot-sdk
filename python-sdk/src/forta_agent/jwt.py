@@ -71,7 +71,7 @@ def verify_jwt(token: str, polygonUrl: str = 'https://polygon-rpc.com') -> bool:
     msgHash = w3.keccak(text=msg)
     b64signature = splitJwt[2]
     signature = base64.urlsafe_b64decode(f'{b64signature}=').hex()
-    recoveredSignerAddress = w3.eth.account.recoverHash(
+    recoveredSignerAddress = w3.eth.account.recover_message(
         msgHash, signature=signature)
 
     if recoveredSignerAddress != signerAddress:
