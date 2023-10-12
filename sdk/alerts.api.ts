@@ -13,11 +13,9 @@ export const sendAlerts: SendAlerts = async (
     input = [input];
   }
 
-  const mutation = getMutationFromInput(input);
-  // console.log(JSON.stringify(mutation, null, 2));
   const response: RawGraphqlSendAlertsResponse = await axios.post(
     getFortaApiURL(),
-    mutation,
+    getMutationFromInput(input),
     getFortaApiHeaders()
   );
 
