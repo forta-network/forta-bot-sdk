@@ -1,6 +1,76 @@
 import requests
+import json
 from .alert import Alert
+from .finding import FindingType, FindingSeverity
+from .label import EntityType
 from .utils import get_forta_api_headers, get_forta_api_url
+
+
+def send_alerts(alerts):
+    if not isinstance(alerts, list):
+        alerts = [alerts]
+
+    alerts_api_url = get_forta_api_url()
+    headers = get_forta_api_headers()
+    mutation = SendAlertsRequest(alerts).get_mutation()
+
+    response = requests.request(
+        "POST", alerts_api_url, json=mutation, headers=headers)
+
+    if response.status_code == 200:
+        data = response.json().get('data')
+        if data:
+            return data.get('sendAlerts').get('alerts')
+    else:
+        message = response.text
+        raise Exception(message)
+
+
+class SendAlertsRequest:
+    def __init__(self, alerts):
+        self.alerts = []
+        # serialize the alerts list
+        for alert in alerts:
+            # convert finding timestamp to RFC3339 format
+            alert["finding"].timestamp = alert["finding"].timestamp.astimezone(
+            ).isoformat()
+            # serialize finding
+            finding = json.loads(alert["finding"].toJson())
+            # convert enums to all caps to match graphql enums
+            finding["type"] = FindingType(finding["type"]).name.upper()
+            finding["severity"] = FindingSeverity(
+                finding["severity"]).name.upper()
+            for label in finding.get("labels", []):
+                label["entityType"] = EntityType(
+                    label["entityType"]).name.upper()
+            # remove protocol field (not part of graphql schema)
+            del finding["protocol"]
+            # remove any empty-value or snake-case-keyed fields
+            finding = {k: v for k, v in finding.items()
+                       if v is not None and "_" not in k}
+            for index, label in enumerate(finding.get("labels", [])):
+                finding["labels"][index] = {k: v for k, v in label.items()
+                                            if v is not None and "_" not in k}
+            self.alerts.append({
+                "botId": alert["bot_id"],
+                "finding": finding
+            })
+
+    def get_mutation(self):
+        mutation = """
+        mutation SendAlerts($alerts: [AlertRequestInput!]!) {
+            sendAlerts(alerts: $alerts) {
+                alerts {
+                    alertHash
+                    error {
+                        code
+                        message
+                    }
+                }
+            }
+        }
+        """
+        return dict(query=mutation, variables={"alerts": self.alerts})
 
 
 def get_alerts(dict):

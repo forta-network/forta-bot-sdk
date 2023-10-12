@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from .label import Label
 from enum import IntEnum
 from .utils import assert_enum_value_in_dict, assert_non_empty_string_in_dict
@@ -51,6 +52,7 @@ class Finding:
             l, Label) else Label(l), dict.get('labels', [])))
         self.unique_key = dict.get('unique_key')
         self.source = dict.get('source')
+        self.timestamp = dict.get('timestamp', datetime.now())
 
     def toJson(self):
         d = dict(self.__dict__, **{
@@ -58,4 +60,4 @@ class Finding:
             'labels': list(map(lambda l: l.toDict(), self.labels)),
             'uniqueKey': self.unique_key
         })
-        return json.dumps({k: v for k, v in d.items() if v or k == 'type' or k == 'severity'})
+        return json.dumps({k: v for k, v in d.items() if v or k == 'type' or k == 'severity'}, default=str)
