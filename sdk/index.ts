@@ -1,67 +1,75 @@
 import axios from "axios";
-import { ethers } from "ethers"
-import { Finding, FindingSeverity, FindingType } from "./finding"
-import { Label, EntityType } from "./label"
-import { BlockEvent } from "./block.event"
-import {AlertEvent} from "./alert.event";
-import { Block } from "./block"
-import { Alert } from "./alert"
-import { TransactionEvent, TxEventBlock, LogDescription } from "./transaction.event"
-import { Log, Receipt } from "./receipt"
-import { Trace, TraceAction, TraceResult } from "./trace"
-import { Transaction } from "./transaction"
-import { 
-  createBlockEvent, 
+import { ethers } from "ethers";
+import { Finding, FindingSeverity, FindingType } from "./finding";
+import { Label, EntityType } from "./label";
+import { BlockEvent } from "./block.event";
+import { AlertEvent } from "./alert.event";
+import { Block } from "./block";
+import { Alert } from "./alert";
+import {
+  TransactionEvent,
+  TxEventBlock,
+  LogDescription,
+} from "./transaction.event";
+import { Log, Receipt } from "./receipt";
+import { Trace, TraceAction, TraceResult } from "./trace";
+import { Transaction } from "./transaction";
+import {
+  createBlockEvent,
   createTransactionEvent,
   createAlertEvent,
-  getJsonRpcUrl, 
-  getEthersProvider, 
-  getEthersBatchProvider, 
+  getJsonRpcUrl,
+  getEthersProvider,
+  getEthersBatchProvider,
   keccak256,
   setPrivateFindings,
   isPrivateFindings,
   getTransactionReceipt,
   getChainId,
   getBotOwner,
-  getBotId
-} from "./utils"
+  getBotId,
+} from "./utils";
 import {
   GetAlerts,
   AlertQueryOptions,
   AlertsResponse,
   AlertCursor,
-  getAlerts
-} from "./alerts.api"
+  getAlerts,
+  SendAlerts,
+  SendAlertsInput,
+  SendAlertsResponse,
+  sendAlerts,
+} from "./alerts.api";
 import {
   GetLabels,
   LabelQueryOptions,
   LabelsResponse,
   LabelCursor,
-  provideGetLabels
-} from './labels.api'
-import {
-  fetchJwt,
-  decodeJwt,
-  verifyJwt,
-  MOCK_JWT
-} from "./jwt"
-import awilixConfigureContainer from '../cli/di.container';
+  provideGetLabels,
+} from "./labels.api";
+import { fetchJwt, decodeJwt, verifyJwt, MOCK_JWT } from "./jwt";
+import awilixConfigureContainer from "../cli/di.container";
 import { InitializeResponse, BotSubscription } from "./initialize.response";
 import { BloomFilter } from "./bloom.filter";
 import { FortaConfig } from "./forta.config";
-import { EventType } from './event.type'
+import { EventType } from "./event.type";
 import { Network } from "./network";
-import { Initialize, HandleTransaction, HandleBlock, HandleAlert } from "./handlers";
+import {
+  Initialize,
+  HandleTransaction,
+  HandleBlock,
+  HandleAlert,
+} from "./handlers";
 
 interface DiContainer {
-  resolve<T>(key: string): T
+  resolve<T>(key: string): T;
 }
-type ConfigureContainer = (args?: object) => DiContainer
+type ConfigureContainer = (args?: object) => DiContainer;
 const configureContainer: ConfigureContainer = (args: object = {}) => {
-  return awilixConfigureContainer(args)
-}
+  return awilixConfigureContainer(args);
+};
 
-const getLabels = provideGetLabels(axios)
+const getLabels = provideGetLabels(axios);
 
 export {
   FortaConfig,
@@ -94,6 +102,9 @@ export {
   AlertsResponse,
   AlertCursor,
   GetLabels,
+  SendAlerts,
+  SendAlertsInput,
+  SendAlertsResponse,
   LabelQueryOptions,
   LabelsResponse,
   LabelCursor,
@@ -112,6 +123,7 @@ export {
   configureContainer,
   getTransactionReceipt,
   getAlerts,
+  sendAlerts,
   getLabels,
   fetchJwt,
   decodeJwt,
@@ -120,5 +132,5 @@ export {
   getBotOwner,
   getBotId,
   BloomFilter,
-  MOCK_JWT
- }
+  MOCK_JWT,
+};
