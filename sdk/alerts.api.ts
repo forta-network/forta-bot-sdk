@@ -22,7 +22,7 @@ export const sendAlerts: SendAlerts = async (
   if (response.data && response.data.errors)
     throw Error(JSON.stringify(response.data.errors));
 
-  return response.data.data.sendAlerts;
+  return response.data.data.sendAlerts.alerts;
 };
 
 export interface SendAlertsInput {
@@ -33,7 +33,9 @@ export interface SendAlertsInput {
 export interface RawGraphqlSendAlertsResponse {
   data: {
     data: {
-      sendAlerts: SendAlertsResponse[];
+      sendAlerts: {
+        alerts: SendAlertsResponse[];
+      };
     };
     errors: any;
   };
