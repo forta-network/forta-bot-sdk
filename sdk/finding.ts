@@ -23,8 +23,37 @@ type FindingSourceChain = {
   chainId: number
 }
 
+type FindingSourceBlock = {
+  chainId: number
+  hash: string
+  number: number
+}
+
+type FindingSourceTransaction = {
+  chainId: number
+  hash: string
+}
+
+type FindingSourceUrls = {
+  url: string
+}
+
+type FindingSourceAlerts = {
+  id: string
+}
+
+type FindingSourceCustom = {
+  name: string
+  value: string
+}
+
 type FindingSource = {
   chains?: FindingSourceChain[]
+  blocks?: FindingSourceBlock[]
+  transactions?: FindingSourceTransaction[]
+  urls?: FindingSourceUrls[]
+  alerts?: FindingSourceAlerts[]
+  customSources?: FindingSourceCustom[]
 }
 
 type FindingInput = {
@@ -39,6 +68,7 @@ type FindingInput = {
   labels?: Label[],
   uniqueKey?: string,
   source?: FindingSource
+  timestamp?: Date
 }
 
 export class Finding {
@@ -54,6 +84,7 @@ export class Finding {
    readonly labels: Label[],
    readonly uniqueKey: string,
    readonly source: FindingSource,
+   readonly timestamp: Date
   ) {}
 
   toString() {
@@ -77,6 +108,7 @@ export class Finding {
     protocol = 'ethereum',
     severity,
     type,
+    timestamp = new Date(),
     metadata = {},
     addresses = [],
     labels = [],
@@ -93,6 +125,6 @@ export class Finding {
 
     labels = labels.map(l => l instanceof Label ? l : Label.fromObject(l))
 
-    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses, labels, uniqueKey, source)
+    return new Finding(name, description, alertId, protocol, severity, type, metadata, addresses, labels, uniqueKey, source, timestamp)
   }
 }

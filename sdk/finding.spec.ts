@@ -22,16 +22,21 @@ describe("finding", () => {
     entity: "Address",
     label: "Address",
     confidence: 1,
-  }
+  };
 
   const labelInput2 = {
     entityType: EntityType.Transaction,
     entity: "Transaction",
     label: "Transaction",
     confidence: 1,
-  }
+  };
 
-  const mockLabels = [Label.fromObject(labelInput1), Label.fromObject(labelInput2)];
+  const mockLabels = [
+    Label.fromObject(labelInput1),
+    Label.fromObject(labelInput2),
+  ];
+
+  const timestamp = new Date();
 
   const findingInput = {
     name: "High Tether Transfer",
@@ -45,30 +50,38 @@ describe("finding", () => {
     },
     addresses: ["0x01", "0x02", "0x03"],
     labels: mockLabels,
-  }
+    timestamp,
+  };
 
   const finding = Finding.fromObject(findingInput);
 
   it("should convert to string", () => {
-    const expectedJSONString = JSON.stringify({
-      name: "High Tether Transfer",
-      description: `High amount of USDT transferred: ${normalizedValue}`,
-      alertId: "FORTA-1",
-      protocol: "ethereum",
-      severity: FindingSeverity[findingInput.severity],
-      type: FindingType[findingInput.type],
-      metadata: {
-        to: mockTetherTransferEvent.args.to,
-        from: mockTetherTransferEvent.args.from,
+    const expectedJSONString = JSON.stringify(
+      {
+        name: "High Tether Transfer",
+        description: `High amount of USDT transferred: ${normalizedValue}`,
+        alertId: "FORTA-1",
+        protocol: "ethereum",
+        severity: FindingSeverity[findingInput.severity],
+        type: FindingType[findingInput.type],
+        metadata: {
+          to: mockTetherTransferEvent.args.to,
+          from: mockTetherTransferEvent.args.from,
+        },
+        addresses: ["0x01", "0x02", "0x03"],
+        labels: findingInput.labels.map((l) => {
+          return {
+            ...l,
+            entityType: EntityType[l.entityType],
+          };
+        }),
+        uniqueKey: "",
+        source: {},
+        timestamp,
       },
-      addresses: ["0x01", "0x02", "0x03"],
-      labels: findingInput.labels.map(l => {
-        return {
-          ...l,
-          entityType: EntityType[l.entityType],
-        }
-      },), uniqueKey: "", source: {}
-    }, null, 2);
+      null,
+      2
+    );
 
     expect(finding.toString()).toEqual(expectedJSONString);
   });

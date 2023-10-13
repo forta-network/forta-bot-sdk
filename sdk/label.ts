@@ -52,6 +52,10 @@ export class Label {
     readonly createdAt?: string
   ) {}
 
+  static from(labelInput: LabelInput) {
+    return this.fromObject(labelInput);
+  }
+
   static fromObject({
     entityType,
     entity,

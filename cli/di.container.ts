@@ -227,7 +227,9 @@ export default function configureContainer(args: any = {}) {
     getSubscriptionAlerts: asFunction(provideGetSubscriptionAlerts),
     getTraceData: asFunction(provideGetTraceData),
     getAgentLogs: asFunction(provideGetAgentLogs),
-    fortaApiUrl: asValue('https://api.forta.network'),
+    fortaApiUrl: asFunction((fortaConfig: FortaConfig) => {
+      return fortaConfig.fortaApiUrl || 'https://api.forta.network'
+    }),
     polyscanApiUrl: asValue('https://api.polygonscan.com/api'),
     traceRpcUrl: asFunction((fortaConfig: FortaConfig) => {
       return fortaConfig.traceRpcUrl
