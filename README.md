@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.41
+### 0.1.42
+
+- Added support for external bots with the `sendAlerts` SDK method
+
+### [0.1.41](https://github.com/forta-network/forta-bot-sdk/commit/ece1393bf0b872b08061d17a3e6ea57807102a58)
 
 - Add retry logic when querying alerts for bots that use `handleAlert`
 

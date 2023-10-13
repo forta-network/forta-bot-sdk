@@ -1,2 +1,2 @@
-forta_agent>=0.1.21
+forta_agent>=0.1.22
 setuptools>=61.3.1
