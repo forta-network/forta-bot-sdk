@@ -98,6 +98,8 @@ def get_forta_api_headers():
     config = get_forta_config()
     if "fortaApiKey" in config:
         headers["Authorization"] = f'Bearer {config.get("fortaApiKey")}'
+    elif 'FORTA_API_KEY' in os.environ:
+        headers["Authorization"] = f'Bearer {os.environ["FORTA_API_KEY"]}'
 
     return headers
 
