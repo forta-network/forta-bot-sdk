@@ -95,11 +95,12 @@ def get_forta_api_url():
 def get_forta_api_headers():
     headers = {"content-type": "application/json"}
 
-    config = get_forta_config()
-    if "fortaApiKey" in config:
-        headers["Authorization"] = f'Bearer {config.get("fortaApiKey")}'
-    elif 'FORTA_API_KEY' in os.environ:
+    if 'FORTA_API_KEY' in os.environ:
         headers["Authorization"] = f'Bearer {os.environ["FORTA_API_KEY"]}'
+    else:
+        config = get_forta_config()
+        if "fortaApiKey" in config:
+            headers["Authorization"] = f'Bearer {config.get("fortaApiKey")}'
 
     return headers
 
