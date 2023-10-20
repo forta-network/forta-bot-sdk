@@ -10,7 +10,12 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.42
+### 0.1.43
+
+- Added support for `healthCheck` method to report bot health
+- Updated grpc proto definition
+
+### [0.1.42](https://github.com/forta-network/forta-bot-sdk/commit/c0b78bf03c82a2d021ecbbb34d9d63d2e8650e09)
 
 - Added support for external bots with the `sendAlerts` SDK method
 
