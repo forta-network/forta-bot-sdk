@@ -12,6 +12,7 @@ service Agent {
   rpc EvaluateTx (EvaluateTxRequest) returns (EvaluateTxResponse) {}
   rpc EvaluateBlock (EvaluateBlockRequest) returns (EvaluateBlockResponse) {}
   rpc EvaluateAlert (EvaluateAlertRequest) returns (EvaluateAlertResponse) {}
+  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse) {}
 }
 
 message Error {
@@ -24,9 +25,23 @@ enum ResponseStatus {
   SUCCESS = 2;
 }
 
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  enum ResponseStatus {
+    UNKNOWN = 0;
+    ERROR = 1;
+    SUCCESS = 2;
+  }
+
+  ResponseStatus status = 1;
+  repeated Error errors = 2;
+}
+
 message InitializeRequest {
   string agentId = 1;
   string proxyHost = 2;
+  int32 shardId = 3;
 }
 
 message InitializeResponse {
@@ -50,16 +65,20 @@ message CombinerBotSubscription {
 message EvaluateTxRequest {
   string requestId = 1;
   TransactionEvent event = 2;
+  int32 shardId = 3;
 }
 
 message EvaluateBlockRequest {
   string requestId = 1;
   BlockEvent event = 2;
+  int32 shardId = 3;
 }
 
 message EvaluateAlertRequest {
   string requestId = 1;
   AlertEvent event = 2;
+  string targetBotId = 3;
+  int32 shardId = 4;
 }
 
 message EvaluateTxResponse {
@@ -122,6 +141,7 @@ message BlockEvent {
     repeated string transactions = 18;
     string transactionsRoot = 19;
     repeated string uncles = 20;
+    string baseFeePerGas = 21;
   }
 
   EventType type = 1;
@@ -147,6 +167,7 @@ message TransactionEvent {
     string blockHash = 1;
     string blockNumber = 2;
     string blockTimestamp = 3;
+    string baseFeePerGas = 4;
   }
 
   message EthTransaction {
@@ -162,6 +183,8 @@ message TransactionEvent {
     string to = 10;
     string hash = 11;
     string from = 12;
+    string maxFeePerGas = 13;
+    string maxPriorityFeePerGas = 14;
   }
 
   message Log {
@@ -273,16 +296,16 @@ message AlertEvent {
 
     message SourceAlertEvent {
       string botId = 1;
-      string alertHash = 2;
+      string hash = 2;
       string timestamp = 3;
-      string chainId = 4;
+      uint64 chainId = 4;
     }
 
     message Source {
       string transactionHash = 1;
       Bot bot = 2;
       Block block = 3;
-      SourceAlertEvent sourceEvent = 4;
+      SourceAlertEvent sourceAlert = 4;
     }
 
     message Label {

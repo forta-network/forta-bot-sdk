@@ -59,6 +59,7 @@ import {
   HandleTransaction,
   HandleBlock,
   HandleAlert,
+  HealthCheck
 } from "./handlers";
 
 interface DiContainer {
@@ -77,6 +78,7 @@ export {
   HandleTransaction,
   HandleBlock,
   HandleAlert,
+  HealthCheck,
   Finding,
   FindingSeverity,
   FindingType,

@@ -1,10 +1,11 @@
-import { HandleBlock, HandleTransaction, HandleAlert, Initialize, InitializeResponse } from "../../sdk"
+import { HandleBlock, HandleTransaction, HandleAlert, Initialize, InitializeResponse, HealthCheck } from "../../sdk"
 import { assertExists, assertIsNonEmptyString } from "."
 import { GetPythonAgentHandlers } from './get.python.agent.handlers'
 
 type AgentHandlers = { 
   initialize?: Initialize,
   initializeResponse?: InitializeResponse | void,
+  healthCheck?: HealthCheck,
   handleTransaction?: HandleTransaction,
   handleBlock?: HandleBlock,
   handleAlert?: HandleAlert,
