@@ -20,6 +20,31 @@ module.exports = class AgentController {
     this.initializeResponse = {};
   }
 
+  async HealthCheck(call, callback) {
+    let errors = [];
+    let status = "SUCCESS";
+
+    if (this.healthCheck) {
+      try {
+        const response = await this.healthCheck();
+        if (response && response.length > 0) {
+          status = "ERROR";
+          errors = response.map((r) => ({ message: r }));
+        }
+      } catch (e) {
+        console.log(`${new Date().toISOString()}    healthCheck`);
+        console.log(e);
+        status = "ERROR";
+        errors = [{ message: e.message }];
+      }
+    }
+
+    callback(null, {
+      status,
+      errors,
+    });
+  }
+
   async Initialize(call, callback) {
     let status = "SUCCESS";
 
@@ -35,7 +60,7 @@ module.exports = class AgentController {
     }
 
     callback(null, {
-      status: status,
+      status,
       alertConfig: this.initializeResponse
         ? this.initializeResponse.alertConfig
         : undefined,
@@ -152,6 +177,7 @@ module.exports = class AgentController {
       this.handleBlock = agentHandlers.handleBlock;
       this.handleTransaction = agentHandlers.handleTransaction;
       this.handleAlert = agentHandlers.handleAlert;
+      this.healthCheck = agentHandlers.healthCheck;
     } catch (e) {
       console.log(e);
     }
