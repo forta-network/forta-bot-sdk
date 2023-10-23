@@ -51,6 +51,11 @@ def handle_transaction(transaction_event):
 #     # detect some block condition
 #     return findings
 
+# def health_check():
+#     errors = []
+#     # detect some health check condition
+#     return errors
+
 # def handle_alert(alert_event):
 #     findings = []
 #     # detect some alert condition

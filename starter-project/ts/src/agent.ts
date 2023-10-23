@@ -78,7 +78,7 @@ const handleTransaction: HandleTransaction = async (
 
 // const healthCheck: HealthCheck = async () => {
 //   const errors: string[] = [];
-  // detect some error condition
+  // detect some health check condition
   // errors.push("not healthy due to some condition")
   // return errors;
 // }
