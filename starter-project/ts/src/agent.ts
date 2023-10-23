@@ -3,6 +3,7 @@ import {
   Finding,
   Initialize,
   HandleBlock,
+  HealthCheck,
   HandleTransaction,
   HandleAlert,
   AlertEvent,
@@ -75,9 +76,17 @@ const handleTransaction: HandleTransaction = async (
 //   return findings;
 // }
 
+// const healthCheck: HealthCheck = async () => {
+//   const errors: string[] = [];
+  // detect some health check condition
+  // errors.push("not healthy due to some condition")
+  // return errors;
+// }
+
 export default {
   // initialize,
   handleTransaction,
+  // healthCheck,
   // handleBlock,
   // handleAlert
 };
