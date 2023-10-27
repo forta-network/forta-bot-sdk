@@ -275,7 +275,22 @@ export default function configureContainer(args: any = {}) {
     }),
 
     jsonRpcUrl: asFunction((fortaConfig: FortaConfig) => {
+      // if rpc url provided by Forta Scanner i.e. in production
+
+      if (process.env.JSON_RPC_HOST) {
+          const address = `${process.env.JSON_RPC_HOST}${
+              process.env.JSON_RPC_PORT ? `:${process.env.JSON_RPC_PORT}` : ""
+          }`
+
+          if (process.env.JSON_RPC_HOST.startsWith('http') || process.env.JSON_RPC_HOST.startsWith('https')) {
+            return address;
+        } else {
+          return `http://${address}`;
+        }
+      }
+
       const jsonRpcUrl = fortaConfig.jsonRpcUrl || "https://cloudflare-eth.com/"
+
       if (!jsonRpcUrl.startsWith("http")) {
         throw new Error(`jsonRpcUrl must begin with http(s)`)
       }
