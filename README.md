@@ -10,6 +10,10 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
+### 0.1.44
+
+- Added Network chain ID enum for Base
+
 ### 0.1.43
 
 - Added support for `healthCheck` method to report bot health
