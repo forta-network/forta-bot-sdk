@@ -9,4 +9,5 @@ export enum Network {
   ARBITRUM = 42161,
   OPTIMISM = 10,
   FANTOM = 250,
+  BASE = 8453,
 }
