@@ -182,6 +182,7 @@ class AlertQueryOptions:
                         entityType
                         remove
                         metadata
+                        uniqueKey
                     }
                     addressBloomFilter {
                         bitset

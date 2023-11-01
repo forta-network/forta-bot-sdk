@@ -131,6 +131,7 @@ export const getQueryFromLabelOptions = (options: LabelQueryOptions) => {
                                 label
                                 metadata
                                 remove
+                                uniqueKey
                             }
                             source {
                               alertHash

@@ -21,7 +21,7 @@ class Label:
         self.confidence = dict['confidence']
         self.label = dict['label']
         self.remove = dict.get('remove', False)
-        self.unique_key = dict.get('uniqueKey', False)
+        self.unique_key = dict.get('unique_key', dict.get('uniqueKey'))
         self.metadata = dict.get('metadata') if dict.get(
             'metadata') is not None else {}
         # if metadata is array, convert to map
@@ -35,6 +35,7 @@ class Label:
     def toDict(self):
         d = dict(self.__dict__, **{
             'entityType': self.entity_type,
+            'uniqueKey': self.unique_key,
         })
         return {k: v for k, v in d.items() if v is not None}
 

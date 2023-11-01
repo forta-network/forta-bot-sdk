@@ -233,6 +233,7 @@ const getQueryFromAlertOptions = (options: AlertQueryOptions) => {
                                 entityType
                                 remove
                                 metadata
+                                uniqueKey
                             }
                             addressBloomFilter {
                                 bitset
