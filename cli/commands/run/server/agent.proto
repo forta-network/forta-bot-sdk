@@ -296,16 +296,16 @@ message AlertEvent {
 
     message SourceAlertEvent {
       string botId = 1;
-      string hash = 2;
+      string alertHash = 2;
       string timestamp = 3;
-      uint64 chainId = 4;
+      string chainId = 4;
     }
 
     message Source {
       string transactionHash = 1;
       Bot bot = 2;
       Block block = 3;
-      SourceAlertEvent sourceAlert = 4;
+      SourceAlertEvent sourceEvent = 4;
     }
 
     message Label {

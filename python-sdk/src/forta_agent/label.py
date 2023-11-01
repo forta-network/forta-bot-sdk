@@ -21,6 +21,7 @@ class Label:
         self.confidence = dict['confidence']
         self.label = dict['label']
         self.remove = dict.get('remove', False)
+        self.unique_key = dict.get('uniqueKey', False)
         self.metadata = dict.get('metadata') if dict.get(
             'metadata') is not None else {}
         # if metadata is array, convert to map
