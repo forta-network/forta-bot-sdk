@@ -37,6 +37,7 @@ type LabelInput = {
   source?: LabelSource;
   createdAt?: string;
   id?: string;
+  uniqueKey?: string;
 };
 
 export class Label {
@@ -49,7 +50,8 @@ export class Label {
     readonly metadata: { [key: string]: string },
     readonly source?: LabelSource,
     readonly id?: string,
-    readonly createdAt?: string
+    readonly createdAt?: string,
+    readonly uniqueKey?: string
   ) {}
 
   static from(labelInput: LabelInput) {
@@ -66,6 +68,7 @@ export class Label {
     source,
     id,
     createdAt,
+    uniqueKey
   }: LabelInput) {
     if (typeof entityType == "string") {
       entityType = ENTITY_TYPE_STRING_TO_ENUM[entityType];
@@ -91,7 +94,8 @@ export class Label {
       metadata,
       source,
       id,
-      createdAt
+      createdAt,
+      uniqueKey
     );
   }
 }

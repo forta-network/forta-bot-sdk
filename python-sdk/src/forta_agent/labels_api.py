@@ -54,6 +54,7 @@ class LabelQueryOptions:
                         label
                         metadata
                         remove
+                        uniqueKey
                     }
                     source {
                         alertHash

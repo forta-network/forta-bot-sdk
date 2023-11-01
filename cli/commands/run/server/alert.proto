@@ -90,6 +90,7 @@ message Label {
   bool remove = 6;
   string label = 7;
   repeated string metadata = 8;
+  string uniqueKey = 9;
 }
 
 message Source {
