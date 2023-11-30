@@ -144,7 +144,7 @@ describe("AgentController", () => {
   beforeEach(() => resetMocks())
 
   beforeAll(() => {
-    jest.useFakeTimers('modern').setSystemTime(systemTime)
+    jest.useFakeTimers().setSystemTime(systemTime)
   })
 
   afterAll(() => {

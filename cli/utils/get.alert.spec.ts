@@ -44,7 +44,7 @@ describe("getAlert", () => {
 
   it("invokes getAlerts query and returns alerts", async () => {
     const systemTime = new Date();
-    jest.useFakeTimers("modern").setSystemTime(systemTime);
+    jest.useFakeTimers().setSystemTime(systemTime);
     mockGetAlerts.mockReturnValue({
       alerts: [mockAlert],
     });

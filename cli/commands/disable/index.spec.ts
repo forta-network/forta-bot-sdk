@@ -57,7 +57,7 @@ describe("disable", () => {
 
   it("disables agent in agent registry contract", async () => {
     const systemTime = new Date()
-    jest.useFakeTimers('modern').setSystemTime(systemTime)
+    jest.useFakeTimers().setSystemTime(systemTime)
     mockAgentRegistry.agentExists.mockReturnValueOnce(true)
     mockAgentRegistry.isEnabled.mockReturnValueOnce(true)
     const mockPrivateKey = "0x4567"

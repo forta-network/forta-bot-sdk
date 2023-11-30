@@ -62,7 +62,7 @@ describe("getTraceData", () => {
 
   it("returns block trace data when requesting block number", async () => {
     const systemTime = new Date()
-    jest.useFakeTimers('modern').setSystemTime(systemTime)
+    jest.useFakeTimers().setSystemTime(systemTime)
     const mockTraces = ['some block trace data']
     mockAxios.post.mockReturnValueOnce({ data: { result: mockTraces }})
 
@@ -88,7 +88,7 @@ describe("getTraceData", () => {
 
   it("returns transaction trace data when requesting transaction hash", async () => {
     const systemTime = new Date()
-    jest.useFakeTimers('modern').setSystemTime(systemTime)
+    jest.useFakeTimers().setSystemTime(systemTime)
     const mockTraces = ['some transaction trace data']
     mockAxios.post.mockReturnValueOnce({ data: { result: mockTraces }})
 
