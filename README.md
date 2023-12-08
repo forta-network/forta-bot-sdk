@@ -10,15 +10,19 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.45
+### 0.1.46
+
+- Updated axios and jest dependencies
+
+### [0.1.45](https://github.com/forta-network/forta-bot-sdk/commit/516fb1036b4823672f58e516ce79f24faef5d571)
 
 - Added support for `uniqueKey` field in labels
 
-### 0.1.44
+### [0.1.44](https://github.com/forta-network/forta-bot-sdk/commit/9b77920914595393a45e12b384fce18cdbfc943b)
 
 - Added Network chain ID enum for Base
 
-### 0.1.43
+### [0.1.43](https://github.com/forta-network/forta-bot-sdk/commit/b4e31adb72bd6ea01701e18fe179e5dd7e2ce096)
 
 - Added support for `healthCheck` method to report bot health
 - Updated grpc proto definition
