@@ -10,7 +10,7 @@ describe("push", () => {
     const mockPrivateKey = "0x4567"
     mockGetCredentials.mockReturnValueOnce({ privateKey: mockPrivateKey})
     const systemTime = new Date()
-    jest.useFakeTimers('modern').setSystemTime(systemTime)
+    jest.useFakeTimers().setSystemTime(systemTime)
     const mockImageRef = "abc123"
     mockUploadImage.mockReturnValueOnce(mockImageRef)
     const mockManifestRef = "def456"
@@ -39,7 +39,7 @@ describe("push", () => {
     const mockPrivateKey = "0x4567"
     mockGetCredentials.mockReturnValueOnce({ privateKey: mockPrivateKey})
     const systemTime = new Date()
-    jest.useFakeTimers('modern').setSystemTime(systemTime)
+    jest.useFakeTimers().setSystemTime(systemTime)
     const mockImageRef = "abc123"
     mockUploadImage.mockReturnValueOnce(mockImageRef)
     const mockManifestRef = "def456"

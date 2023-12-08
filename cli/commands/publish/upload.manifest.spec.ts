@@ -122,7 +122,7 @@ describe("uploadManifest", () => {
 
   it("uploads signed manifest to ipfs and returns ipfs reference", async () => {
     const systemTime = new Date();
-    jest.useFakeTimers("modern").setSystemTime(systemTime);
+    jest.useFakeTimers().setSystemTime(systemTime);
     mockFilesystem.existsSync.mockReturnValueOnce(true);
     mockFilesystem.statSync.mockReturnValueOnce({ size: 1 });
     const mockDocumentationFile = JSON.stringify({ some: "documentation" });

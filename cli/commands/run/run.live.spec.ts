@@ -41,7 +41,7 @@ describe("runLive", () => {
       mockRunHandlersOnAlert,
       mockSleep
     );
-    jest.useFakeTimers("modern").setSystemTime(systemTime);
+    jest.useFakeTimers().setSystemTime(systemTime);
   });
 
   afterAll(() => {

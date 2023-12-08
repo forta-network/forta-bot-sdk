@@ -64,7 +64,7 @@ describe("pushToRegistry", () => {
 
   it("adds agent to registry if it does not already exist", async () => {
     const systemTime = new Date()
-    jest.useFakeTimers('modern').setSystemTime(systemTime)
+    jest.useFakeTimers().setSystemTime(systemTime)
     mockAgentRegistry.getAgent.mockReturnValueOnce({created: false})
     mockFromWallet.getAddress.mockReturnValue('0x123')
     mockFromWallet.getBalance.mockReturnValueOnce(BigNumber.from(1))
@@ -88,7 +88,7 @@ describe("pushToRegistry", () => {
 
   it("updates agent in registry if it already exists", async () => {
     const systemTime = new Date()
-    jest.useFakeTimers('modern').setSystemTime(systemTime)
+    jest.useFakeTimers().setSystemTime(systemTime)
     mockAgentRegistry.getAgent.mockReturnValueOnce({created: true, owner: mockFromAddress})
     mockFromWallet.getAddress.mockReturnValue('0x123')
     mockFromWallet.getBalance.mockReturnValueOnce(BigNumber.from(1))
