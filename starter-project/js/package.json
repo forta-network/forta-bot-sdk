@@ -31,10 +31,10 @@
     "test": "jest"
   },
   "dependencies": {
-    "forta-agent": "^0.1.46"
+    "forta-agent": "^0.1.47"
   },
   "devDependencies": {
-    "jest": "^27.0.6",
+    "jest": "^29.7.0",
     "nodemon": "^2.0.8"
   }
 }

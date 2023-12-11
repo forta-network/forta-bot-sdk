@@ -10,7 +10,11 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.46
+### 0.1.47
+
+- Updated JS and TS starter project dependencies
+
+### [0.1.46](https://github.com/forta-network/forta-bot-sdk/commit/49b10db3952e268ffc3ab4444802b471195f6391)
 
 - Updated axios and jest dependencies
 
