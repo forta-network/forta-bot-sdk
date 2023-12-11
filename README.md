@@ -10,7 +10,13 @@ We have a [bug bounty program on Immunefi](https://immunefi.com/bounty/forta). P
 
 ## Changelog
 
-### 0.1.47
+### 0.1.48
+
+- Expose `filterLog` as standalone utility function
+- Check for empty addresses when populating `TransactionEvent.addresses` field
+- Add support for label embeddings
+
+### [0.1.47](https://github.com/forta-network/forta-bot-sdk/commit/bb4758b8a12c8a437ad74ed362215c0348aa4a85)
 
 - Updated JS and TS starter project dependencies
 
