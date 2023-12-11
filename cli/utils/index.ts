@@ -155,8 +155,12 @@ export const createTransactionEvent: CreateTransactionEvent = (
 
   const trcs: Trace[] = []
   traces.forEach(trace => {
-    addresses[formatAddress(trace.action.address)] = true
-    addresses[formatAddress(trace.action.refundAddress)] = true
+    if (trace.action.address) {
+      addresses[formatAddress(trace.action.address)] = true
+    }
+    if (trace.action.refundAddress) {
+      addresses[formatAddress(trace.action.refundAddress)] = true
+    }
     addresses[formatAddress(trace.action.to)] = true
     addresses[formatAddress(trace.action.from)] = true
 
