@@ -28,6 +28,7 @@ import {
   getChainId,
   getBotOwner,
   getBotId,
+  filterLog,
 } from "./utils";
 import {
   GetAlerts,
@@ -133,6 +134,7 @@ export {
   getChainId,
   getBotOwner,
   getBotId,
+  filterLog,
   BloomFilter,
   MOCK_JWT,
 };
