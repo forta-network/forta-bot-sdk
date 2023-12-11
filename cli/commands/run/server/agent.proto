@@ -316,6 +316,7 @@ message AlertEvent {
       bool remove = 5;
       repeated string metadata = 6;
       string uniqueKey = 7;
+      repeated float embedding = 8;
     }
 
     // Unique string to identify this class of finding,

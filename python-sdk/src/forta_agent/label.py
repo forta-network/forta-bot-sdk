@@ -31,6 +31,7 @@ class Label:
         self.source = LabelSource(dict.get('source')) if dict.get(
             'source') is not None else None
         self.created_at = dict.get('createdAt', dict.get('created_at'))
+        self.embedding = dict.get('embedding')
 
     def toDict(self):
         d = dict(self.__dict__, **{

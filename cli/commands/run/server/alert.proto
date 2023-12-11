@@ -91,6 +91,7 @@ message Label {
   string label = 7;
   repeated string metadata = 8;
   string uniqueKey = 9;
+  repeated float embedding = 10;
 }
 
 message Source {
