@@ -108,7 +108,7 @@ export class Finding {
     protocol = 'ethereum',
     severity,
     type,
-    timestamp = new Date(),
+    timestamp = new Date(Math.floor(Date.now() / 1000) * 1000),
     metadata = {},
     addresses = [],
     labels = [],
