@@ -59,14 +59,41 @@ export const assertFindings = (findings: Finding[]) => {
 
 export const assertIsValidChainSettings = (chainSettings?: any) => {
   if(!chainSettings) {
-    return 
+    return
   }
   for(let key in chainSettings) {
     if(key == "default") {
-      continue 
+      continue
     }
     if(isNaN(parseInt(key))) {
       throw new Error("keys in chainSettings must be numerical string or default")
+    }
+  }
+}
+
+export const assertIsValidDocumentationSettings = (documentationSettings: any) => {
+  if(!Array.isArray(documentationSettings)) {
+    throw new Error('documentationSettings must be array')
+  }
+  if(documentationSettings.length === 0) {
+    throw new Error("documentationSettings must be non-empty array")
+  }
+  if(documentationSettings.length > 10) {
+    throw new Error("documentationSettings must contain up to 10 items")
+  }
+
+  for(const item of documentationSettings) {
+    if(typeof item.title !== 'string') {
+      throw new Error('title in documentationSettings must be string')
+    }
+    if(!item.title?.trim()) {
+      throw new Error('title in documentationSettings must be non-empty string');
+    }
+    if(typeof item.filePath !== 'string') {
+      throw new Error('filePath in documentationSettings must be string')
+    }
+    if(!item.filePath?.trim()) {
+      throw new Error('filePath in documentationSettings must be non-empty string')
     }
   }
 }
@@ -121,9 +148,9 @@ export const createBlockEvent: CreateBlockEvent = (block: JsonRpcBlock, networkI
 // creates a Forta TransactionEvent from a json-rpc transaction receipt and block object
 export type CreateTransactionEvent = (transaction: JsonRpcTransaction, block: JsonRpcBlock, networkId: number, traces: Trace[], logs: JsonRpcLog[]) => TransactionEvent
 export const createTransactionEvent: CreateTransactionEvent = (
-  transaction: JsonRpcTransaction, 
-  block: JsonRpcBlock, 
-  networkId: number, 
+  transaction: JsonRpcTransaction,
+  block: JsonRpcBlock,
+  networkId: number,
   traces: Trace[] = [],
   logs: JsonRpcLog[] = []
 ) => {

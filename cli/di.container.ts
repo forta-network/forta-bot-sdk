@@ -160,6 +160,25 @@ export default function configureContainer(args: any = {}) {
     }).singleton(),
     version: asFunction((packageJson: any) => packageJson.version),
     documentation: asFunction((contextPath: string) => { return join(contextPath, 'README.md') }).singleton(),
+    documentationSettings: asFunction((packageJson: any, contextPath: string) => {
+      const { documentation } = packageJson
+      if(Array.isArray(documentation)) {
+        const items = [];
+        // join filePath with contextPath, if possible
+        for(const setting of documentation) {
+          if(typeof setting.filePath === 'string') {
+            items.push({
+              ...setting,
+              filePath: join(contextPath, setting.filePath)
+            })
+          } else {
+            items.push(setting)
+          }
+        }
+        return items
+      }
+      return undefined;
+    }).singleton(),
     repository: asFunction((packageJson: any) => {
       const repository = packageJson.repository
       if (typeof repository === 'string') {

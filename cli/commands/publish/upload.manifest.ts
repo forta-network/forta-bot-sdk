@@ -1,6 +1,12 @@
 import fs from "fs"
 import { ethers, Wallet } from "ethers"
-import { assertExists, assertIsNonEmptyString, assertIsValidChainSettings, keccak256 } from "../../utils"
+import {
+  assertExists,
+  assertIsValidDocumentationSettings,
+  assertIsNonEmptyString,
+  assertIsValidChainSettings,
+  keccak256
+} from "../../utils"
 import { AddToIpfs } from "../../utils/add.to.ipfs"
 
 // uploads signed agent manifest to ipfs and returns ipfs reference
@@ -12,6 +18,16 @@ export type ChainSetting = {
 }
 
 export type ChainSettings = { [id: string]: ChainSetting }
+
+export type DocumentationSetting = {
+  title: string;
+  filePath: string
+};
+
+export type DocumentationItem = {
+  title: string;
+  ipfsUrl: string
+};
 
 type Manifest = {
   from: string,
@@ -43,6 +59,7 @@ export default function provideUploadManifest(
  agentId: string,
  version: string,
  documentation: string,
+ documentationSettings: DocumentationSetting[] | undefined,
  repository: string,
  licenseUrl: string,
  promoUrl: string,
@@ -57,22 +74,57 @@ export default function provideUploadManifest(
   assertIsNonEmptyString(description, 'description')
   assertIsNonEmptyString(agentId, 'agentId')
   assertIsNonEmptyString(version, 'version')
-  assertIsNonEmptyString(documentation, 'documentation')
   assertIsNonEmptyString(cliVersion, 'cliVersion')
   assertExists(chainIds, 'chainIds')
   assertIsValidChainSettings(chainSettings)
+  if(documentationSettings) {
+    assertIsValidDocumentationSettings(documentationSettings);
+  } else {
+    assertIsNonEmptyString(documentation, 'documentation')
+  }
 
   return async function uploadManifest(imageReference: string | undefined, privateKey: string) {
+    const assertDocumentationFile = (documentationFile: string) => {
+      if (!filesystem.existsSync(documentationFile)) {
+        throw new Error(`documentation file ${documentationFile} not found`)
+      }
+      if (!filesystem.statSync(documentationFile).size) {
+        throw new Error(`documentation file ${documentationFile} cannot be empty`)
+      }
+    }
+
+    if(documentationSettings) {
+      for(const item of documentationSettings) {
+        assertDocumentationFile(item.filePath)
+      }
+    } else {
+      assertDocumentationFile(documentation)
+    }
+
+    // normalize to one format
+    const settings: DocumentationSetting[] = [];
+    if(documentationSettings) {
+      settings.push(...documentationSettings);
+    } else {
+      settings.push({
+        title: 'README',
+        filePath: documentation
+      })
+    }
+
     // upload documentation to ipfs
-    if (!filesystem.existsSync(documentation)) {
-      throw new Error(`documentation file ${documentation} not found`)
-    }
-    if (!filesystem.statSync(documentation).size) {
-      throw new Error(`documentation file ${documentation} cannot be empty`)
-    }
     console.log('pushing agent documentation to IPFS...')
-    const documentationFile = filesystem.readFileSync(documentation, 'utf8')
-    const documentationReference = await addToIpfs(documentationFile)
+
+    const items: DocumentationItem[] = [];
+    for(const setting of settings) {
+      const documentationFile = filesystem.readFileSync(setting.filePath, 'utf8')
+      const documentationReference = await addToIpfs(documentationFile)
+
+      items.push({
+        title: setting.title,
+        ipfsUrl: documentationReference
+      })
+    }
 
     // create agent manifest
     const manifest: Manifest = {
@@ -85,7 +137,7 @@ export default function provideUploadManifest(
       version,
       timestamp: new Date().toUTCString(),
       imageReference,
-      documentation: documentationReference,
+      documentation: JSON.stringify(items),
       repository,
       licenseUrl,
       promoUrl,
@@ -96,7 +148,7 @@ export default function provideUploadManifest(
     }
 
     // sign agent manifest
-    const signingKey = new ethers.utils.SigningKey(privateKey)
+    const signingKey = new ethers.utils.SigningKey(privateKey)
     const signature = ethers.utils.joinSignature(signingKey.signDigest(keccak256(JSON.stringify(manifest))))
 
     // upload signed manifest to ipfs
