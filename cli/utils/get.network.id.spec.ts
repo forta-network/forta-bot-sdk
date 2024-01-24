@@ -9,7 +9,7 @@ describe("getNetworkId", () => {
     getNetworkId = provideGetNetworkId(mockWithRetry, mockEthersProviderSend);
   });
 
-  it("invokes the net_version jsonrpc method and returns network id", async () => {
+  it("invokes the eth_chainId jsonrpc method and returns chain id", async () => {
     const mockNetworkId = "0xf";
     mockWithRetry.mockReturnValueOnce(mockNetworkId);
 
@@ -18,7 +18,7 @@ describe("getNetworkId", () => {
     expect(networkId).toEqual(15);
     expect(mockWithRetry).toHaveBeenCalledTimes(1);
     expect(mockWithRetry).toHaveBeenCalledWith(mockEthersProviderSend, [
-      "net_version",
+      "eth_chainId",
       [],
     ]);
   });

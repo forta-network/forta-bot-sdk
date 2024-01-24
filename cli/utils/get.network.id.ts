@@ -1,7 +1,7 @@
 import { assertExists } from ".";
 import { WithRetry } from "./with.retry";
 
-// returns the network/chain id as reported by the "net_version" json-rpc method
+// returns the network/chain id as reported by the "eth_chainId" json-rpc method
 export type GetNetworkId = () => Promise<number>;
 
 export default function provideGetNetworkId(
@@ -13,7 +13,7 @@ export default function provideGetNetworkId(
 
   return async function getNetworkId() {
     const networkId: string = await withRetry(ethersProviderSend, [
-      "net_version",
+      "eth_chainId",
       [],
     ]);
     return parseInt(networkId);
